@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Allievi</title>
+    <style>
+        /* Stile generale della tabella */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        /* Stile delle celle della tabella */
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Stile dell'header della tabella */
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+            text-transform: uppercase;
+        }
+        tr{
+            transition: .25s;
+            cursor: pointer;
+        }
+
+        /* Hover effect */
+        tbody tr:hover {
+            background-color: #71a1cb;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Cognome</th>
+                <th>Data di nascita</th>
+                <th>Comune di nascita</th>
+                <th>Provincia di nascita</th>
+                <th>Residenza</th>
+                <th>Email</th>
+                <th>Telefono</th>
+                <th>Tipo di documento</th>
+                <th>Numero di documento</th>
+                <th>Patente</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% users.forEach(function(user) { %>
+                <tr data-cFiscale="<%= user.cFiscale %>">
+                    <td><%= user.nome %></td>
+                    <td><%= user.cognome %></td>
+                    <td><%= user.nascita.data %></td>
+                    <td><%= user.nascita.comune %></td>
+                    <td><%= user.nascita.provincia %></td>
+                    <td><%= user.residenza.via + ', ' + user.residenza.nCivico + ', ' + user.residenza.cap + ', ' + user.residenza.comune + ', ' + user.residenza.provincia %></td>
+                    <td><%= user.contatti.email %></td>
+                    <td><%= user.contatti.tel %></td>
+                    <td><%= user.documento %></td>
+                    <td><%= user.nDocumento %></td>
+                    <td>
+                        <% user.patente.forEach(function(patente) { %>
+                            <%= patente.tipo %> (<%= patente.pagato ? 'Pagata' : 'Non pagata' %>)<br>
+                        <% }); %>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+    <script>
+        const tableRows = document.querySelectorAll('tr');
+        tableRows.forEach((row) => {
+            row.addEventListener('click', () => {
+                const userCFiscale = row.dataset.cfiscale;
+                const url = `/userPage?cf=${encodeURIComponent(userCFiscale)}`;
+                window.location.href = url;
+            });
+        });
+    </script>
+</body>
+</html>

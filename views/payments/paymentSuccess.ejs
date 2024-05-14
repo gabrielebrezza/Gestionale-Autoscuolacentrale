@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento effetuato con successo</title>
+    <link rel="stylesheet" href="/styles/paymentStatus.css">
+    <script>
+        setTimeout(function() {
+            window.location.href = '/';
+        }, 30000);
+    </script>
+</head>
+<body>
+    <header>
+        <img src="https://autoscuolacentrale.com/templates/autoscuola/images/logo_autoscuola.svg" alt="" width="500px">
+    </header>
+    <section>
+        <h1><%= text %></h1>
+        <a href="/"><button>Torna alla home</button></a>
+    </section>
+</body>
+</html>

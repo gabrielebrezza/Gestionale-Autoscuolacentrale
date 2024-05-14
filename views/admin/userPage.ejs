@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Allievi</title>
+    <style>
+        /* Stile generale della tabella */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        /* Stile delle celle della tabella */
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Stile dell'header della tabella */
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+            text-transform: uppercase;
+        }
+        tr{
+            transition: .25s;
+            cursor: pointer;
+        }
+
+        /* Hover effect */
+        tbody tr:hover {
+            background-color: #71a1cb;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <form action="/uploadUserImage" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="cf" value="<%= user.cFiscale %>">
+        <label for="immagine">Seleziona un'immagine:</label>
+        <input type="file" id="immagine" name="immagine" accept="image/*">
+        <button type="submit">Carica</button>
+    </form>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Campo</th>
+                <th>Valore</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Codice Fiscale</td>
+                <td><%= user.cFiscale %></td>
+            </tr>
+            <tr>
+                <td>Nome</td>
+                <td><%= user.nome %></td>
+            </tr>
+            <tr>
+                <td>Cognome</td>
+                <td><%= user.cognome %></td>
+            </tr>
+            <tr>
+                <td>Data di Nascita</td>
+                <td><%= user.nascita.data %></td>
+            </tr>
+            <tr>
+                <td>Comune di Nascita</td>
+                <td><%= user.nascita.comune %></td>
+            </tr>
+            <tr>
+                <td>Provincia di Nascita</td>
+                <td><%= user.nascita.provincia %></td>
+            </tr>
+            <tr>
+                <td>Sesso</td>
+                <td><%= user.sesso %></td>
+            </tr>
+            <tr>
+                <td>Via di Residenza</td>
+                <td><%= user.residenza.via %></td>
+            </tr>
+            <tr>
+                <td>Numero Civico</td>
+                <td><%= user.residenza.nCivico %></td>
+            </tr>
+            <tr>
+                <td>Cap</td>
+                <td><%= user.residenza.cap %></td>
+            </tr>
+            <tr>
+                <td>Comune di Residenza</td>
+                <td><%= user.residenza.comune %></td>
+            </tr>
+            <tr>
+                <td>Provincia di Residenza</td>
+                <td><%= user.residenza.provincia %></td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td><%= user.contatti.email %></td>
+            </tr>
+            <tr>
+                <td>Telefono</td>
+                <td><%= user.contatti.tel %></td>
+            </tr>
+            <tr>
+                <td>Tipo di Documento</td>
+                <td><%= user.documento %></td>
+            </tr>
+            <tr>
+                <td>Numero di Documento</td>
+                <td><%= user.nDocumento %></td>
+            </tr>
+            <tr>
+                <td>Patenti</td>
+                <td>
+                    <ul>
+                        <% user.patente.forEach(function(patente) { %>
+                            <li><%= patente.tipo %> (<%= patente.pagato ? 'Pagata' : 'Non pagata' %>)</li>
+                        <% }); %>
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+</body>
+</html>
