@@ -63,7 +63,12 @@ app.post('/payment', async (req, res) =>{
   const comune = req.body.comune.trim(); 
 
   const {giorno, anno, paymentMethod} = req.body;
+  const oggi = new Date();
+  const giornoReg = String(oggi.getDate()).padStart(2, '0');
+  const meseReg = String(oggi.getMonth() + 1).padStart(2, '0'); // +1 perché i mesi partono da 0
+  const annoReg = oggi.getFullYear();
 
+  const dataRegistrazione = `${giornoReg}/${meseReg}/${annoReg}`;
 
   const existingUser = await utenti.findOne({"cFiscale": cFiscale});
   if(existingUser){
@@ -112,7 +117,8 @@ app.post('/payment', async (req, res) =>{
       "patente": [{
         tipo: tipoPatente,
         pagato: false
-      }]
+      }],
+      "dataRegistrazione": dataRegistrazione
     });
     saveUser.save()
     .then(() => {
@@ -143,7 +149,8 @@ app.post('/payment', async (req, res) =>{
             "contatti.email": email,
             "contatti.tel": tel,
             "documento": documento,
-            "nDocumento": nDocumento
+            "nDocumento": nDocumento,
+            "dataRegistrazione": dataRegistrazione
           },
           $addToSet: {
             "patente": {

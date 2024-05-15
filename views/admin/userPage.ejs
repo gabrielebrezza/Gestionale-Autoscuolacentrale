@@ -127,6 +127,18 @@
                     </ul>
                 </td>
             </tr>
+            <tr>
+                <td>Data Registrazione</td>
+                <td><%= user.dataRegistrazione %></td>
+            </tr>
+            <% for( let i = 0; i < user.teoria.length; i++ ) { %>
+                <% const esame = user.teoria[i] %>
+                <tr>
+                    <td>Esame di Teoria <%= i+1 %></td>
+                    <td>Data: <%= esame.data %> <br> Esito: <%= esame.esito ? 'Ammesso' : 'Non ammesso'%></td>
+                </tr>
+            <% } %>
+
         </tbody>
     </table>
     

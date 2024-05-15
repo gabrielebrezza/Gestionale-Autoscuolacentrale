@@ -90,7 +90,27 @@ const UserSchema = new mongoose.Schema({
                 required: true
             }
         }
-    ]
+    ],
+    visita: {
+        type: String,
+        required: false
+    },
+    teoria:[
+        {
+            data:{
+                type: String,
+                required: false
+            },
+            esito:{
+                type: Boolean,
+                required: false
+            },
+        }
+    ],
+    dataRegistrazione:{
+        type: String,
+        required: true
+    },
 });
 const utenti = new mongoose.model('user', UserSchema);
 
