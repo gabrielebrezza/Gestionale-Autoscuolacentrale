@@ -84,7 +84,7 @@
 <body>
     <form action="/uploadUserImage" method="post" enctype="multipart/form-data">
         <input type="hidden" name="cf" value="<%= user.cFiscale %>">
-        <img id="profilePic" src="<%= user.immagineProfilo ? user.immagineProfilo : '/img/profile.png' %>" alt="Immagine Profilo">
+        <img id="profilePic" src="/img/<%= user.immagineProfilo ? user.immagineProfilo : 'profile.png' %>" alt="Immagine Profilo">
         <label for="inputFile">Carica Immagine:</label>
         <input type="file" id="inputFile" name="inputFile" accept="image/*">
         <button type="submit">Aggiorna</button>
