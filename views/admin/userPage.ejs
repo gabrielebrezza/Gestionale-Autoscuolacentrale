@@ -97,7 +97,7 @@
             <tbody>
                 <tr>
                     <td>Codice Fiscale</td>
-                    <td><%= user.cFiscale %></td>
+                    <td><input type="hidden" id="cf" name="cf" value="<%= user.cFiscale %>"><%= user.cFiscale %></td>
                 </tr>
                 <tr>
                     <td>Nome</td>
@@ -198,6 +198,7 @@
                 <% } %>
             </tbody>
         </table>
+        <button type="submit">Salva</button>
     </form>
 
     <script>

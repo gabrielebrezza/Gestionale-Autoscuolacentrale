@@ -73,4 +73,42 @@ router.post('/uploadUserImage', (req, res) => {
   });
 });
 
+router.use(express.json());
+router.use(express.urlencoded({ extended: true }));
+
+router.post('/updateUser', async (req, res) =>{
+    try {
+        const userData= {
+            nome: req.body.nome,
+            cognome: req.body.cognome,
+            nascita:{
+                comune: req.body.comuneNascita,
+                provincia: req.body.provinciaNascita,
+                data: req.body.dataNascita,
+            },
+            sesso: req.body.sesso,
+            residenza: {
+                via: req.body.viaResidenza,
+                nCivico: req.body.civicoResidenza,
+                cap: req.body.capResidenza,
+                comune: req.body.comuneResidenza,
+                provincia: req.body.provinciaResidenza,
+            },
+            contatti: {
+                email: req.body.email,
+                tel: req.body.tel,
+            },
+            documento: req.body.documento,
+            nDocumento: req.body.nDocumento,
+            visita: (req.body.visita).split('-').reverse().join('/')
+        };
+        await utenti.findOneAndUpdate({"cFiscale": req.body.cf}, userData);
+        res.redirect(`/userPage?cf=${req.body.cf}`);
+    } catch (error) {
+        // Gestione degli errori
+        console.error('Errore durante l\'aggiornamento dei dati dell\'utente:', error);
+        res.status(500).send({ error: 'Si è verificato un errore durante l\'aggiornamento dei dati dell\'utente' });
+    }
+});
+
 module.exports = router;
