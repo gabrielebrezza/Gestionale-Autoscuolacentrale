@@ -111,6 +111,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    immagineProfilo{
+        type: String,
+        required: false
+    }
 });
 const utenti = new mongoose.model('user', UserSchema);
 
