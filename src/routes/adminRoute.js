@@ -25,7 +25,7 @@ const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
   fileFilter: function (req, file, cb) {
-    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png|webp)$/)) {
       return cb(new Error('Solo file JPG, JPEG, o PNG sono consentiti!'));
     }
     cb(null, true);
@@ -33,43 +33,42 @@ const upload = multer({
 }).single('inputFile');
 
 router.post('/uploadUserImage', (req, res) => {
-  upload(req, res, async function (err) {
+
+    upload(req, res, async function (err) {
     if (err) {
       return res.status(400).send(err.message);
     }
-
-    const cf = req.body.cf; // Recupera il codice fiscale dalla richiesta
+    if(!req.file){
+        return res.render('errorPage',{error: 'Nessuna immagine caricata'});
+    }
+    const cf = req.body.cf; 
     const file = req.file;
-
-    // Ridimensiona e converte il file in formato WebP
+ 
     const webpBuffer = await sharp(file.buffer)
-      .resize({ width: 800 }) // Ridimensiona a una larghezza massima di 800px
-      .toFormat('webp') // Converti in formato WebP
-      .toBuffer(); // Restituisci come buffer
+      .resize({ width: 800 })
+      .toFormat('webp')
+      .toBuffer();
 
     const fileName = cf + '_' + Date.now() + '.webp';
     const filePath = 'public/img/' + fileName;
 
-    // Salva il file sul disco
     fs.writeFile(filePath, webpBuffer, async (err) => {
       if (err) {
         console.error('Errore durante il salvataggio del file:', err);
         return res.status(500).send('Errore durante il salvataggio del file');
       }
 
-      // Trova e elimina eventuali immagini precedenti associate a questo codice fiscale
       const existingUser = await utenti.findOne({ cFiscale: cf });
       if (existingUser && existingUser.immagineProfilo) {
         const imagePath = 'public/img/' + existingUser.immagineProfilo;
         if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath); // Elimina il file dall'hard disk
+          fs.unlinkSync(imagePath);
         }
       }
 
-      // Salva il nome del nuovo file nel database
       await utenti.findOneAndUpdate({ cFiscale: cf }, { immagineProfilo: fileName });
 
-      res.redirect('/profile'); // Reindirizza alla pagina del profilo
+      res.redirect(`/userPage?cf=${cf}`);
     });
   });
 });

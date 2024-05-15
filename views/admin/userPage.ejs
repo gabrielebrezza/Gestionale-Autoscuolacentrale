@@ -5,42 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Allievi</title>
     <style>
-        /* Stile generale della tabella */
         table {
             width: 100%;
             border-collapse: collapse;
             border-spacing: 0;
         }
-
-        /* Stile delle celle della tabella */
+        form{
+            width: 50%;
+        }
         th, td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
 
-        /* Stile dell'header della tabella */
         th {
             background-color: #f2f2f2;
             color: #333;
             text-transform: uppercase;
         }
-        tr{
-            transition: .25s;
-            cursor: pointer;
-        }
 
-        /* Hover effect */
-        tbody tr:hover {
-            background-color: #71a1cb;
-            color: #fff;
-        }
         body{
             display: flex;
             align-items: center;
             flex-direction: column;
         }
-        form{
+        .imageForm{
             width: 400px;
             background: #fff;
             padding: 40px;
@@ -53,14 +43,14 @@
             border: 2px solid #333;
             margin-block: 15px;
         }
-        form img{
+        .imageForm img{
             width: 180px;
             height: 180px;
             border-radius: 50%;
             margin-top: 40px;
             margin-bottom: 30px;
         }
-        form button, form label{
+        .imageForm button, form label{
             width: 200px;
             background-color: #71a1cb;
             color: #fff;
@@ -73,16 +63,16 @@
             transition: .5s;
             font-size: 1rem;
         }
-        form button:hover, form label:hover {
+        .imageForm button:hover, form label:hover {
             background-color: #5681a9;
         }
-        form input{
+        .imageForm input{
             display: none;
         }
     </style>
 </head>
 <body>
-    <form action="/uploadUserImage" method="post" enctype="multipart/form-data">
+    <form class="imageForm" action="/uploadUserImage" method="post" enctype="multipart/form-data">
         <input type="hidden" name="cf" value="<%= user.cFiscale %>">
         <img id="profilePic" src="/img/<%= user.immagineProfilo ? user.immagineProfilo : 'profile.png' %>" alt="Immagine Profilo">
         <label for="inputFile">Carica Immagine:</label>
@@ -96,101 +86,148 @@
             profilePic.src = URL.createObjectURL(inputFile.files[0]);
         }
     </script>
-    <table>
-        <thead>
-            <tr>
-                <th>Campo</th>
-                <th>Valore</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Codice Fiscale</td>
-                <td><%= user.cFiscale %></td>
-            </tr>
-            <tr>
-                <td>Nome</td>
-                <td><%= user.nome %></td>
-            </tr>
-            <tr>
-                <td>Cognome</td>
-                <td><%= user.cognome %></td>
-            </tr>
-            <tr>
-                <td>Data di Nascita</td>
-                <td><%= user.nascita.data %></td>
-            </tr>
-            <tr>
-                <td>Comune di Nascita</td>
-                <td><%= user.nascita.comune %></td>
-            </tr>
-            <tr>
-                <td>Provincia di Nascita</td>
-                <td><%= user.nascita.provincia %></td>
-            </tr>
-            <tr>
-                <td>Sesso</td>
-                <td><%= user.sesso %></td>
-            </tr>
-            <tr>
-                <td>Via di Residenza</td>
-                <td><%= user.residenza.via %></td>
-            </tr>
-            <tr>
-                <td>Numero Civico</td>
-                <td><%= user.residenza.nCivico %></td>
-            </tr>
-            <tr>
-                <td>Cap</td>
-                <td><%= user.residenza.cap %></td>
-            </tr>
-            <tr>
-                <td>Comune di Residenza</td>
-                <td><%= user.residenza.comune %></td>
-            </tr>
-            <tr>
-                <td>Provincia di Residenza</td>
-                <td><%= user.residenza.provincia %></td>
-            </tr>
-            <tr>
-                <td>Email</td>
-                <td><%= user.contatti.email %></td>
-            </tr>
-            <tr>
-                <td>Telefono</td>
-                <td><%= user.contatti.tel %></td>
-            </tr>
-            <tr>
-                <td>Tipo di Documento</td>
-                <td><%= user.documento %></td>
-            </tr>
-            <tr>
-                <td>Numero di Documento</td>
-                <td><%= user.nDocumento %></td>
-            </tr>
-            <tr>
-                <td>Patenti</td>
-                <td>
-                    <ul>
-                        <% user.patente.forEach(function(patente) { %>
-                            <li><%= patente.tipo %> (<%= patente.pagato ? 'Pagata' : 'Non pagata' %>)</li>
-                        <% }); %>
-                    </ul>
-                </td>
-            </tr>
-            <tr>
-                <td>Data Registrazione</td>
-                <td><%= user.dataRegistrazione %></td>
-            </tr>
-            <% for( let i = 0; i < user.teoria.length; i++ ) { %>
-                <% const esame = user.teoria[i] %>
+    <form action="/updateUser" method="post">
+        <table>
+            <thead>
                 <tr>
-                    <td>Esame di Teoria <%= i+1 %></td>
-                    <td>Data: <%= esame.data %> <br> Esito: <%= esame.esito ? 'Ammesso' : 'Non ammesso'%></td>
+                    <th>Campo</th>
+                    <th>Valore</th>
                 </tr>
-            <% } %>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Codice Fiscale</td>
+                    <td><%= user.cFiscale %></td>
+                </tr>
+                <tr>
+                    <td>Nome</td>
+                    <td><input type="text" id="nome" name="nome" value="<%= user.nome %>"></td>
+                </tr>
+                <tr>
+                    <td>Cognome</td>
+                    <td><input type="text" id="cognome" name="cognome" value="<%= user.cognome %>"></td>
+                </tr>
+                <tr>
+                    <td>Data di Nascita</td>
+                    <td><input type="date" id="dataNascita" name="dataNascita" value="<%= (user.nascita.data).split('/').reverse().join('-') %>"></td>
+                </tr>
+                <tr>
+                    <td>Comune di Nascita</td>
+                    <td><input type="text" id="comuneNascita" name="comuneNascita" value="<%= user.nascita.comune %>"></td>
+                </tr>
+                <tr>
+                    <td>Provincia di Nascita</td>
+                    <td>
+                        <select name="provinciaNascita" class="provincia">
+                            <option value="<%= user.nascita.provincia %>"><%= user.nascita.provincia %></option>
+                        </select>
+                    </tr>
+                <tr>
+                    <td>Sesso</td>
+                    <td>
+                        <select name="sesso" id="sesso">
+                            <option value="<%= user.sesso %>"><%= user.sesso %></option>
+                            <option value="<%= user.sesso == 'M' ? 'F' : 'M' %>"><%= user.sesso == 'M' ? 'F' : 'M' %></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Via di Residenza</td>
+                    <td><input type="text" id="viaResidenza" name="viaResidenza" value="<%= user.residenza.via %>"></td>
+                </tr>
+                <tr>
+                    <td>Numero Civico</td>
+                    <td><input type="text" id="civicoResidenza" name="civicoResidenza" value="<%= user.residenza.nCivico %>"></td>
+                </tr>
+                <tr>
+                    <td>Cap</td>
+                    <td><input type="text" id="capResidenza" name="capResidenza" value="<%= user.residenza.cap %>"></td>
+                </tr>
+                <tr>
+                    <td>Comune di Residenza</td>
+                    <td><input type="text" id="comuneResidenza" name="comuneResidenza" value="<%= user.residenza.comune %>"></td>
+                </tr>
+                <tr>
+                    <td>Provincia di Residenza</td>
+                    <td>
+                        <select name="provinciaResidenza" class="provincia">
+                            <option value="<%= user.residenza.provincia %>"><%= user.residenza.provincia %></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td><input type="email" id="email" name="email" value="<%= user.contatti.email %>"></td>
+                </tr>
+                <tr>
+                    <td>Telefono</td>
+                    <td><input type="tel" id="tel" name="tel" value="<%= user.contatti.tel %>"></td>
+                </tr>
+                <tr>
+                    <td>Tipo di Documento</td>
+                    <td><input type="text" id="documento" name="documento" value="<%= user.documento %>"></td>
+                </tr>
+                <tr>
+                    <td>Numero di Documento</td>
+                    <td><input type="text" id="nDocumento" name="nDocumento" value="<%= user.nDocumento %>"></td>
+                </tr>
+                <tr>
+                    <td>Patenti</td>
+                    <td>
+                        <ul>
+                            <% user.patente.forEach(function(patente) { %>
+                                <li><%= patente.tipo %> (<%= patente.pagato ? 'Pagata' : 'Non pagata' %>)</li>
+                            <% }); %>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Visita Medica</td>
+                    <td><input type="date" id="visita" name="visita" value="<%= user.visita ? (user.visita).split('/').reverse().join('-') : '' %>"></td>
+                </tr>
+                <tr>
+                    <td>Data Registrazione</td>
+                    <td><%= user.dataRegistrazione %></td>
+                </tr>
+                <% for( let i = 0; i < user.teoria.length; i++ ) { %>
+                    <% const esame = user.teoria[i] %>
+                    <tr>
+                        <td>Esame di Teoria <%= i+1 %></td>
+                        <td>Data: <%= esame.data %> <br>Ammesso: <input type="checkbox" id="<%= `esame${i}` %>" name="<%= `esame${i}` %>" value="<%= user.visita ? (user.visita).split('/').reverse().join('-') : '' %>"></td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </form>
+
+    <script>
+        const provinceList = [
+            "AG", "AL", "AN", "AR", "AP", "AT", "AV", "BA", "BT", "BL",
+            "BN", "BG", "BI", "BO", "BZ", "BS", "BR", "CA", "CL", "CB",
+            "CI", "CE", "CT", "CZ", "CH", "CO", "CS", "CR", "KR", "CN",
+            "EN", "FM", "FE", "FI", "FG", "FC", "FR", "GE", "GO", "GR",
+            "IM", "IS", "AQ", "SP", "LT", "LE", "LC", "LI", "LO", "LU",
+            "MC", "MN", "MS", "MT", "VS", "ME", "MI", "MO", "MB", "NA",
+            "NO", "NU", "OG", "OT", "OR", "PD", "PA", "PR", "PV", "PG",
+            "PU", "PE", "PC", "PI", "PT", "PN", "PZ", "PO", "RG", "RA",
+            "RC", "RE", "RI", "RN", "RM", "RO", "SA", "SS", "SV", "SI",
+            "SR", "SO", "TA", "TE", "TR", "TO", "TP", "TN", "TV", "TS",
+            "UD", "AO", "VA", "VE", "VB", "VC", "VR", "VV", "VI", "VT"
+        ];
     
+        const selectProvince = document.querySelectorAll(".provincia");
+
+        selectProvince.forEach((opt) => {
+            provinceList.forEach(province => {
+                // Verifica se l'opzione è già presente nel menu a discesa
+                if (!opt.querySelector(`option[value="${province}"]`)) {
+                    const option = document.createElement("option");
+                    option.value = province;
+                    option.textContent = province;
+                    opt.appendChild(option);
+                }
+            });
+        });
+    </script>
 </body>
 </html>

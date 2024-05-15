@@ -61,8 +61,8 @@ app.post('/payment', async (req, res) =>{
   const luogoNascita = req.body.luogoNascita.trim();
   const via = req.body.via.trim();
   const comune = req.body.comune.trim(); 
-
-  const {giorno, anno, paymentMethod} = req.body;
+  const giorno = req.body.giorno < 10 ? `0${req.body.giorno}`: req.body.giorno;
+  const {anno, paymentMethod} = req.body;
   const oggi = new Date();
   const giornoReg = String(oggi.getDate()).padStart(2, '0');
   const meseReg = String(oggi.getMonth() + 1).padStart(2, '0'); // +1 perché i mesi partono da 0
