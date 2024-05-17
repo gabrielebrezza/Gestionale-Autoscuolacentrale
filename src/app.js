@@ -15,9 +15,10 @@ const utenti = require('./DB/User');
 const app = express();
 
 //routes
-const adminRoute = require('./routes/adminRoute');
 const paymentsRoute = require('./routes/paymentsRoute');
-app.use(adminRoute, paymentsRoute);
+const adminRoute = require('./routes/adminRoute');
+
+app.use(paymentsRoute, adminRoute);
 
 
 app.use(cookieParser());
@@ -156,6 +157,12 @@ app.post('/payment', async (req, res) =>{
             "contatti.tel": tel,
             "documento": documento,
             "nDocumento": nDocumento,
+            "teoria":[
+              {
+                data: null,
+                esito: null
+              }
+            ],
             "dataRegistrazione": dataRegistrazione
           },
           $addToSet: {
@@ -189,7 +196,7 @@ app.post('/payment', async (req, res) =>{
               product_data:{
                 name: `Iscrizione Scuola Guida per la patente ${tipoPatente}`
               },
-              unit_amount: 60000
+              unit_amount: 10000
             },
             quantity: 1
           }
