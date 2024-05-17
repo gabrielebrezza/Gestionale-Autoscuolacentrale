@@ -100,8 +100,30 @@ router.post('/updateUser', async (req, res) =>{
             },
             documento: req.body.documento,
             nDocumento: req.body.nDocumento,
-            visita: (req.body.visita).split('-').reverse().join('/')
+            visita: (req.body.visita).split('-').reverse().join('/'),
+            protocollo:{
+              numero: req.body.nProtocollo,
+              dataEmissione: (req.body.dataNProtocollo).split('-').reverse().join('/')
+            },
+            numeroFoglioRosa: req.body.nFoglioRosa,
+            teoria: []
         };
+        let respinto;
+        for (let i = 0; i < req.body.teoriaLength; i++) {
+          const esameData = req.body[`dataEsame${i}`];
+          const idoneo = req.body[`esitoEsame${i}`] === 'idoneo';
+          respinto = req.body[`esitoEsame${i}`] === 'respinto';
+          userData.teoria.push({
+              data: esameData ? esameData.split('-').reverse().join('/') : '',
+              esito: idoneo ? true : respinto ? false : null
+          });
+        }
+        if(respinto){
+          userData.teoria.push({
+            data: null,
+            esito: null
+          });
+        }
         await utenti.findOneAndUpdate({"cFiscale": req.body.cf}, userData);
         res.redirect(`/userPage?cf=${req.body.cf}`);
     } catch (error) {

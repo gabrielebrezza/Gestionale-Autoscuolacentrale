@@ -50,7 +50,7 @@
             margin-top: 40px;
             margin-bottom: 30px;
         }
-        .imageForm button, form label{
+        .imageForm button, .imageForm label{
             width: 200px;
             background-color: #71a1cb;
             color: #fff;
@@ -63,7 +63,7 @@
             transition: .5s;
             font-size: 1rem;
         }
-        .imageForm button:hover, form label:hover {
+        .imageForm button:hover, .imageForm label:hover {
             background-color: #5681a9;
         }
         .imageForm input{
@@ -185,15 +185,35 @@
                     <td>Visita Medica</td>
                     <td><input type="date" id="visita" name="visita" value="<%= user.visita ? (user.visita).split('/').reverse().join('-') : '' %>"></td>
                 </tr>
+                <tr> 
+                    <td>Numero Protocollo</td>
+                    <td>
+                        <input type="text" id="nProtocollo" name="nProtocollo" value="<%= user.protocollo.numero %>">
+                        <input type="date" id="dataNProtocollo" name="dataNProtocollo" value="<%= user.protocollo.dataEmissione ? (user.protocollo.dataEmissione).split('/').reverse().join('-') : '' %>">
+                    </td>
+                </tr>
+                <tr> 
+                    <td>Numero Foglio Rosa</td>
+                    <td><input type="text" id="nFoglioRosa" name="nFoglioRosa" value="<%= user.numeroFoglioRosa %>"></td>
+                </tr>
                 <tr>
                     <td>Data Registrazione</td>
                     <td><%= user.dataRegistrazione %></td>
                 </tr>
+                <input type="hidden" name="teoriaLength" value="<%= user.teoria.length %>">
                 <% for( let i = 0; i < user.teoria.length; i++ ) { %>
                     <% const esame = user.teoria[i] %>
                     <tr>
                         <td>Esame di Teoria <%= i+1 %></td>
-                        <td>Data: <%= esame.data %> <br>Ammesso: <input type="checkbox" id="<%= `esame${i}` %>" name="<%= `esame${i}` %>" value="<%= user.visita ? (user.visita).split('/').reverse().join('-') : '' %>"></td>
+                        <td>
+                            Esame di Teoria <%= i+1 %><br>
+                            <label for="dataEsame<%= i %>">Data: </label>
+                            <input type="date" name="dataEsame<%= i %>" value="<%= esame.data != null ? (esame.data).split('/').reverse().join('-') : '' %>"> <br>
+                            <label for="esitoEsame<%= i %>">Idoneo: </label>
+                            <input type="radio" name="esitoEsame<%= i %>" <%= esame.esito ? 'checked' : '' %> value="idoneo"><br>
+                            <label for="esitoEsame<%= i %>">Respinto: </label>
+                            <input type="radio" name="esitoEsame<%= i %>" <%= esame.esito === false ? 'checked' : '' %> value="respinto"><br>
+                        </td>
                     </tr>
                 <% } %>
             </tbody>

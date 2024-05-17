@@ -118,6 +118,12 @@ app.post('/payment', async (req, res) =>{
         tipo: tipoPatente,
         pagato: false
       }],
+      "teoria":[
+        {
+          data: null,
+          esito: null
+        }
+      ],
       "dataRegistrazione": dataRegistrazione
     });
     saveUser.save()

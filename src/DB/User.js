@@ -99,14 +99,30 @@ const UserSchema = new mongoose.Schema({
         {
             data:{
                 type: String,
-                required: false
+                required: false,
+                default: null
             },
             esito:{
                 type: Boolean,
-                required: false
+                required: false,
+                default: null
             },
         }
     ],
+    protocollo: {
+        numero:{
+            type: String,
+            required: false
+        },
+        dataEmissione:{
+            type: String,
+            required: false
+        },
+    },
+    numeroFoglioRosa:{
+        type: String,
+        required: false
+    },
     dataRegistrazione:{
         type: String,
         required: true

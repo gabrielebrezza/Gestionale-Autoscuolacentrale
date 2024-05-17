@@ -38,42 +38,39 @@
     </style>
 </head>
 <body>
+
+    <input type="text" id="filterNome" placeholder="Filtra per Nome">
+    <input type="text" id="filterCognome" placeholder="Filtra per Cognome">
+    <input type="text" id="filterVisita" placeholder="Filtra per Visita Medica">
+    <input type="text" id="filterPatente" placeholder="Filtra per Patente">
+    <input type="text" id="filterRegistrazione" placeholder="Filtra per Data di Registrazione">
+
     <table>
         <thead>
             <tr>
                 <th>Nome</th>
                 <th>Cognome</th>
-                <th>Data di nascita</th>
-                <th>Comune di nascita</th>
-                <th>Provincia di nascita</th>
-                <th>Residenza</th>
                 <th>Email</th>
                 <th>Telefono</th>
-                <th>Tipo di documento</th>
-                <th>Numero di documento</th>
                 <th>Visita Medica</th>
                 <th>Patente</th>
+                <th>Registrazione</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="usersTableBody">
             <% users.forEach(function(user) { %>
-                <tr data-cFiscale="<%= user.cFiscale %>" data-email="<%= user.contatti.email %>" data-tel="<%= user.contatti.tel %>">
+                <tr data-cFiscale="<%= user.cFiscale %>">
                     <td><%= user.nome %></td>
                     <td><%= user.cognome %></td>
-                    <td><%= user.nascita.data %></td>
-                    <td><%= user.nascita.comune %></td>
-                    <td><%= user.nascita.provincia %></td>
-                    <td><%= user.residenza.via + ', ' + user.residenza.nCivico + ', ' + user.residenza.cap + ', ' + user.residenza.comune + ', ' + user.residenza.provincia %></td>
                     <td><%= user.contatti.email %></td>
                     <td><%= user.contatti.tel %></td>
-                    <td><%= user.documento %></td>
-                    <td><%= user.nDocumento %></td>
                     <td><%= user.visita ? user.visita : 'Mancante' %></td>
                     <td>
                         <% user.patente.forEach(function(patente) { %>
                             <%= patente.tipo %> (<%= patente.pagato ? 'Pagata' : 'Non pagata' %>)<br>
                         <% }); %>
                     </td>
+                    <td><%= user.dataRegistrazione %></td>
                 </tr>
             <% }); %>
         </tbody>
@@ -88,5 +85,51 @@
             });
         });
     </script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const filterNome = document.getElementById('filterNome');
+        const filterCognome = document.getElementById('filterCognome');
+        const filterVisita = document.getElementById('filterVisita');
+        const filterPatente = document.getElementById('filterPatente');
+        const filterRegistrazione = document.getElementById('filterRegistrazione');
+        const tableBody = document.getElementById('usersTableBody');
+        const rows = tableBody.getElementsByTagName('tr');
+
+        function filterTable() {
+            const nome = filterNome.value.toLowerCase();
+            const cognome = filterCognome.value.toLowerCase();
+            const visita = filterVisita.value.toLowerCase();
+            const patente = filterPatente.value.toLowerCase();
+            const dataRegistrazione = filterRegistrazione.value.toLowerCase();
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const nomeTd = row.getElementsByTagName('td')[0].textContent.toLowerCase();
+                const cognomeTd = row.getElementsByTagName('td')[1].textContent.toLowerCase();
+                const visitaTd = row.getElementsByTagName('td')[4].textContent.toLowerCase();
+                const patenteTd = row.getElementsByTagName('td')[5].textContent.toLowerCase();
+                const dataRegTd = row.getElementsByTagName('td')[6].textContent.toLowerCase();
+                if (
+                    (nome === '' || nomeTd.includes(nome)) &&
+                    (cognome === '' || cognomeTd.includes(cognome)) &&
+                    (visita === '' || visitaTd.includes(visita)) &&
+                    (patente === '' || patenteTd.includes(patente)) &&
+                    (dataRegistrazione === '' || dataRegTd.includes(dataRegistrazione))
+                ) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+
+        filterNome.addEventListener('input', filterTable);
+        filterCognome.addEventListener('input', filterTable);
+        filterVisita.addEventListener('input', filterTable);
+        filterPatente.addEventListener('input', filterTable);
+        filterRegistrazione.addEventListener('input', filterTable);
+    });
+</script>
 </body>
 </html>
