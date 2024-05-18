@@ -118,20 +118,22 @@ router.post('/updateUser', async (req, res) =>{
               $elemMatch: { "emailSent": true }
           }
       }));    
-        let respinto, idoneo;
-        for (let i = 0; i < req.body.teoriaLength && i < 2; i++) {
+        let respinto, idoneo, assente;
+        for (let i = 0; i < req.body.teoriaLength && i < 2 + req.body.countTeoriaAssente; i++) {
           const esameData = req.body[`dataEsame${i}`];
           idoneo = req.body[`esitoEsame${i}`] === 'idoneo';
           respinto = req.body[`esitoEsame${i}`] === 'respinto';
+          assente = req.body[`esitoEsame${i}`] === 'assente';
           userData.teoria.push({
               data: esameData ? esameData.split('-').reverse().join('/') : '',
               esito: idoneo ? true : respinto ? false : null,
+              assente: assente,
               emailSent: emailSent ? true : false
           });
         }
-        if(respinto && req.body.teoriaLength == 2){
+        if(respinto && req.body.teoriaLength - 2 == req.body.countTeoriaAssente){
           userData.archiviato = true;
-        }else if(respinto){
+        }else if(respinto || assente){
           userData.teoria.push({
             data: null,
             esito: null

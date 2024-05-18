@@ -201,8 +201,15 @@
                     <td>Data Registrazione</td>
                     <td><%= user.dataRegistrazione %></td>
                 </tr>
+                
+                <% 
+                    const teoriaAssente = user.teoria.filter(item => item.assente === true);
+                    const countTeoriaAssente = teoriaAssente.length;
+                    console.log(countTeoriaAssente)
+                %>
                 <input type="hidden" name="teoriaLength" value="<%= user.teoria.length %>">
-                <% for( let i = 0; i < user.teoria.length && i<2; i++ ) { %>
+                <input type="hidden" name="countTeoriaAssente" value="<%= countTeoriaAssente %>">
+                <% for( let i = 0; i < user.teoria.length && i<2+countTeoriaAssente; i++ ) { %>
                     <% const esame = user.teoria[i] %>
                     <tr>
                         <td>Esame di Teoria <%= i+1 %></td>
@@ -214,6 +221,8 @@
                             <input type="radio" name="esitoEsame<%= i %>" <%= esame.esito ? 'checked' : '' %> value="idoneo"><br>
                             <label for="esitoEsame<%= i %>">Respinto: </label>
                             <input type="radio" name="esitoEsame<%= i %>" <%= esame.esito === false ? 'checked' : '' %> value="respinto"><br>
+                            <label for="esitoEsame<%= i %>">Assente: </label>
+                            <input type="radio" name="esitoEsame<%= i %>" <%= esame.assente ? 'checked' : '' %> value="assente"><br>
                         </td>
                     </tr>
                 <% } %>

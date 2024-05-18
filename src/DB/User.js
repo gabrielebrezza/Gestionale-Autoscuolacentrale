@@ -107,6 +107,10 @@ const UserSchema = new mongoose.Schema({
                 required: false,
                 default: null
             },
+            assente:{
+                type: Boolean,
+                required: false,
+            },
             emailSent:{
                 type: Boolean,
                 required: false,
