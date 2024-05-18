@@ -206,7 +206,8 @@ app.post('/payment', async (req, res) =>{
         cancel_url: `${process.env.SERVER_URL}/cancelPayment`,
         metadata: {
           cFiscale: cFiscale,
-          patente: tipoPatente
+          patente: tipoPatente,
+          email: email
         }
       });
       res.redirect(session.url);
@@ -242,7 +243,7 @@ app.post('/payment', async (req, res) =>{
                       currency: "EUR",
                       total: 600
                   },
-                  custom: JSON.stringify({cFiscale: cFiscale, patente: tipoPatente}),
+                  custom: JSON.stringify({cFiscale: cFiscale, patente: tipoPatente, email: email}),
                   description: `Iscrizione a Scuola Guida per la patente di tipo ${tipoPatente}`
               }
           ]

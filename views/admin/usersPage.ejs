@@ -42,8 +42,17 @@
     <input type="text" id="filterNome" placeholder="Filtra per Nome">
     <input type="text" id="filterCognome" placeholder="Filtra per Cognome">
     <input type="text" id="filterVisita" placeholder="Filtra per Visita Medica">
-    <input type="text" id="filterPatente" placeholder="Filtra per Patente">
-    <input type="text" id="filterRegistrazione" placeholder="Filtra per Data di Registrazione">
+    <select id="filterPatente">
+        <option value="all">tutte</option>
+        <option value="AM">AM</option>
+        <option value="A1">A1</option>
+        <option value="B">B</option>
+        <option value="estensione A1B">estensione A1B</option>
+    </select>
+    <label for="filterRegistrazioneFrom">Da</label>
+    <input type="date" id="filterRegistrazioneFrom" name="filterRegistrazioneFrom">
+    <label for="filterRegistrazioneTo">A</label>
+    <input type="date" id="filterRegistrazioneTo" name="filterRegistrazioneTo">
 
     <table>
         <thead>
@@ -93,7 +102,8 @@
         const filterCognome = document.getElementById('filterCognome');
         const filterVisita = document.getElementById('filterVisita');
         const filterPatente = document.getElementById('filterPatente');
-        const filterRegistrazione = document.getElementById('filterRegistrazione');
+        const filterRegistrazioneFrom = document.getElementById('filterRegistrazioneFrom');
+        const filterRegistrazioneTo = document.getElementById('filterRegistrazioneTo');
         const tableBody = document.getElementById('usersTableBody');
         const rows = tableBody.getElementsByTagName('tr');
 
@@ -102,7 +112,8 @@
             const cognome = filterCognome.value.toLowerCase();
             const visita = filterVisita.value.toLowerCase();
             const patente = filterPatente.value.toLowerCase();
-            const dataRegistrazione = filterRegistrazione.value.toLowerCase();
+            const dataRegistrazioneDa = filterRegistrazioneFrom.value;
+            const dataRegistrazioneA = filterRegistrazioneTo.value;
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
                 const nomeTd = row.getElementsByTagName('td')[0].textContent.toLowerCase();
@@ -110,12 +121,18 @@
                 const visitaTd = row.getElementsByTagName('td')[4].textContent.toLowerCase();
                 const patenteTd = row.getElementsByTagName('td')[5].textContent.toLowerCase();
                 const dataRegTd = row.getElementsByTagName('td')[6].textContent.toLowerCase();
+                const dataRegistrazione = new Date(dataRegTd.split('/').reverse().join('-'));
+                
+                const startDate = new Date(dataRegistrazioneDa);
+                const endDate = new Date(dataRegistrazioneA);
+            
+                const isDateInRange = dataRegistrazione >= startDate && dataRegistrazione <= endDate;
                 if (
                     (nome === '' || nomeTd.includes(nome)) &&
                     (cognome === '' || cognomeTd.includes(cognome)) &&
                     (visita === '' || visitaTd.includes(visita)) &&
-                    (patente === '' || patenteTd.includes(patente)) &&
-                    (dataRegistrazione === '' || dataRegTd.includes(dataRegistrazione))
+                    (patente === '' || patenteTd.includes(patente) || patente == 'all') &&
+                    (dataRegistrazioneDa === '' || dataRegistrazioneA === '' || isDateInRange)
                 ) {
                     row.style.display = '';
                 } else {
@@ -128,7 +145,8 @@
         filterCognome.addEventListener('input', filterTable);
         filterVisita.addEventListener('input', filterTable);
         filterPatente.addEventListener('input', filterTable);
-        filterRegistrazione.addEventListener('input', filterTable);
+        filterRegistrazioneFrom.addEventListener('input', filterTable);
+        filterRegistrazioneTo.addEventListener('input', filterTable);
     });
 </script>
 </body>

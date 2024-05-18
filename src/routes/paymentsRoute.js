@@ -5,6 +5,9 @@ const bodyParser = require('body-parser');
 
 const utenti = require('../DB/User');
 
+//functions
+const sendEmail = require('../utils/emailsUtils.js');
+
 const router = express.Router();
 
 router.post('/stripeHooks', bodyParser.raw({type: 'application/json'}), async (req, res) =>{
@@ -21,8 +24,14 @@ router.post('/stripeHooks', bodyParser.raw({type: 'application/json'}), async (r
   
     if(event.type == 'checkout.session.completed') {
         const paymentIntentSucceeded = event.data.object;
-        const {cFiscale, patente} = paymentIntentSucceeded.metadata;
+        const {cFiscale, patente, email} = paymentIntentSucceeded.metadata;
         await setPayment(cFiscale, patente);
+        try{
+          const result = await sendEmail(email, 'Iscrizione effettuata con successo', `Grazie per esserti iscritto alla patente ${patente}. Ti chiediamo gentilmente in caso tu non l'avessi ancora fatto di inviarci la scansione della tua firma e della fototessera che apparirà sulla patente`);
+          console.log(result);
+        }catch (error){
+          console.error('Errore durante l\'invio dell\'email:', error);
+        }
     }
     res.json({success: true});
   })
@@ -78,8 +87,14 @@ router.post('/stripeHooks', bodyParser.raw({type: 'application/json'}), async (r
               throw error
           }else{
             try{
-              const {cFiscale, patente} = JSON.parse(payment.transactions[0].custom);
+              const {cFiscale, patente, email} = JSON.parse(payment.transactions[0].custom);
               await setPayment(cFiscale, patente);
+              try{
+                const result = await sendEmail(email, 'Iscrizione effettuata con successo', `Grazie per esserti iscritto alla patente ${patente}. Ti chiediamo gentilmente in caso tu non l'avessi ancora fatto di inviarci la scansione della tua firma e della fototessera che apparirà sulla patente`);
+                console.log(result);
+              }catch (error){
+                console.error('Errore durante l\'invio dell\'email:', error);
+              }
               return res.render('payments/paymentSuccess', {text: 'Grazie per esserti iscritto da noi!!'});
             }catch(error){
               return res.status(500).json({error: error.message});
