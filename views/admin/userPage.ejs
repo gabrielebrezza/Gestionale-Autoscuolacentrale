@@ -201,7 +201,7 @@
                     <td><%= user.dataRegistrazione %></td>
                 </tr>
                 <input type="hidden" name="teoriaLength" value="<%= user.teoria.length %>">
-                <% for( let i = 0; i < user.teoria.length; i++ ) { %>
+                <% for( let i = 0; i < user.teoria.length && i<2; i++ ) { %>
                     <% const esame = user.teoria[i] %>
                     <tr>
                         <td>Esame di Teoria <%= i+1 %></td>

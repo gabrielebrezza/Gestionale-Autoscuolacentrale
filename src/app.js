@@ -17,6 +17,7 @@ const app = express();
 //routes
 const paymentsRoute = require('./routes/paymentsRoute');
 const adminRoute = require('./routes/adminRoute');
+const sendEmail = require('./utils/emailsUtils');
 
 app.use(paymentsRoute, adminRoute);
 

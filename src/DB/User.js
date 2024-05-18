@@ -107,6 +107,10 @@ const UserSchema = new mongoose.Schema({
                 required: false,
                 default: null
             },
+            emailSent:{
+                type: Boolean,
+                required: false,
+            }
         }
     ],
     protocollo: {
@@ -129,6 +133,10 @@ const UserSchema = new mongoose.Schema({
     },
     immagineProfilo: {
         type: String,
+        required: false
+    },
+    archiviato:{
+        type: Boolean,
         required: false
     }
 });

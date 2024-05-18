@@ -6,8 +6,12 @@ const multer  = require('multer');
 const sharp = require('sharp');
 const router = express.Router();
 
+//databases
 const admins = require('../DB/Admin');
 const utenti = require('../DB/User');
+
+//functions
+const sendEmail = require('../utils/emailsUtils.js');
 
 router.get('/admin', async (req, res) =>{
     const users = await utenti.find({});
@@ -108,26 +112,45 @@ router.post('/updateUser', async (req, res) =>{
             numeroFoglioRosa: req.body.nFoglioRosa,
             teoria: []
         };
-        let respinto;
-        for (let i = 0; i < req.body.teoriaLength; i++) {
+        const emailSent = !!(await utenti.findOne({
+          'cFiscale': req.body.cf,
+          "teoria": {
+              $elemMatch: { "emailSent": true }
+          }
+      }));    
+        let respinto, idoneo;
+        for (let i = 0; i < req.body.teoriaLength && i < 2; i++) {
           const esameData = req.body[`dataEsame${i}`];
-          const idoneo = req.body[`esitoEsame${i}`] === 'idoneo';
+          idoneo = req.body[`esitoEsame${i}`] === 'idoneo';
           respinto = req.body[`esitoEsame${i}`] === 'respinto';
           userData.teoria.push({
               data: esameData ? esameData.split('-').reverse().join('/') : '',
-              esito: idoneo ? true : respinto ? false : null
+              esito: idoneo ? true : respinto ? false : null,
+              emailSent: emailSent ? true : false
           });
         }
-        if(respinto){
+        if(respinto && req.body.teoriaLength == 2){
+          userData.archiviato = true;
+        }else if(respinto){
           userData.teoria.push({
             data: null,
             esito: null
           });
+        }else if(idoneo && !emailSent){
+          try{
+            const result = await sendEmail(req.body.email, 'Superamento Esame Teoria', `Complimenti ${req.body.nome} hai superato l'esame di teoria, vai sul sito agenda-autoscuolacentrale.com e registrati per poter iniziare a prenotare le lezioni di guida`);
+            console.log(result);
+            userData.teoria[req.body.teoriaLength-1] = {
+              ...userData.teoria[req.body.teoriaLength-1],
+              emailSent: true
+            };
+          }catch (error){
+            console.error('Errore durante l\'invio dell\'email:', error);
+          }
         }
         await utenti.findOneAndUpdate({"cFiscale": req.body.cf}, userData);
         res.redirect(`/userPage?cf=${req.body.cf}`);
     } catch (error) {
-        // Gestione degli errori
         console.error('Errore durante l\'aggiornamento dei dati dell\'utente:', error);
         res.status(500).send({ error: 'Si è verificato un errore durante l\'aggiornamento dei dati dell\'utente' });
     }
