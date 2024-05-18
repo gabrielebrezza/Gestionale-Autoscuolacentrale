@@ -13,7 +13,7 @@ const sendEmail = async (email, subject, text) => {
                 rejectUnauthorized: false
             }
         });
-    
+        
         const mailOptions = {
             from: process.env.EMAIL,
             to: email,

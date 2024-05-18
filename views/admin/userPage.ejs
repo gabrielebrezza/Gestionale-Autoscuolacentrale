@@ -72,6 +72,7 @@
     </style>
 </head>
 <body>
+    <a href="/admin">Torna Indietro</a>
     <form class="imageForm" action="/uploadUserImage" method="post" enctype="multipart/form-data">
         <input type="hidden" name="cf" value="<%= user.cFiscale %>">
         <img id="profilePic" src="/img/<%= user.immagineProfilo ? user.immagineProfilo : 'profile.png' %>" alt="Immagine Profilo">
