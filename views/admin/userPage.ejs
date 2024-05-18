@@ -72,7 +72,7 @@
     </style>
 </head>
 <body>
-    <a href="/admin">Torna alla lista utenti</a>
+    <a href="/admin">Torna alla Lista Utenti</a>
     <form class="imageForm" action="/uploadUserImage" method="post" enctype="multipart/form-data">
         <input type="hidden" name="cf" value="<%= user.cFiscale %>">
         <img id="profilePic" src="/img/<%= user.immagineProfilo ? user.immagineProfilo : 'profile.png' %>" alt="Immagine Profilo">
