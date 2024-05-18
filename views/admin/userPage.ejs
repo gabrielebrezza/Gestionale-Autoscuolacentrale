@@ -205,7 +205,6 @@
                 <% 
                     const teoriaAssente = user.teoria.filter(item => item.assente === true);
                     const countTeoriaAssente = teoriaAssente.length;
-                    console.log(countTeoriaAssente)
                 %>
                 <input type="hidden" name="teoriaLength" value="<%= user.teoria.length %>">
                 <input type="hidden" name="countTeoriaAssente" value="<%= countTeoriaAssente %>">

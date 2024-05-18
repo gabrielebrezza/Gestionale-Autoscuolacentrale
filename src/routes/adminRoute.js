@@ -146,6 +146,7 @@ router.post('/updateUser', async (req, res) =>{
               ...userData.teoria[req.body.teoriaLength-1],
               emailSent: true
             };
+            userData.archiviato = true;
           }catch (error){
             console.error('Errore durante l\'invio dell\'email:', error);
           }
