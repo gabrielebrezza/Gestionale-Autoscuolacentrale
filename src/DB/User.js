@@ -139,6 +139,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    firma: {
+        type: String,
+        required: false
+    },
     archiviato:{
         type: Boolean,
         required: false

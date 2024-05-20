@@ -26,7 +26,7 @@ router.get('/userPage', async (req, res) =>{
 });
 const storage = multer.memoryStorage();
 
-const upload = multer({
+const uploadProfilePic = multer({
   storage: storage,
   fileFilter: function (req, file, cb) {
     if (!file.originalname.match(/\.(jpg|jpeg|png|webp)$/)) {
@@ -34,11 +34,11 @@ const upload = multer({
     }
     cb(null, true);
   }
-}).single('inputFile');
+}).single('inputProfileFile');
 
 router.post('/uploadUserImage', (req, res) => {
 
-    upload(req, res, async function (err) {
+    uploadProfilePic(req, res, async function (err) {
     if (err) {
       return res.status(400).send(err.message);
     }
@@ -54,7 +54,7 @@ router.post('/uploadUserImage', (req, res) => {
       .toBuffer();
 
     const fileName = cf + '_' + Date.now() + '.webp';
-    const filePath = 'public/img/' + fileName;
+    const filePath = 'public/img/profileImages/' + fileName;
 
     fs.writeFile(filePath, webpBuffer, async (err) => {
       if (err) {
@@ -64,18 +64,74 @@ router.post('/uploadUserImage', (req, res) => {
 
       const existingUser = await utenti.findOne({ cFiscale: cf });
       if (existingUser && existingUser.immagineProfilo) {
-        const imagePath = 'public/img/' + existingUser.immagineProfilo;
+        const imagePath = 'public/img/profileImages/' + existingUser.immagineProfilo;
         if (fs.existsSync(imagePath)) {
           fs.unlinkSync(imagePath);
         }
       }
-
       await utenti.findOneAndUpdate({ cFiscale: cf }, { immagineProfilo: fileName });
+      
 
       res.redirect(`/userPage?cf=${cf}`);
     });
   });
 });
+
+
+const uploadFirmaPic = multer({
+  storage: storage,
+  fileFilter: function (req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png|webp)$/)) {
+      return cb(new Error('Solo file JPG, JPEG, o PNG sono consentiti!'));
+    }
+    cb(null, true);
+  }
+}).single('inputSigningFile');
+
+router.post('/uploadUserFirma', (req, res) => {
+
+  uploadFirmaPic(req, res, async function (err) {
+    if (err) {
+      return res.status(400).send(err.message);
+    }
+    if(!req.file){
+        return res.render('errorPage',{error: 'Nessuna immagine caricata'});
+    }
+    const cf = req.body.cf; 
+    const file = req.file;
+ 
+    const webpBuffer = await sharp(file.buffer)
+      .resize({ width: 800 })
+      .toFormat('webp')
+      .toBuffer();
+
+    const fileName = cf + '_' + Date.now() + '.webp';
+    const filePath = 'public/img/firme/' + fileName;
+
+    fs.writeFile(filePath, webpBuffer, async (err) => {
+      if (err) {
+        console.error('Errore durante il salvataggio del file:', err);
+        return res.status(500).send('Errore durante il salvataggio del file');
+      }
+
+      const existingUser = await utenti.findOne({ cFiscale: cf });
+      if (existingUser && existingUser.firma) {
+        const imagePath = 'public/img/firme/' + existingUser.firma;
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
+        }
+      }
+      await utenti.findOneAndUpdate({ cFiscale: cf }, { firma: fileName });
+      
+      res.redirect(`/userPage?cf=${cf}`);
+    });
+  });
+});
+
+
+
+
+
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));

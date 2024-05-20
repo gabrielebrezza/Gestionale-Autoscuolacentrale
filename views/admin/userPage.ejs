@@ -30,10 +30,17 @@
             align-items: center;
             flex-direction: column;
         }
+        .imageForms{
+            width: 100%;
+            display: flex;
+            justify-content: space-evenly;
+            flex-wrap: wrap;
+        }
         .imageForm{
-            width: 400px;
+            max-width: 250px;
+            width: 100%;
             background: #fff;
-            padding: 40px;
+            padding: 10px;
             border-radius: 15px;
             text-align: center;
             color: #333;
@@ -44,17 +51,16 @@
             margin-block: 15px;
         }
         .imageForm img{
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
+            width: 100px;
+            height: 100px;
             margin-top: 40px;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
         }
         .imageForm button, .imageForm label{
-            width: 200px;
+            width: fit-content;
             background-color: #71a1cb;
             color: #fff;
-            padding: 12px;
+            padding: 12px 30px;
             margin: 10px auto;
             border-radius: 5px;
             border: none;
@@ -73,18 +79,33 @@
 </head>
 <body>
     <a href="/admin">Torna alla Lista Utenti</a>
-    <form class="imageForm" action="/uploadUserImage" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="cf" value="<%= user.cFiscale %>">
-        <img id="profilePic" src="/img/<%= user.immagineProfilo ? user.immagineProfilo : 'profile.png' %>" alt="Immagine Profilo">
-        <label for="inputFile">Carica Immagine:</label>
-        <input type="file" id="inputFile" name="inputFile" accept="image/*">
-        <button type="submit">Aggiorna</button>
-    </form>
+    <div class="imageForms">
+        <form class="imageForm" action="/uploadUserFirma" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="cf" value="<%= user.cFiscale %>">
+            <img id="signPic" src="/img/firme/<%= user.firma ? user.firma : 'default.png' %>" alt="Scansione Firma">
+            <label for="inputSigningFile">Carica Firma:</label>
+            <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
+            <button type="submit">Aggiorna</button>
+        </form>
+        <form class="imageForm" action="/uploadUserImage" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="cf" value="<%= user.cFiscale %>">
+            <img id="profilePic" src="/img/profileImages/<%= user.immagineProfilo ? user.immagineProfilo : 'profile.png' %>" alt="Immagine Profilo">
+            <label for="inputProfileFile">Carica Immagine:</label>
+            <input type="file" id="inputProfileFile" name="inputProfileFile" accept="image/*">
+            <button type="submit">Aggiorna</button>
+        </form>
+    </div>
     <script>
         const profilePic = document.getElementById('profilePic');
-        const inputFile = document.getElementById('inputFile');
-        inputFile.onchange = function() {
-            profilePic.src = URL.createObjectURL(inputFile.files[0]);
+        const inputProfileFile = document.getElementById('inputProfileFile');
+        inputProfileFile.onchange = function() {
+            profilePic.src = URL.createObjectURL(inputProfileFile.files[0]);
+        }
+
+        const signPic = document.getElementById('signPic');
+        const inputSigningFile = document.getElementById('inputSigningFile');
+        inputSigningFile.onchange = function() {
+            signPic.src = URL.createObjectURL(inputSigningFile.files[0]);
         }
     </script>
     <form action="/updateUser" method="post">
