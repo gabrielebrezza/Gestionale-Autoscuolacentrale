@@ -41,7 +41,13 @@
 
     <input type="text" id="filterNome" placeholder="Filtra per Nome">
     <input type="text" id="filterCognome" placeholder="Filtra per Cognome">
-    <input type="text" id="filterVisita" placeholder="Filtra per Visita Medica">
+    <label for="filterVisitaFrom">Da</label>
+    <input type="date" id="filterVisitaFrom" name="filterVisitaFrom">
+    <label for="filterVisitaTo">A</label>
+    <input type="date" id="filterVisitaTo" name="filterVisitaTo">
+    <label for="filterVisitaMancante">visita Mancante</label>
+    <input type="checkbox" id="filterVisitaMancante" name="filterVisitaMancante">
+
     <select id="filterPatente">
         <option value="all">Tutte</option>
         <option value="AM">AM</option>
@@ -100,7 +106,9 @@
     document.addEventListener('DOMContentLoaded', function () {
         const filterNome = document.getElementById('filterNome');
         const filterCognome = document.getElementById('filterCognome');
-        const filterVisita = document.getElementById('filterVisita');
+        const filterVisitaFrom = document.getElementById('filterVisitaFrom');
+        const filterVisitaTo = document.getElementById('filterVisitaTo');
+        const filterVisitaMancante = document.getElementById('filterVisitaMancante');
         const filterPatente = document.getElementById('filterPatente');
         const filterRegistrazioneFrom = document.getElementById('filterRegistrazioneFrom');
         const filterRegistrazioneTo = document.getElementById('filterRegistrazioneTo');
@@ -110,10 +118,12 @@
         function filterTable() {
             const nome = filterNome.value.toLowerCase();
             const cognome = filterCognome.value.toLowerCase();
-            const visita = filterVisita.value.toLowerCase();
             const patente = filterPatente.value.toLowerCase();
             const dataRegistrazioneDa = filterRegistrazioneFrom.value;
             const dataRegistrazioneA = filterRegistrazioneTo.value;
+            const dataVisitaDa = filterVisitaFrom.value;
+            const dataVisitaA = filterVisitaTo.value;
+            const visitaMancante = filterVisitaMancante.checked;
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
                 const nomeTd = row.getElementsByTagName('td')[0].textContent.toLowerCase();
@@ -121,18 +131,28 @@
                 const visitaTd = row.getElementsByTagName('td')[4].textContent.toLowerCase();
                 const patenteTd = row.getElementsByTagName('td')[5].textContent.toLowerCase();
                 const dataRegTd = row.getElementsByTagName('td')[6].textContent.toLowerCase();
-                const dataRegistrazione = new Date(dataRegTd.split('/').reverse().join('-'));
                 
-                const startDate = new Date(dataRegistrazioneDa);
-                const endDate = new Date(dataRegistrazioneA);
-            
-                const isDateInRange = dataRegistrazione >= startDate && dataRegistrazione <= endDate;
+                let isDateVisitaInRange, isVisitaMancante;
+                if(!visitaMancante){
+                    const dataVisita = new Date(visitaTd.split('/').reverse().join('-'));
+                    const startVisitaDate = new Date(dataVisitaDa);
+                    const endVisitaDate = new Date(dataVisitaA);
+                    isDateVisitaInRange = dataVisita >= startVisitaDate && dataVisita <= endVisitaDate;
+                }else{
+                    isVisitaMancante = visitaTd == 'mancante' ? true : false;      
+                }g
+                const dataRegistrazione = new Date(dataRegTd.split('/').reverse().join('-'));
+                const startRegistrazioneDate = new Date(dataRegistrazioneDa);
+                const endRegistrazioneDate = new Date(dataRegistrazioneA);
+
+                const isDateRegInRange = dataRegistrazione >= startRegistrazioneDate && dataRegistrazione <= endRegistrazioneDate;
                 if (
                     (nome === '' || nomeTd.includes(nome)) &&
                     (cognome === '' || cognomeTd.includes(cognome)) &&
-                    (visita === '' || visitaTd.includes(visita)) &&
                     (patente === '' || patenteTd.includes(patente) || patente == 'all') &&
-                    (dataRegistrazioneDa === '' || dataRegistrazioneA === '' || isDateInRange)
+                    (dataRegistrazioneDa === '' || dataRegistrazioneA === '' || isDateRegInRange) &&
+                    (dataVisitaDa === '' || dataVisitaA === '' || isDateVisitaInRange) &&
+                    (!visitaMancante || isVisitaMancante)
                 ) {
                     row.style.display = '';
                 } else {
@@ -143,10 +163,12 @@
 
         filterNome.addEventListener('input', filterTable);
         filterCognome.addEventListener('input', filterTable);
-        filterVisita.addEventListener('input', filterTable);
         filterPatente.addEventListener('input', filterTable);
+        filterVisitaFrom.addEventListener('input', filterTable);
+        filterVisitaTo.addEventListener('input', filterTable);
         filterRegistrazioneFrom.addEventListener('input', filterTable);
         filterRegistrazioneTo.addEventListener('input', filterTable);
+        filterVisitaMancante.addEventListener('input', filterTable);
     });
 </script>
 </body>
