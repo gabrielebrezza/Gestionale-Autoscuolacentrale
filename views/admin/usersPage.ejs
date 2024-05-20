@@ -131,7 +131,7 @@
                 const visitaTd = row.getElementsByTagName('td')[4].textContent.toLowerCase();
                 const patenteTd = row.getElementsByTagName('td')[5].textContent.toLowerCase();
                 const dataRegTd = row.getElementsByTagName('td')[6].textContent.toLowerCase();
-                
+                 
                 let isDateVisitaInRange, isVisitaMancante;
                 if(!visitaMancante){
                     const dataVisita = new Date(visitaTd.split('/').reverse().join('-'));
