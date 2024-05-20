@@ -78,7 +78,7 @@
                     <td><%= user.nome %></td>
                     <td><%= user.cognome %></td>
                     <td><%= user.contatti.email %></td>
-                    <td><%= user.contatti.tel %></td>
+                    <td><a href="tel:<%= user.contatti.tel %>"><%= user.contatti.tel %></a></td>
                     <td><%= user.visita ? user.visita : 'Mancante' %></td>
                     <td>
                         <% user.patente.forEach(function(patente) { %>
