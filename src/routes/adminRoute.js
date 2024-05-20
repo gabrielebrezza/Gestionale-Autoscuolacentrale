@@ -49,7 +49,7 @@ router.post('/uploadUserImage', (req, res) => {
     const file = req.file;
  
     const webpBuffer = await sharp(file.buffer)
-      .resize({ width: 800 })
+    .resize({ width: 260, height: 315, fit: 'cover', position: 'center' })
       .toFormat('webp')
       .toBuffer();
 
@@ -101,7 +101,7 @@ router.post('/uploadUserFirma', (req, res) => {
     const file = req.file;
  
     const webpBuffer = await sharp(file.buffer)
-      .resize({ width: 800 })
+      .resize({ width: 236, height: 47, fit: 'cover', position: 'center' })
       .toFormat('webp')
       .toBuffer();
 

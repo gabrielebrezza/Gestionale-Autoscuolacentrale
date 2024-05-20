@@ -34,12 +34,14 @@
             width: 100%;
             display: flex;
             justify-content: space-evenly;
+            align-items: center;
             flex-wrap: wrap;
         }
         .imageForm{
-            max-width: 250px;
+            max-width: 300px;
             width: 100%;
             background: #fff;
+            height: fit-content;
             padding: 10px;
             border-radius: 15px;
             text-align: center;
@@ -51,7 +53,9 @@
             margin-block: 15px;
         }
         .imageForm img{
-            width: 100px;
+            width: 50%;
+            /* object-fit: cover; */
+            object-position: center;
             height: 100px;
             margin-top: 40px;
             margin-bottom: 10px;
@@ -74,6 +78,43 @@
         }
         .imageForm input{
             display: none;
+        }
+        tr:has(.attivo){
+            background: green;
+            color: #fff;
+        }
+        tr:has(.scaduto){
+            background: red;
+            color: #fff;
+        }
+        .field{
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            text-align: justify;
+        }
+        .field p{
+            font-weight: bold;
+        }
+        tr:has(input[value="respinto"]:checked){
+            background: red;
+            color: #fff;
+        }
+        tr:has(input[value="idoneo"]:checked){
+            background: green;
+            color: #fff;
+        }
+        tr:has(input[value="assente"]:checked){
+            background: orange;
+            color: #fff;
+        }
+        #signPic{
+            width: 236px;
+            height: 47px;
+        }
+        #profilePic{
+            width: 260px;
+            height: 315px;
         }
     </style>
 </head>
@@ -211,18 +252,22 @@
                     <td>Numero Protocollo</td>
                     <td>
                         <input type="text" id="nProtocollo" name="nProtocollo" value="<%= user.protocollo.numero %>"> <br>
-                        <label for="dataNProtocollo">Emissione: </label>
-                        <input type="date" id="dataNProtocollo" name="dataNProtocollo" value="<%= user.protocollo.dataEmissione ? (user.protocollo.dataEmissione).split('/').reverse().join('-') : '' %>"> <br>
-                        
-                        <% if(user.protocollo.dataEmissione){ %>
-                            <label>Stato: </label>
-                        <%
-                            const emissione = new Date((user.protocollo.dataEmissione).split('/').reverse().join('-'));
-                            const scadenza = new Date(emissione.setMonth(emissione.getMonth() + 6));
-                            %>
-                           <%= new Date() >= scadenza ? 'Scaduto' : 'Attivo'; %> 
-                        <% } %>
-                        
+                        <div class="field">
+                            <label for="dataNProtocollo">Emissione: </label>
+                            <input type="date" id="dataNProtocollo" name="dataNProtocollo" value="<%= user.protocollo.dataEmissione ? (user.protocollo.dataEmissione).split('/').reverse().join('-') : '' %>"> <br>
+                        </div>
+                        <div class="field">
+                            <% if(user.protocollo.dataEmissione){ %>
+                                <label>Stato: </label>
+                            <%
+                                const emissione = new Date((user.protocollo.dataEmissione).split('/').reverse().join('-'));
+                                const scadenza = new Date(emissione.setMonth(emissione.getMonth() + 6));
+                                const scaduto = new Date() >= scadenza;
+                                %>
+
+                               <p class="<%= scaduto ? 'scaduto' : 'attivo'; %>"><%= scaduto ? ' Scaduto' : ' Attivo'; %> </p>
+                            <% } %>
+                        </div>
                         
                     </td>
                 </tr>
