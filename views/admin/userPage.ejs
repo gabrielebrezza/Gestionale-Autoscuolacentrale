@@ -213,12 +213,17 @@
                         <input type="text" id="nProtocollo" name="nProtocollo" value="<%= user.protocollo.numero %>"> <br>
                         <label for="dataNProtocollo">Emissione: </label>
                         <input type="date" id="dataNProtocollo" name="dataNProtocollo" value="<%= user.protocollo.dataEmissione ? (user.protocollo.dataEmissione).split('/').reverse().join('-') : '' %>"> <br>
-                        <label>Stato: </label>
-                        <%  
-                        const emissione = new Date(user.protocollo.dataEmissione);
-                        const scadenza = new Date(emissione.setMonth(emissione.getMonth() + 6));
-                        %>
-                        <%= new Date() >= scadenza ? 'Scaduto' : 'Attivo' %>
+                        
+                        <% if(user.protocollo.dataEmissione){ %>
+                            <label>Stato: </label>
+                        <%
+                            const emissione = new Date((user.protocollo.dataEmissione).split('/').reverse().join('-'));
+                            const scadenza = new Date(emissione.setMonth(emissione.getMonth() + 6));
+                            %>
+                           <%= new Date() >= scadenza ? 'Scaduto' : 'Attivo'; %> 
+                        <% } %>
+                        
+                        
                     </td>
                 </tr>
                 <tr> 
