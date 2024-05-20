@@ -72,7 +72,7 @@ router.post('/uploadUserImage', (req, res) => {
       await utenti.findOneAndUpdate({ cFiscale: cf }, { immagineProfilo: fileName });
       
 
-      res.redirect(`/userPage?cf=${cf}`);
+      res.redirect(req.get('referer'));
     });
   });
 });
@@ -123,7 +123,7 @@ router.post('/uploadUserFirma', (req, res) => {
       }
       await utenti.findOneAndUpdate({ cFiscale: cf }, { firma: fileName });
       
-      res.redirect(`/userPage?cf=${cf}`);
+      res.redirect(req.get('referer'));
     });
   });
 });

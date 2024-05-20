@@ -28,7 +28,6 @@ router.post('/stripeHooks', bodyParser.raw({type: 'application/json'}), async (r
         await setPayment(cFiscale, patente);
         try{
           const result = await sendEmail(email, 'Iscrizione effettuata con successo', `Grazie per esserti iscritto alla patente ${patente}. Ti chiediamo gentilmente in caso tu non l'avessi ancora fatto di inviarci la scansione della tua firma e della fototessera che apparirà sulla patente`);
-          console.log(result);
         }catch (error){
           console.error('Errore durante l\'invio dell\'email:', error);
         }
@@ -66,9 +65,9 @@ router.post('/stripeHooks', bodyParser.raw({type: 'application/json'}), async (r
       const payerId = req.query.PayerID;
       const paymentId = req.query.paymentId;
       if(!paymentId || !payerId){
-        return res.status(500).json({errore: 'non hai effettuato il pagamento'});
+        return res.render('errorPage' ,{error: 'non hai effettuato nessun pagamento'});
       }
-      const price = 600;
+      const price = 6;
       const execute_payment_json = {
           payer_id: payerId,
           transactions: [
@@ -95,15 +94,14 @@ router.post('/stripeHooks', bodyParser.raw({type: 'application/json'}), async (r
               }catch (error){
                 console.error('Errore durante l\'invio dell\'email:', error);
               }
-              return res.render('payments/paymentSuccess', {text: 'Grazie per esserti iscritto da noi!!'});
+              return res.redirect(`/successPayment?cf=${encodeURIComponent(cFiscale)}`);
             }catch(error){
               return res.status(500).json({error: error.message});
             }
           }
     });
   });
-
-  router.get('/successPayment/stripe', async (req, res) => res.render('payments/paymentSuccess', {text: 'Grazie per esserti iscritto da noi!!'}));
+  router.get('/successPayment', async (req, res) =>{ res.render('payments/paymentSuccess', {text: 'Grazie per esserti iscritto da noi!!', cf: req.query.cf})});
   router.get('/cancelPayment', async (req, res) => res.render('payments/cancelPayment', {text: 'Ci spiace che tu abbia deciso di non iscriverti da noi.'}));
 
 module.exports = router;

@@ -5,11 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pagamento effetuato con successo</title>
     <link rel="stylesheet" href="/styles/paymentStatus.css">
-    <script>
-        setTimeout(function() {
-            window.location.href = '/';
-        }, 30000);
-    </script>
 </head>
 <body>
     <header>
@@ -17,6 +12,61 @@
     </header>
     <section>
         <h1><%= text %></h1>
+        <p>Per completare la registrazione online, ti preghiamo di inviarci la scansione della foto tessera (deve essere la stessa che porterai in duplice copia in autoscuola) e il modulo TT2112 (scaricalo qui), opportunamente firmato</p>
+        <div class="imageForms">
+            <form id="combinedForm" class="imageForm" enctype="multipart/form-data">
+                <input type="hidden" name="cf" value="<%= cf %>">
+                <div class="field">
+                    <label for="inputSigningFile">Carica Firma:</label>
+                    <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
+                </div>
+                <div class="field">
+                    <label for="inputProfileFile">Carica Fototessera:</label>
+                    <input type="file" id="inputProfileFile" name="inputProfileFile" accept="image/*">
+                </div>
+                <button type="submit">Salva</button>
+            </form>
+        
+            <script>
+                document.getElementById('combinedForm').addEventListener('submit', async function(event) {
+                    event.preventDefault();
+        
+                    const form = event.target;
+                    const formDataFirma = new FormData();
+                    const formDataImage = new FormData();
+        
+                    formDataFirma.append('cf', form.querySelector('input[name="cf"]').value);
+                    formDataFirma.append('inputSigningFile', form.querySelector('input[name="inputSigningFile"]').files[0]);
+        
+                    formDataImage.append('cf', form.querySelector('input[name="cf"]').value);
+                    formDataImage.append('inputProfileFile', form.querySelector('input[name="inputProfileFile"]').files[0]);
+        
+                    try {
+                        const [responseFirma, responseImage] = await Promise.all([
+                            fetch('/uploadUserFirma', {
+                                method: 'POST',
+                                body: formDataFirma
+                            }),
+                            fetch('/uploadUserImage', {
+                                method: 'POST',
+                                body: formDataImage
+                            })
+                        ]);
+        
+                        if (responseFirma.ok && responseImage.ok) {
+                            alert('Entrambi i file sono stati caricati con successo!');
+                        } else {
+                            alert('Errore durante il caricamento dei file.');
+                        }
+                    } catch (error) {
+                        console.error('Errore:', error);
+                        alert('Errore durante il caricamento dei file.');
+                    }
+                });
+            </script>
+        </div>
+        <h2>Documenti da portare in autoscuola</h2>
+        <p>Copia della carta d'identità, copia del codice fiscale (o tessera sanitaria), modulo TT2112 firmato, autocertificazione di residenza firmata, 2 foto tessere.</p>
         <a href="/"><button>Torna alla home</button></a>
     </section>
 </body>

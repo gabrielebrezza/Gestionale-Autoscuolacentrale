@@ -21,7 +21,8 @@ header img{
     opacity: 0.8;
 }
 section{
-    height: 100%;
+    margin-top: 150px;
+    /* height: 100%; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -47,4 +48,58 @@ button:hover{
     color: #71a1cb;
     background: #f1f1f1;
     transform: scale(1.2);
+}
+
+
+.imageForms{
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.imageForm{
+    max-width: 300px;
+    width: 100%;
+    background: #fff;
+    height: fit-content;
+    padding: 10px;
+    border-radius: 15px;
+    text-align: center;
+    color: #333;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    border: 2px solid #333;
+    margin-block: 15px;
+}
+
+.imageForm button, .imageForm label{
+    width: fit-content;
+    background-color: #71a1cb;
+    color: #fff;
+    padding: 12px 30px;
+    margin: 10px auto;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: .5s;
+    font-size: 1rem;
+}
+.imageForm button:hover, .imageForm label:hover {
+    background-color: #5681a9;
+}
+.imageForm input{
+    display: none;
+}
+.field{
+    margin-block: 25px;
+}
+
+h2, p{
+    width: 50%;
+    color: #fff;
+    text-align: center;
+    line-height: 25px;
 }

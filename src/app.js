@@ -197,12 +197,12 @@ app.post('/payment', async (req, res) =>{
               product_data:{
                 name: `Iscrizione Scuola Guida per la patente ${tipoPatente}`
               },
-              unit_amount: 10000
+              unit_amount: 1000
             },
             quantity: 1
           }
         ],
-        success_url: `${process.env.SERVER_URL}/successPayment/stripe`,
+        success_url: `${process.env.SERVER_URL}/successPayment?cf=${encodeURIComponent(cFiscale)}`,
         cancel_url: `${process.env.SERVER_URL}/cancelPayment`,
         metadata: {
           cFiscale: cFiscale,
@@ -233,7 +233,7 @@ app.post('/payment', async (req, res) =>{
                           {
                               name: `Iscrizione Scuola Guida per la patente ${tipoPatente}`,
                               sku: 1,
-                              price: 600,
+                              price: 6,
                               currency: "EUR",
                               quantity: 1
                           }
@@ -241,7 +241,7 @@ app.post('/payment', async (req, res) =>{
                   },
                   amount: {
                       currency: "EUR",
-                      total: 600
+                      total: 6
                   },
                   custom: JSON.stringify({cFiscale: cFiscale, patente: tipoPatente, email: email}),
                   description: `Iscrizione a Scuola Guida per la patente di tipo ${tipoPatente}`
