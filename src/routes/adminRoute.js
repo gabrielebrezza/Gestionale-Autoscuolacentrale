@@ -93,44 +93,31 @@ const uploadFirmaPic = multer({
 }).single('inputSigningFile');
 
 router.post('/uploadUserFirma', (req, res) => {
+
   uploadFirmaPic(req, res, async function (err) {
     if (err) {
       return res.status(400).send(err.message);
     }
-    if (!req.file) {
-      return res.render('errorPage', { error: 'Nessuna immagine caricata' });
+    if(!req.file){
+        return res.render('errorPage',{error: 'Nessuna immagine caricata'});
     }
-    const cf = req.body.cf;
+    const cf = req.body.cf; 
     const file = req.file;
+ 
+    const webpBuffer = await sharp(file.buffer)
+      .resize({ width: 236, height: 47, fit: 'cover', position: 'center' })
+      .toFormat('jpg')
+      .toBuffer();
 
-    try {
-      const image = await sharp(file.buffer);
+    const fileName = cf + '_' + Date.now() + '.jpg';
+    const filePath = 'public/img/firme/' + fileName;
 
-      // Ottieni le dimensioni dell'immagine
-      const metadata = await image.metadata();
-      const width = metadata.width;
-      const height = metadata.height;
+    fs.writeFile(filePath, webpBuffer, async (err) => {
+      if (err) {
+        console.error('Errore durante il salvataggio del file:', err);
+        return res.status(500).send('Errore durante il salvataggio del file');
+      }
 
-      // Calcola le dimensioni e la posizione del ritaglio per centrare l'immagine
-      const targetWidth = 236;
-      const targetHeight = 47;
-      const left = Math.max(0, Math.floor((width - targetWidth) / 2));
-      const top = Math.max(0, Math.floor((height - targetHeight) / 2));
-
-      // Ritaglia l'immagine
-      const croppedImage = await image.extract({
-        left: left,
-        top: top,
-        width: targetWidth,
-        height: targetHeight
-      }).resize(targetWidth, targetHeight);
-
-      // Salva l'immagine
-      const fileName = cf + '_' + Date.now() + '.jpg';
-      const filePath = 'public/img/firme/' + fileName;
-      await croppedImage.toFile(filePath);
-
-      // Rimuovi l'immagine precedente dell'utente, se presente
       const existingUser = await utenti.findOne({ cFiscale: cf });
       if (existingUser && existingUser.firma) {
         const imagePath = 'public/img/firme/' + existingUser.firma;
@@ -138,16 +125,10 @@ router.post('/uploadUserFirma', (req, res) => {
           fs.unlinkSync(imagePath);
         }
       }
-
-      // Aggiorna il nome del file dell'immagine per l'utente nel database
       await utenti.findOneAndUpdate({ cFiscale: cf }, { firma: fileName });
-
-      // Redirect alla pagina precedente
+      
       res.redirect(req.get('referer'));
-    } catch (error) {
-      console.error('Errore durante il caricamento e il salvataggio dell\'immagine:', error);
-      return res.status(500).send('Errore durante il caricamento e il salvataggio dell\'immagine');
-    }
+    });
   });
 });
 
