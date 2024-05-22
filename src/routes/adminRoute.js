@@ -105,14 +105,21 @@ router.post('/uploadUserFirma', (req, res) => {
     const file = req.file;
  
     const webpBuffer = await sharp(file.buffer)
-      .resize({ width: 236, height: 47, fit: 'cover', position: 'center' })
+      .resize({ width: 236, height: 47, fit: 'inside' })
       .toFormat('jpg')
       .toBuffer();
+
+      const left = Math.floor((webpBuffer.width - 236) / 2); // Posizione orizzontale centrata
+      const top = Math.floor((webpBuffer.height - 47) / 2); // Posizione verticale centrata
+  
+      const croppedBuffer = await sharp(webpBuffer)
+        .extract({ left, top, width: 236, height: 47 }) // Ritaglia l'immagine alle dimensioni specificate
+        .toBuffer();
 
     const fileName = cf + '_' + Date.now() + '.jpg';
     const filePath = 'public/img/firme/' + fileName;
 
-    fs.writeFile(filePath, webpBuffer, async (err) => {
+    fs.writeFile(filePath, croppedBuffer, async (err) => {
       if (err) {
         console.error('Errore durante il salvataggio del file:', err);
         return res.status(500).send('Errore durante il salvataggio del file');
