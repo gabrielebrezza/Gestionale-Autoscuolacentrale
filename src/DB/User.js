@@ -127,7 +127,7 @@ const UserSchema = new mongoose.Schema({
             required: false
         },
     },
-    numeroFoglioRosa:{
+    numeroPatente:{
         type: String,
         required: false
     },

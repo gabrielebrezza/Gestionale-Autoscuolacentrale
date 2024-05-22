@@ -171,5 +171,17 @@
         filterVisitaMancante.addEventListener('input', filterTable);
     });
 </script>
+
+    <script>
+        function showForm(tel) {
+            document.getElementById('messageForm').style.display = 'block';
+        }
+    </script>
+
+    <form action="/sendMessage" method="POST" id="messageForm" style="display: none;">
+        <input type="tel" name="tel" value="">
+        <input type="text" name="content">
+        <button type="submit">invia</button>
+    </form>
 </body>
 </html>

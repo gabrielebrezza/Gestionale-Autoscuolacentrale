@@ -6,6 +6,10 @@ const multer  = require('multer');
 const sharp = require('sharp');
 const router = express.Router();
 
+
+
+// const client = require('twilio')(accountSid, authToken);
+
 //databases
 const admins = require('../DB/Admin');
 const utenti = require('../DB/User');
@@ -50,10 +54,10 @@ router.post('/uploadUserImage', (req, res) => {
  
     const webpBuffer = await sharp(file.buffer)
     .resize({ width: 260, height: 315, fit: 'cover', position: 'center' })
-      .toFormat('webp')
+      .toFormat('jpg')
       .toBuffer();
 
-    const fileName = cf + '_' + Date.now() + '.webp';
+    const fileName = cf + '_' + Date.now() + '.jpg';
     const filePath = 'public/img/profileImages/' + fileName;
 
     fs.writeFile(filePath, webpBuffer, async (err) => {
@@ -102,10 +106,10 @@ router.post('/uploadUserFirma', (req, res) => {
  
     const webpBuffer = await sharp(file.buffer)
       .resize({ width: 236, height: 47, fit: 'cover', position: 'center' })
-      .toFormat('webp')
+      .toFormat('jpg')
       .toBuffer();
 
-    const fileName = cf + '_' + Date.now() + '.webp';
+    const fileName = cf + '_' + Date.now() + '.jpg';
     const filePath = 'public/img/firme/' + fileName;
 
     fs.writeFile(filePath, webpBuffer, async (err) => {
@@ -126,6 +130,20 @@ router.post('/uploadUserFirma', (req, res) => {
       res.redirect(req.get('referer'));
     });
   });
+});
+
+router.post('/sendMessage', async (req, res) => {
+
+
+client.messages
+    .create({
+        body: 'ciao',
+        from: 'whatsapp:+14155238886',
+        to: 'whatsapp:+393314185824'
+    })
+    .then((message) => console.log(`Messaggio inviato con SID: ${message.sid}`))
+    .catch((error) => console.error(`Errore: ${error.message}`));
+    res.redirect('/admin');
 });
 
 
@@ -165,7 +183,7 @@ router.post('/updateUser', async (req, res) =>{
               numero: req.body.nProtocollo,
               dataEmissione: (req.body.dataNProtocollo).split('-').reverse().join('/')
             },
-            numeroFoglioRosa: req.body.nFoglioRosa,
+            numeroPatente: req.body.nPatente,
             teoria: []
         };
         const emailSent = !!(await utenti.findOne({
@@ -215,4 +233,22 @@ router.post('/updateUser', async (req, res) =>{
     }
 });
 
+router.post('/deleteUserImage', async (req, res) => {
+  const { cf, intent } = req.body;
+  const existingUser = await utenti.findOne({ cFiscale: cf });
+  if(intent == 'firma' && existingUser){
+    const imagePath = 'public/img/firme/' + existingUser.firma;
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+    }
+    await utenti.findOneAndUpdate({ "cFiscale": cf }, {$unset : {"firma" : ""}});
+  }else if(intent == 'profilo' && existingUser){
+    const imagePath = 'public/img/profileImages/' + existingUser.immagineProfilo;
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+    }
+    await utenti.findOneAndUpdate({ "cFiscale": cf }, {$unset : {"immagineProfilo" : ""}});
+  }
+  res.redirect(`/userPage?cf=${cf}`);
+});
 module.exports = router;

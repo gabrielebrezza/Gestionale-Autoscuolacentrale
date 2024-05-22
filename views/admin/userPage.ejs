@@ -108,15 +108,27 @@
             background: orange;
             color: #fff;
         }
-        #signPic{
-            width: 236px;
-            height: 47px;
+
+        .formField{
+            display: flex;
+            align-items: center;
         }
-        #profilePic{
-            width: 260px;
-            height: 315px;
+        .formField button{
+            width: fit-content;
+            height: 40px;
+            margin-inline: 10px;
+            display: flex;
+            align-items: center;
+        }
+        button.deleteButton {
+            background: red;
+            transition: .5s;
+        }
+        button.deleteButton:hover {
+            background: rgb(119, 64, 64);
         }
     </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 </head>
 <body>
     <a href="/admin">Torna alla Lista Utenti</a>
@@ -126,16 +138,62 @@
             <img id="signPic" src="/img/firme/<%= user.firma ? user.firma : 'default.png' %>" alt="Scansione Firma">
             <label for="inputSigningFile">Carica Firma:</label>
             <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
-            <button type="submit">Aggiorna</button>
+            <div class="formField">
+                <button type="submit">Salva</button>
+                <input type="hidden" name="intent" value="firma">
+                <button type="button" class="deleteButton">
+                    <span class="material-symbols-outlined">
+                        delete
+                    </span>
+                </button>
+            </div>
         </form>
         <form class="imageForm" action="/uploadUserImage" method="post" enctype="multipart/form-data">
             <input type="hidden" name="cf" value="<%= user.cFiscale %>">
             <img id="profilePic" src="/img/profileImages/<%= user.immagineProfilo ? user.immagineProfilo : 'profile.png' %>" alt="Immagine Profilo">
             <label for="inputProfileFile">Carica Immagine:</label>
             <input type="file" id="inputProfileFile" name="inputProfileFile" accept="image/*">
-            <button type="submit">Aggiorna</button>
+            <div class="formField">
+                <button type="submit">Salva</button>
+                <input type="hidden" name="intent" value="profilo">
+                <button type="button" class="deleteButton">
+                    <span class="material-symbols-outlined">
+                        delete
+                    </span>
+                </button>
+            </div>
         </form>
     </div>
+
+    <script>
+    document.querySelectorAll('.deleteButton').forEach(function(button) {
+        button.addEventListener('click', function() {
+          var form = this.closest('form');
+          var cf = form.querySelector('input[name="cf"]').value;
+          var intent = form.querySelector('input[name="intent"]').value;
+
+          var deleteForm = document.createElement('form');
+          deleteForm.action = '/deleteUserImage';
+          deleteForm.method = 'post';
+
+          var inputCf = document.createElement('input');
+          inputCf.type = 'hidden';
+          inputCf.name = 'cf';
+          inputCf.value = cf;
+          deleteForm.appendChild(inputCf);
+
+          var inputIntent = document.createElement('input');
+          inputIntent.type = 'hidden';
+          inputIntent.name = 'intent';
+          inputIntent.value = intent;
+          deleteForm.appendChild(inputIntent);
+
+          document.body.appendChild(deleteForm);
+          deleteForm.submit();
+        });
+    });
+    </script>
+
     <script>
         const profilePic = document.getElementById('profilePic');
         const inputProfileFile = document.getElementById('inputProfileFile');
@@ -159,16 +217,16 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>Codice Fiscale</td>
-                    <td><input type="hidden" id="cf" name="cf" value="<%= user.cFiscale %>"><%= user.cFiscale %></td>
+                    <td>Cognome</td>
+                    <td><input type="text" id="cognome" name="cognome" value="<%= user.cognome %>"></td>
                 </tr>
                 <tr>
                     <td>Nome</td>
                     <td><input type="text" id="nome" name="nome" value="<%= user.nome %>"></td>
                 </tr>
                 <tr>
-                    <td>Cognome</td>
-                    <td><input type="text" id="cognome" name="cognome" value="<%= user.cognome %>"></td>
+                    <td>Codice Fiscale</td>
+                    <td><input type="hidden" id="cf" name="cf" value="<%= user.cFiscale %>"><%= user.cFiscale %></td>
                 </tr>
                 <tr>
                     <td>Data di Nascita</td>
@@ -248,6 +306,10 @@
                     <td>Visita Medica</td>
                     <td><input type="date" id="visita" name="visita" value="<%= user.visita ? (user.visita).split('/').reverse().join('-') : '' %>"></td>
                 </tr>
+                <tr>
+                    <td>Data Registrazione</td>
+                    <td><%= user.dataRegistrazione %></td>
+                </tr>
                 <tr> 
                     <td>Numero Protocollo</td>
                     <td>
@@ -271,15 +333,6 @@
                         
                     </td>
                 </tr>
-                <tr> 
-                    <td>Numero Foglio Rosa</td>
-                    <td><input type="text" id="nFoglioRosa" name="nFoglioRosa" value="<%= user.numeroFoglioRosa %>"></td>
-                </tr>
-                <tr>
-                    <td>Data Registrazione</td>
-                    <td><%= user.dataRegistrazione %></td>
-                </tr>
-                
                 <% 
                     const teoriaAssente = user.teoria.filter(item => item.assente === true);
                     const countTeoriaAssente = teoriaAssente.length;
@@ -303,6 +356,10 @@
                         </td>
                     </tr>
                 <% } %>
+                <tr> 
+                    <td>Numero Patente</td>
+                    <td><input type="text" id="nPatente" name="nPatente" value="<%= user.numeroPatente %>"></td>
+                </tr>
             </tbody>
         </table>
         <button type="submit">Salva</button>
