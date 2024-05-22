@@ -81,7 +81,6 @@ router.post('/uploadUserImage', (req, res) => {
   });
 });
 
-const Jimp = require('jimp');
 
 const uploadFirmaPic = multer({
   storage: storage,
@@ -105,21 +104,30 @@ router.post('/uploadUserFirma', (req, res) => {
     const cf = req.body.cf; 
     const file = req.file;
  
-    const image = await Jimp.read(file.buffer);
+    const image = await sharp(file.buffer);
 
-    // Calcola le dimensioni dell'immagine ritagliata
+    // Ottieni le dimensioni dell'immagine
+    const metadata = await image.metadata();
+    const width = metadata.width;
+    const height = metadata.height;
+
+    // Calcola le dimensioni e la posizione del ritaglio per centrare l'immagine
     const targetWidth = 236;
     const targetHeight = 47;
-    const left = Math.floor((image.bitmap.width - targetWidth) / 2); // Posizione orizzontale centrata
-    const top = Math.floor((image.bitmap.height - targetHeight) / 2); // Posizione verticale centrata
+    const left = Math.max(0, Math.floor((width - targetWidth) / 2));
+    const top = Math.max(0, Math.floor((height - targetHeight) / 2));
 
-    // Ritaglia e ridimensiona l'immagine
-    image.crop(left, top, targetWidth, targetHeight).resize(targetWidth, targetHeight);
+    // Ritaglia l'immagine
+    const croppedImage = await image.extract({
+      left: left,
+      top: top,
+      width: targetWidth,
+      height: targetHeight
+    }).resize(targetWidth, targetHeight);
 
     const fileName = cf + '_' + Date.now() + '.jpg';
     const filePath = 'public/img/firme/' + fileName;
-    await image.quality(100).writeAsync(filePath);
-    
+
     fs.writeFile(filePath, webpBuffer, async (err) => {
       if (err) {
         console.error('Errore durante il salvataggio del file:', err);
