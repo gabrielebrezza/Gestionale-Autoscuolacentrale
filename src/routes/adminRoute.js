@@ -81,6 +81,7 @@ router.post('/uploadUserImage', (req, res) => {
   });
 });
 
+const Jimp = require('jimp');
 
 const uploadFirmaPic = multer({
   storage: storage,
@@ -104,14 +105,21 @@ router.post('/uploadUserFirma', (req, res) => {
     const cf = req.body.cf; 
     const file = req.file;
  
-    const webpBuffer = await sharp(file.buffer)
-      .resize({ width: 236, height: 47, fit: 'inside' })
-      .toFormat('jpg')
-      .toBuffer();
+    const image = await Jimp.read(file.buffer);
+
+    // Calcola le dimensioni dell'immagine ritagliata
+    const targetWidth = 236;
+    const targetHeight = 47;
+    const left = Math.floor((image.bitmap.width - targetWidth) / 2); // Posizione orizzontale centrata
+    const top = Math.floor((image.bitmap.height - targetHeight) / 2); // Posizione verticale centrata
+
+    // Ritaglia e ridimensiona l'immagine
+    image.crop(left, top, targetWidth, targetHeight).resize(targetWidth, targetHeight);
 
     const fileName = cf + '_' + Date.now() + '.jpg';
     const filePath = 'public/img/firme/' + fileName;
-
+    await image.quality(100).writeAsync(filePath);
+    
     fs.writeFile(filePath, webpBuffer, async (err) => {
       if (err) {
         console.error('Errore durante il salvataggio del file:', err);
