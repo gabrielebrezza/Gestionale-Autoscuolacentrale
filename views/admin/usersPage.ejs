@@ -74,11 +74,11 @@
         </thead>
         <tbody id="usersTableBody">
             <% users.forEach(function(user) { %>
-                <tr data-cFiscale="<%= user.cFiscale %>">
-                    <td><%= user.nome %></td>
+                <tr>
+                    <td><a href="<%=`/userPage?cf=${encodeURIComponent(user.cFiscale)}`%>"><%= user.nome %></a></td>
                     <td><%= user.cognome %></td>
                     <td><%= user.contatti.email %></td>
-                    <td><a href="tel:<%= user.contatti.tel %>"><%= user.contatti.tel %></a></td>
+                    <td onclick="showForm('<%= user.contatti.tel %>')"><%= user.contatti.tel %></td>
                     <td><%= user.visita ? user.visita : 'Mancante' %></td>
                     <td>
                         <% user.patente.forEach(function(patente) { %>
@@ -90,16 +90,6 @@
             <% }); %>
         </tbody>
     </table>
-    <script>
-        const tableRows = document.querySelectorAll('tr');
-        tableRows.forEach((row) => {
-            row.addEventListener('click', () => {
-                const userCFiscale = row.dataset.cfiscale;
-                const url = `/userPage?cf=${encodeURIComponent(userCFiscale)}`;
-                window.location.href = url;
-            });
-        });
-    </script>
 
 
 <script>
@@ -175,11 +165,12 @@
     <script>
         function showForm(tel) {
             document.getElementById('messageForm').style.display = 'block';
+            document.getElementById('telInput').value = tel;
         }
     </script>
 
     <form action="/sendMessage" method="POST" id="messageForm" style="display: none;">
-        <input type="tel" name="tel" value="">
+        <input type="tel" id="telInput" name="tel" value="">
         <input type="text" name="content">
         <button type="submit">invia</button>
     </form>

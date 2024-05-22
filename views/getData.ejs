@@ -194,5 +194,53 @@
         })
 
     </script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-4kRhi6tLoGevxXo5mjXxDBTRqfSZ6ww&libraries=places"></script>
+<input id="autocomplete" type="text" placeholder="Inserisci un luogo" />
+<script>
+    function initAutocomplete() {
+      // Seleziona l'elemento di input
+      var input = document.getElementById('autocomplete');
+      
+      // Crea l'oggetto Autocomplete e lo associa all'elemento di input
+      var autocomplete = new google.maps.places.Autocomplete(input);
+  
+      // Facoltativo: limita i suggerimenti a un'area geografica specifica
+      // autocomplete.setBounds(new google.maps.LatLngBounds(
+      //   new google.maps.LatLng(-33.8902, 151.1759),
+      //   new google.maps.LatLng(-33.8474, 151.2631)));
+  
+      // Facoltativo: imposta restrizioni sui tipi di luogo
+      // autocomplete.setTypes(['geocode']); // 'geocode' per indirizzi, 'establishment' per aziende, ecc.
+    }
+  
+    // Assicurati che initAutocomplete venga chiamato quando la pagina è caricata
+    google.maps.event.addDomListener(window, 'load', initAutocomplete);
+  </script>
+  <script>
+    function initAutocomplete() {
+      var input = document.getElementById('autocomplete');
+      var autocomplete = new google.maps.places.Autocomplete(input);
+  
+      // Ascolta l'evento place_changed per ottenere i dettagli del luogo selezionato
+      autocomplete.addListener('place_changed', function() {
+        var place = autocomplete.getPlace();
+  
+        if (!place.geometry) {
+          console.log("Nessun dettaglio disponibile per il luogo selezionato: '" + place.name + "'");
+          return;
+        }
+  
+        // Usa i dettagli del luogo secondo necessità
+        console.log('Place details:', place);
+        // Ad esempio, ottieni le coordinate
+        console.log('Latitudine:', place.geometry.location.lat());
+        console.log('Longitudine:', place.geometry.location.lng());
+      });
+    }
+  
+    google.maps.event.addDomListener(window, 'load', initAutocomplete);
+  </script>
+  
 </body>
 </html>

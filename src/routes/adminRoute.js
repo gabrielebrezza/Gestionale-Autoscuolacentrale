@@ -8,7 +8,7 @@ const router = express.Router();
 
 
 
-// const client = require('twilio')(accountSid, authToken);
+const client = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
 
 //databases
 const admins = require('../DB/Admin');
@@ -132,19 +132,7 @@ router.post('/uploadUserFirma', (req, res) => {
   });
 });
 
-router.post('/sendMessage', async (req, res) => {
 
-
-client.messages
-    .create({
-        body: 'ciao',
-        from: 'whatsapp:+14155238886',
-        to: 'whatsapp:+393314185824'
-    })
-    .then((message) => console.log(`Messaggio inviato con SID: ${message.sid}`))
-    .catch((error) => console.error(`Errore: ${error.message}`));
-    res.redirect('/admin');
-});
 
 
 
@@ -153,6 +141,25 @@ client.messages
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
+
+router.post('/sendMessage', async (req, res) => {
+  const {tel, content} = req.body;
+  client.messages
+    .create({
+        body: content,
+        from: '+12182748160',
+        to: `+39${tel}`
+    })
+    .then((message) => {
+      console.log(`Messaggio inviato con SID: ${message.sid} al numero ${tel}`);
+      res.redirect('/admin')
+    })
+    .catch((error)=> {
+      console.log(`Errore nell\'invio del messaggio al numero ${tel}`);
+      res.render('errorPage',{error: `Errore nell\'invio del messaggio al numero ${tel}`})
+    } );
+});
+
 
 router.post('/updateUser', async (req, res) =>{
     try {
