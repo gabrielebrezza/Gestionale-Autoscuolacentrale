@@ -140,10 +140,9 @@ router.use(express.urlencoded({ extended: true }));
 
 router.post('/sendMessage', async (req, res) => {
   const {tel, content} = req.body;
-  const phoneNumbers = tel.trim().split(' ');
+  const phoneNumbers = tel.trim().split(', ');
   await sendMessage(phoneNumbers, content)
     .then(({ results, errorNumbers }) => {
-        console.log('Tutti i messaggi sono stati processati.');
         console.log('Numeri con errori:', errorNumbers);
         if(errorNumbers){
            return res.render('errorPage',{error: `errore nell\'invio dei messaggi ai numeri ${errorNumbers.join(', ')}`})

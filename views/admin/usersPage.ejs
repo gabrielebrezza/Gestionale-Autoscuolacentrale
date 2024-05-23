@@ -28,38 +28,111 @@
         tr{
             transition: .25s;
             cursor: pointer;
+            background-color: #fff;
         }
 
         /* Hover effect */
         tbody tr:hover {
-            background-color: #71a1cb;
-            color: #fff;
+            background-color: #d6d6d6;
+            /* color: #fff; */
         }
+
+.telBtn{
+    color: blue;
+}
+
+
+    .filterBox {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filterField {
+    padding: 25px;
+    margin-inline: 25px;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #1f1f1f5e;
+    border-radius: 5px;
+}
+
+.filterField h3 {
+    margin: 0;
+    margin-bottom: 10px;
+    font-size: 1.3em;
+    color: #1f1f1f;
+}
+
+.filterField label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #646464a6;
+}
+
+.filterField input[type="text"],
+.filterField input[type="date"],
+.filterField select {
+    max-width: 150px;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.filterField input[type="checkbox"] {
+    margin-left: 5px;
+}
+
     </style>
 </head>
 <body>
-
-    <input type="text" id="filterNome" placeholder="Filtra per Nome">
-    <input type="text" id="filterCognome" placeholder="Filtra per Cognome">
-    <label for="filterVisitaFrom">Da</label>
-    <input type="date" id="filterVisitaFrom" name="filterVisitaFrom">
-    <label for="filterVisitaTo">A</label>
-    <input type="date" id="filterVisitaTo" name="filterVisitaTo">
-    <label for="filterVisitaMancante">visita Mancante</label>
-    <input type="checkbox" id="filterVisitaMancante" name="filterVisitaMancante">
-
-    <select id="filterPatente">
-        <option value="all">Tutte</option>
-        <option value="AM">AM</option>
-        <option value="A1">A1</option>
-        <option value="B">B</option>
-        <option value="estensione A1B">estensione A1B</option>
-    </select>
-    <label for="filterRegistrazioneFrom">Da</label>
-    <input type="date" id="filterRegistrazioneFrom" name="filterRegistrazioneFrom">
-    <label for="filterRegistrazioneTo">A</label>
-    <input type="date" id="filterRegistrazioneTo" name="filterRegistrazioneTo">
-
+    <div class="filterBox">
+        <div class="filterField">
+            <label for="filterNome">Nome</label>
+            <input type="text" name="filterNome" id="filterNome" placeholder="Nome">
+        </div>
+        <div class="filterField">
+            <label for="filterNome">Cognome</label>
+            <input type="text" id="filterCognome" placeholder="Cognome">
+        </div>
+        <div class="filterField">
+            <h3>Visita Medica</h3>
+            <label for="filterVisitaFrom">Da</label>
+            <input type="date" id="filterVisitaFrom" name="filterVisitaFrom">
+            <label for="filterVisitaTo">A</label>
+            <input type="date" id="filterVisitaTo" name="filterVisitaTo">
+            <div class="checkboxField">
+                <label for="filterVisitaMancante">visita Mancante</label>
+                <input type="checkbox" id="filterVisitaMancante" name="filterVisitaMancante">
+            </div>
+        </div>
+        <div class="filterField">
+            <label for="filterPatente">Patente</label>
+            <select id="filterPatente" name="filterPatente">
+                <option value="all">Tutte</option>
+                <option value="AM">AM</option>
+                <option value="A1">A1</option>
+                <option value="B">B</option>
+                <option value="estensione A1B">estensione A1B</option>
+            </select>
+        </div>
+        <div class="filterField">
+            <h3>Registrazione</h3>
+            <label for="filterRegistrazioneFrom">Da</label>
+            <input type="date" id="filterRegistrazioneFrom" name="filterRegistrazioneFrom">
+            <label for="filterRegistrazioneTo">A</label>
+            <input type="date" id="filterRegistrazioneTo" name="filterRegistrazioneTo">
+        </div>
+    </div>
     <table>
         <thead>
             <tr>
@@ -73,12 +146,12 @@
             </tr>
         </thead>
         <tbody id="usersTableBody">
-            <% users.forEach(function(user) { %>
-                <tr>
+            <% users.forEach(function(user, index) { %>
+                <tr id="row<%= index %>">
                     <td><a href="<%=`/userPage?cf=${encodeURIComponent(user.cFiscale)}`%>"><%= user.nome %></a></td>
                     <td><%= user.cognome %></td>
                     <td><%= user.contatti.email %></td>
-                    <td onclick="showForm('<%= user.contatti.tel %>')"><%= user.contatti.tel %></td>
+                    <td class="telBtn" onclick="showForm('<%= user.contatti.tel%>', 'row<%= index %>')"><%= user.contatti.tel %></td>
                     <td><%= user.visita ? user.visita : 'Mancante' %></td>
                     <td>
                         <% user.patente.forEach(function(patente) { %>
@@ -163,9 +236,17 @@
 </script>
 
     <script>
-        function showForm(tel) {
+        
+        function showForm(tel, rowId) {
             document.getElementById('messageForm').style.display = 'block';
-            document.getElementById('telInput').value += ` ${tel}`;
+            var telInput = document.getElementById('telInput')
+            if(!telInput.value.includes(tel)){
+                telInput.value += `${tel}, `;
+            }else{
+                telInput.value = telInput.value.split(`${tel}, `).join(' ');
+            }
+            const row = document.getElementById(rowId)
+            row.style.background = row.style.background == 'lightblue' ? '#fff': 'lightblue';
         }
     </script>
 

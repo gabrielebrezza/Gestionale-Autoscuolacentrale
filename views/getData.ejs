@@ -196,28 +196,29 @@
     </script>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-4kRhi6tLoGevxXo5mjXxDBTRqfSZ6ww&libraries=places"></script>
-
 <script>
-    function initAutocomplete() {
-      var input = document.getElementById('autocomplete');
-      var autocomplete = new google.maps.places.Autocomplete(input);
+  function initAutocomplete() {
+    var input = document.getElementById('autocomplete');
+    var autocomplete = new google.maps.places.Autocomplete(input);
 
-      autocomplete.addListener('place_changed', function() {
-        var place = autocomplete.getPlace();
+    autocomplete.addListener('place_changed', function() {
+      var place = autocomplete.getPlace();
 
-        if (!place.geometry) {
-          console.log("Nessun dettaglio disponibile per il luogo selezionato: '" + place.name + "'");
-          return;
-        }
+      if (!place.geometry) {
+        console.log("Nessun dettaglio disponibile per il luogo selezionato: '" + place.name + "'");
+        return;
+      }
 
-        console.log('Place details:', place);
-        console.log('Latitudine:', place.geometry.location.lat());
-        console.log('Longitudine:', place.geometry.location.lng());
-      });
-    }
+      console.log('Place details:', place);
+      console.log('Latitudine:', place.geometry.location.lat());
+      console.log('Longitudine:', place.geometry.location.lng());
+    });
+  }
 
-    google.maps.event.addDomListener(window, 'load', initAutocomplete);
-  </script>
+  document.addEventListener("DOMContentLoaded", function() {
+    initAutocomplete();
+  });
+</script>
   <input id="autocomplete" type="text" placeholder="Inserisci un luogo" />
 </body>
 </html>
