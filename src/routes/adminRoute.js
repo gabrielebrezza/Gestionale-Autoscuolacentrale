@@ -6,17 +6,13 @@ const multer  = require('multer');
 const sharp = require('sharp');
 const router = express.Router();
 
-
-
-const client = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
-
 //databases
 const admins = require('../DB/Admin');
 const utenti = require('../DB/User');
 
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
-
+const sendMessage = require('../utils/messagesUtils.js');
 router.get('/admin', async (req, res) =>{
     const users = await utenti.find({});
     res.render('admin/usersPage', {users})
@@ -144,20 +140,20 @@ router.use(express.urlencoded({ extended: true }));
 
 router.post('/sendMessage', async (req, res) => {
   const {tel, content} = req.body;
-  client.messages
-    .create({
-        body: content,
-        from: '+12182748160',
-        to: `+39${tel}`
+  const phoneNumbers = tel.trim().split(' ');
+  await sendMessage(phoneNumbers, content)
+    .then(({ results, errorNumbers }) => {
+        console.log('Tutti i messaggi sono stati processati.');
+        console.log('Numeri con errori:', errorNumbers);
+        if(errorNumbers){
+           return res.render('errorPage',{error: `errore nell\'invio dei messaggi ai numeri ${errorNumbers.join(', ')}`})
+        }
+        res.redirect('/admin');
     })
-    .then((message) => {
-      console.log(`Messaggio inviato con SID: ${message.sid} al numero ${tel}`);
-      res.redirect('/admin')
-    })
-    .catch((error)=> {
-      console.log(`Errore nell\'invio del messaggio al numero ${tel}`);
-      res.render('errorPage',{error: `Errore nell\'invio del messaggio al numero ${tel}`})
-    } );
+    .catch(error => {
+        console.log('Si è verificato un errore:', error);
+    });
+
 });
 
 

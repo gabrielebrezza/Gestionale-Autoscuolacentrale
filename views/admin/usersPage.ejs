@@ -165,13 +165,13 @@
     <script>
         function showForm(tel) {
             document.getElementById('messageForm').style.display = 'block';
-            document.getElementById('telInput').value = tel;
+            document.getElementById('telInput').value += ` ${tel}`;
         }
     </script>
 
     <form action="/sendMessage" method="POST" id="messageForm" style="display: none;">
-        <input type="tel" id="telInput" name="tel" value="">
-        <input type="text" name="content">
+        <input type="tel" id="telInput" name="tel" value="" required>
+        <input type="text" name="content" required>
         <button type="submit">invia</button>
     </form>
 </body>
