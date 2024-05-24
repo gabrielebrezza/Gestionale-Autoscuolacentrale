@@ -267,7 +267,9 @@ app.post('/payment', async (req, res) =>{
 });
 
 
-
+app.get('/autocomplete', async (req, res) => {
+  res.render('autocomplete');
+});
 
 
 
