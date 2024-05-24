@@ -196,12 +196,17 @@
 
     </script>
 
-<script type="module" src="https://unpkg.com/@googlemaps/extended-component-library@0.6"></script>
+<!-- <script type="module" src="https://unpkg.com/@googlemaps/extended-component-library@0.6.11"></script> -->
+<script type="module">
+    import 'https://unpkg.com/@googlemaps/extended-component-library@0.6.11/dist/index.min.js';
+</script>
 
 <gmpx-api-loader key="AIzaSyALmDut3wCx3pFPGA5OdiR0NNyEzD_VMcU" solution-channel="GMP_GCC_placepicker_v1"></gmpx-api-loader>
 <div class="container">
-  <gmpx-place-picker placeholder="Enter a place to see its address"></gmpx-place-picker>
-  <div class="result"></div>
+    <!-- Componente Place Picker -->
+    <gmpx-place-picker placeholder="Enter a place" id="place-picker" style="width: 100%"></gmpx-place-picker>
+    <!-- Visualizzazione dei risultati -->
+    <div class="result"></div>
 </div>
 
 <script>
