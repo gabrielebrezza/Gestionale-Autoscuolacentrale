@@ -132,6 +132,13 @@
             <label for="filterRegistrazioneTo">A</label>
             <input type="date" id="filterRegistrazioneTo" name="filterRegistrazioneTo">
         </div>
+        <div class="filterField">
+            <h3>Esame Teoria</h3>
+            <label for="filterEsameFrom">Da</label>
+            <input type="date" id="filterEsameFrom" name="filterEsameFrom">
+            <label for="filterEsameTo">A</label>
+            <input type="date" id="filterEsameTo" name="filterEsameTo">
+        </div>
     </div>
     <table>
         <thead>
@@ -143,6 +150,7 @@
                 <th>Visita Medica</th>
                 <th>Patente</th>
                 <th>Registrazione</th>
+                <th>Esami</th>
             </tr>
         </thead>
         <tbody id="usersTableBody">
@@ -159,6 +167,11 @@
                         <% }); %>
                     </td>
                     <td><%= user.dataRegistrazione %></td>
+                    <td>
+                        <% user.teoria.forEach(function(patente) { %>
+                            <%= patente.data %> <br>
+                        <% }); %>
+                    </td>
                 </tr>
             <% }); %>
         </tbody>
@@ -175,6 +188,8 @@
         const filterPatente = document.getElementById('filterPatente');
         const filterRegistrazioneFrom = document.getElementById('filterRegistrazioneFrom');
         const filterRegistrazioneTo = document.getElementById('filterRegistrazioneTo');
+        const filterEsameFrom = document.getElementById('filterEsameFrom');
+        const filterEsameTo = document.getElementById('filterEsameTo');
         const tableBody = document.getElementById('usersTableBody');
         const rows = tableBody.getElementsByTagName('tr');
 
@@ -187,6 +202,8 @@
             const dataVisitaDa = filterVisitaFrom.value;
             const dataVisitaA = filterVisitaTo.value;
             const visitaMancante = filterVisitaMancante.checked;
+            const dataEsameDa = filterEsameFrom.value;
+            const dataEsameA = filterEsameTo.value;
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
                 const nomeTd = row.getElementsByTagName('td')[0].textContent.toLowerCase();
@@ -194,7 +211,16 @@
                 const visitaTd = row.getElementsByTagName('td')[4].textContent.toLowerCase();
                 const patenteTd = row.getElementsByTagName('td')[5].textContent.toLowerCase();
                 const dataRegTd = row.getElementsByTagName('td')[6].textContent.toLowerCase();
-                 
+                const dataEsamiTd = row.getElementsByTagName('td')[7].textContent.toLowerCase().replace(/\s+/g, ' ').trim().split(' ');
+                
+                let isDateEsameInRange;
+                for (const esame of dataEsamiTd) {
+                    const dataEsame = new Date(esame.split('/').reverse().join('-'));
+                    const startEsameDate = new Date(dataEsameDa);
+                    const endEsameDate = new Date(dataEsameA);
+                    isDateEsameInRange = dataEsame >= startEsameDate && dataEsame <= endEsameDate;
+                    if (isDateEsameInRange) break;
+                }
                 let isDateVisitaInRange, isVisitaMancante;
                 if(!visitaMancante){
                     const dataVisita = new Date(visitaTd.split('/').reverse().join('-'));
@@ -215,7 +241,8 @@
                     (patente === '' || patenteTd.includes(patente) || patente == 'all') &&
                     (dataRegistrazioneDa === '' || dataRegistrazioneA === '' || isDateRegInRange) &&
                     (dataVisitaDa === '' || dataVisitaA === '' || isDateVisitaInRange) &&
-                    (!visitaMancante || isVisitaMancante)
+                    (!visitaMancante || isVisitaMancante) &&
+                    (dataEsameDa === '' || dataEsameA === '' || isDateEsameInRange)
                 ) {
                     row.style.display = '';
                 } else {
@@ -232,6 +259,8 @@
         filterRegistrazioneFrom.addEventListener('input', filterTable);
         filterRegistrazioneTo.addEventListener('input', filterTable);
         filterVisitaMancante.addEventListener('input', filterTable);
+        filterEsameFrom.addEventListener('input', filterTable);
+        filterEsameTo.addEventListener('input', filterTable);
     });
 </script>
 

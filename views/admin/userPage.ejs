@@ -242,7 +242,12 @@
                         <select name="provinciaNascita" class="provincia">
                             <option value="<%= user.nascita.provincia %>"><%= user.nascita.provincia %></option>
                         </select>
-                    </tr>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Stato di Nascita</td>
+                    <td><input type="text" id="statoNascita" name="statoNascita" value="<%= user.nascita.stato %>"></td>
+                </tr>
                 <tr>
                     <td>Sesso</td>
                     <td>

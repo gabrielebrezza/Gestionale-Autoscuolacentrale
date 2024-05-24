@@ -125,6 +125,7 @@ app.post('/payment', async (req, res) =>{
       "cognome": cognome,
       "nascita.comune": comuneNascita,
       "nascita.provincia": provinciaNascita,
+      "nascita.stato": statoNascita,
       "nascita.data": `${giorno}/${mese}/${anno}`,
       "sesso": sesso,
       "residenza.via": via,
@@ -159,16 +160,17 @@ app.post('/payment', async (req, res) =>{
     try{
       const updateUser = await utenti.findOneAndUpdate(
         {
-          "cFiscale": cFiscale,
-          "nome": nome,
-          "cognome": cognome,
-          "nascita.comune": comuneNascita,
-          "nascita.provincia": provinciaNascita,
-          "nascita.data": `${giorno}/${mese}/${anno}`,
-          "sesso": sesso
+          "cFiscale": cFiscale
         },
         {
           $set: {
+            "nome": nome,
+            "cognome": cognome,
+            "nascita.comune": comuneNascita,
+            "nascita.provincia": provinciaNascita,
+            "nascita.stato": statoNascita,
+            "nascita.data": `${giorno}/${mese}/${anno}`,
+            "sesso": sesso,
             "residenza.via": via,
             "residenza.nCivico": nCivico,
             "residenza.cap": cap,
