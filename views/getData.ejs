@@ -6,6 +6,8 @@
     <title>Iscrizione Scuola Guida</title>
     <link rel="stylesheet" href="/styles/form.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-4kRhi6tLoGevxXo5mjXxDBTRqfSZ6ww&libraries=places&callback=initMap"></script>
+
 </head>
 <body>
     <header>
@@ -195,30 +197,28 @@
 
     </script>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-4kRhi6tLoGevxXo5mjXxDBTRqfSZ6ww&libraries=places"></script>
-<script>
-  function initAutocomplete() {
-    var input = document.getElementById('autocomplete');
-    var autocomplete = new google.maps.places.Autocomplete(input);
+    <script>
+        const center = { lat: 50.064192, lng: -130.605469 };
+        // Create a bounding box with sides ~10km away from the center point
+        const defaultBounds = {
+          north: center.lat + 0.1,
+          south: center.lat - 0.1,
+          east: center.lng + 0.1,
+          west: center.lng - 0.1,
+        };
+        const input = document.getElementById('place_input');
+        const options = {
+          bounds: defaultBounds,
+          componentRestrictions: { country: "us" },
+          fields: ["address_components", "geometry", "icon", "name"],
+          strictBounds: false,
+        };
+        const autocomplete = new google.maps.places.Autocomplete(input, options);
+    </script>
+    <div class="form-group container">
+        <label for="location">Enter Your Loacation: (Autocomplete)</label>
+        <input type="text" name="search_input" id="place_input" class="form-control" />
+    </div>
 
-    autocomplete.addListener('place_changed', function() {
-      var place = autocomplete.getPlace();
-
-      if (!place.geometry) {
-        console.log("Nessun dettaglio disponibile per il luogo selezionato: '" + place.name + "'");
-        return;
-      }
-
-      console.log('Place details:', place);
-      console.log('Latitudine:', place.geometry.location.lat());
-      console.log('Longitudine:', place.geometry.location.lng());
-    });
-  }
-
-  document.addEventListener("DOMContentLoaded", function() {
-    initAutocomplete();
-  });
-</script>
-  <input id="autocomplete" type="text" placeholder="Inserisci un luogo" />
 </body>
 </html>
