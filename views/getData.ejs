@@ -151,11 +151,10 @@
     </script>
 
 <script type="module">
-    "use strict";
+    // "use strict";
     import {APILoader} from 'https://unpkg.com/@googlemaps/extended-component-library@0.6';
 
     const CONFIGURATION = {
-      "ctaTitle": "Checkout",
       "mapsApiKey": "AIzaSyA4iu52UT4JEx3Reh5fk0VI6WCafwqZwtM",
       "capabilities": {"addressAutocompleteControl":true}
     };
@@ -172,7 +171,7 @@
     ];
 
     function getFormInputElement(componentType) {
-      return document.getElementById(`${componentType}-input`);
+        return document.getElementById(`${componentType}-input`);
     }
 
     function getComponentName(componentType, place) {
@@ -206,7 +205,7 @@ async function initMap() {
 
     const luogoNascitaAutocomplete = new Autocomplete(getFormInputElement('location'), {
         fields: ['address_components', 'geometry', 'name'],
-        types: ['address'],
+        types: ['locality'],
     });
 
     luogoNascitaAutocomplete.addListener('place_changed', () => {
