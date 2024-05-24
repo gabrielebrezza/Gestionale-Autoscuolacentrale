@@ -56,7 +56,6 @@ app.post('/payment', async (req, res) =>{
     const comuneNascita = luogoNascita[0].trim();
     const provinciaNascita = luogoNascita[1].replace(/\s/g, "");
     const statoNascita = luogoNascita[2].replace(/\s/g, "") == 'Italy' || luogoNascita[2].replace(/\s/g, "") == 'Italia' ? luogoNascita[2].replace(/\s/g, "") : 'EE';
-    console.log(luogoNascita, comuneNascita, provinciaNascita, statoNascita)
     
     const via = residenza[0].trim();
     const nCivico = residenza[1].replace(/\s/g, "");
