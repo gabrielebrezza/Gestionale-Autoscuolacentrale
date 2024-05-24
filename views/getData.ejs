@@ -187,7 +187,12 @@
 
 function fillInLuogoNascita(place) {
     const luogoNascitaInput = document.getElementById('location-input');
-    luogoNascitaInput.value = `${getComponentName('administrative_area_level_3', place)}, ${getComponentName('administrative_area_level_2', place)}, ${getComponentName('country', place)}`;
+    if(getComponentName('administrative_area_level_2', place)){
+        luogoNascitaInput.value = `${getComponentName('locality', place)}, ${getComponentName('administrative_area_level_2', place)}, ${getComponentName('country', place)}`;
+    }else{
+        luogoNascitaInput.value = `${getComponentName('locality', place)}, ${getComponentName('administrative_area_level_1', place)}, ${getComponentName('country', place)}`;
+    }
+    
 }
 
 
