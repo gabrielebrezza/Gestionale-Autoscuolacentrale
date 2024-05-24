@@ -12,6 +12,8 @@
     <header>
         <img src="https://autoscuolacentrale.com/templates/autoscuola/images/logo_autoscuola.svg" alt="" width="500px">
     </header>
+    <gmpx-api-loader key="AIzaSyA4iu52UT4JEx3Reh5fk0VI6WCafwqZwtM" solution-channel="GMP_QB_addressselection_v3_cA">
+    </gmpx-api-loader>
     <div class="container">
         <form action="/payment" method="POST">
             <h1>Inserisci i tuoi dati per poterti registrare</h1>
@@ -29,13 +31,7 @@
             <div class="innerContainer">
                 <div class="field">
                     <label for="luogoNascita">Comune:</label>
-                    <input type="text" name="luogoNascita" id="luogoNascita"  required>
-                </div>
-                <div class="field">
-                    <label for="provinciaNascita">Provincia:</label>
-                    <select name="provinciaNascita" class="provincia" required>
-
-                    </select>
+                    <input type="text" name="luogoNascita" id="location-input" class="autocomplete" required>
                 </div>
             </div>
             <div class="field">
@@ -84,24 +80,8 @@
             </div>
             <div class="innerContainer">
                 <div class="field">
-                    <label for="via">Via:</label>
-                    <input type="text" name="via" id="via" required>
-                </div>
-                <div class="field">
-                    <label for="nCivico">Numero Civico:</label>
-                    <input type="text" name="nCivico" id="nCivico" required>
-                </div>
-                <div class="field">
-                    <label for="cap">CAP:</label>
-                    <input type="text" name="cap" id="cap" required>
-                </div>
-                <div class="field">
-                    <label for="comune">Comune:</label>
-                    <input type="text" name="comune" id="comune" required>
-                </div>
-                <div class="field">
-                    <label for="provinciaResidenza">Provincia:</label>
-                    <select name="provinciaResidenza" class="provincia" required></select>
+                    <label for="residenza">Indirizzo di Residenza:</label>
+                    <input type="text" name="residenza" id="locality-input" class="autocomplete" required>
                 </div>
             </div>
             <div class="field">
@@ -168,48 +148,99 @@
         centoAnniFa.setFullYear(oggi.getFullYear() - 100);
         year.setAttribute("min", centoAnniFa.getFullYear());
         year.setAttribute("max", (oggi.getFullYear() - 14));
-
-
-        const provinceList = [
-            "AG", "AL", "AN", "AR", "AP", "AT", "AV", "BA", "BT", "BL",
-            "BN", "BG", "BI", "BO", "BZ", "BS", "BR", "CA", "CL", "CB",
-            "CI", "CE", "CT", "CZ", "CH", "CO", "CS", "CR", "KR", "CN",
-            "EN", "FM", "FE", "FI", "FG", "FC", "FR", "GE", "GO", "GR",
-            "IM", "IS", "AQ", "SP", "LT", "LE", "LC", "LI", "LO", "LU",
-            "MC", "MN", "MS", "MT", "VS", "ME", "MI", "MO", "MB", "NA",
-            "NO", "NU", "OG", "OT", "OR", "PD", "PA", "PR", "PV", "PG",
-            "PU", "PE", "PC", "PI", "PT", "PN", "PZ", "PO", "RG", "RA",
-            "RC", "RE", "RI", "RN", "RM", "RO", "SA", "SS", "SV", "SI",
-            "SR", "SO", "TA", "TE", "TR", "TO", "TP", "TN", "TV", "TS",
-            "UD", "AO", "VA", "VE", "VB", "VC", "VR", "VV", "VI", "VT"
-        ];
-    
-        const selectProvince = document.querySelectorAll(".provincia");
-        selectProvince.forEach((opt) =>{
-            provinceList.forEach(province => {
-                const option = document.createElement("option");
-                option.value = province;
-                option.textContent = province;
-                opt.appendChild(option);
-            });
-        })
-
     </script>
 
-<script type="module" src="https://unpkg.com/@googlemaps/extended-component-library@0.6"></script>
+<script type="module">
+    "use strict";
+    import {APILoader} from 'https://unpkg.com/@googlemaps/extended-component-library@0.6';
 
-<gmpx-api-loader key="AIzaSyA4iu52UT4JEx3Reh5fk0VI6WCafwqZwtM" solution-channel="GMP_GCC_placepicker_v1"></gmpx-api-loader>
-<div class="container">
-  <gmpx-place-picker placeholder="Enter a place to see its address"></gmpx-place-picker>
-  <div class="result"></div>
-</div>
-<script>
-    const picker = document.querySelector('gmpx-place-picker');
-const result = document.querySelector('.result');
-picker.addEventListener('gmpx-placechange', (e) => {
-  result.textContent = e.target.value?.formattedAddress ?? '';
-});
+    const CONFIGURATION = {
+      "ctaTitle": "Checkout",
+      "mapsApiKey": "AIzaSyA4iu52UT4JEx3Reh5fk0VI6WCafwqZwtM",
+      "capabilities": {"addressAutocompleteControl":true}
+    };
 
-</script>
+    const SHORT_NAME_ADDRESS_COMPONENT_TYPES =
+        new Set(['street_number', 'administrative_area_level_2', 'postal_code']);
+
+    const ADDRESS_COMPONENT_TYPES_IN_FORM = [
+      'location',
+      'locality',
+      'administrative_area_level_2',
+      'postal_code',
+      'country',
+    ];
+
+    function getFormInputElement(componentType) {
+      return document.getElementById(`${componentType}-input`);
+    }
+
+    function getComponentName(componentType, place) {
+    for (const component of place.address_components || []) {
+        if (component.types[0] === componentType) {
+            return SHORT_NAME_ADDRESS_COMPONENT_TYPES.has(componentType) ?
+                component.short_name :
+                component.long_name;
+        }
+    }
+    return '';
+}
+
+function fillInLuogoNascita(place) {
+    const luogoNascitaInput = document.getElementById('location-input');
+    luogoNascitaInput.value = `${getComponentName('administrative_area_level_3', place)}, ${getComponentName('administrative_area_level_2', place)}, ${getComponentName('country', place)}`;
+}
+
+
+
+function fillInResidenza(place) {
+    console.log(place)
+    const residenzaInput = document.getElementById('locality-input');
+    residenzaInput.value = `${getComponentName('route', place)}, ${getComponentName('street_number', place)}, ${getComponentName('postal_code', place)}, ${getComponentName('administrative_area_level_3', place)}, ${getComponentName('administrative_area_level_2', place)}`;
+}
+
+
+
+async function initMap() {
+    const {Autocomplete} = await APILoader.importLibrary('places');
+
+    const luogoNascitaAutocomplete = new Autocomplete(getFormInputElement('location'), {
+        fields: ['address_components', 'geometry', 'name'],
+        types: ['address'],
+    });
+
+    luogoNascitaAutocomplete.addListener('place_changed', () => {
+        const placeLuogoNascita = luogoNascitaAutocomplete.getPlace();
+        if (!placeLuogoNascita.geometry) {
+            window.alert(`No details available for input: '${placeLuogoNascita.name}'`);
+            return;
+        }
+        console.log(placeLuogoNascita)
+        fillInLuogoNascita(placeLuogoNascita);
+    });
+
+    const residenzaAutocomplete = new Autocomplete(getFormInputElement('locality'), {
+        fields: ['address_components', 'geometry', 'name'],
+        types: ['address'],
+    });
+
+    residenzaAutocomplete.addListener('place_changed', () => {
+        const placeResidenza = residenzaAutocomplete.getPlace();
+        if (!placeResidenza.geometry) {
+            window.alert(`No details available for input: '${placeResidenza.name}'`);
+            return;
+        }
+        fillInResidenza(placeResidenza);
+    });
+}
+
+    initMap();
+  </script>
+
+
+
+
+
+
 </body>
 </html>

@@ -45,13 +45,34 @@ app.get('/', async (req, res) =>{
 });
 
 app.post('/payment', async (req, res) =>{
-  const provinciaNascita = req.body.provinciaNascita.replace(/\s/g, "");
+    const luogoNascita = req.body.luogoNascita.split(',');
+    const residenza = req.body.residenza.split(',');
+    if(luogoNascita.length < 3){
+      return res.render('errorPage', { error: `Dato mancante all'interno dell'indirizzo di nascita` });
+    }
+    if(residenza.length < 5){
+      return res.render('errorPage', { error: `Dato mancante all'interno dell'indirizzo di residenza` });
+    }
+    const comuneNascita = luogoNascita[0].trim();
+    const provinciaNascita = luogoNascita[1].replace(/\s/g, "");
+    const statoNascita = luogoNascita[2].replace(/\s/g, "") == 'Italy' || luogoNascita[2].replace(/\s/g, "") == 'Italia' ? luogoNascita[2].replace(/\s/g, "") : 'EE';
+    console.log(luogoNascita, comuneNascita, provinciaNascita, statoNascita)
+    
+    const via = residenza[0].trim();
+    const nCivico = residenza[1].replace(/\s/g, "");
+    const cap = residenza[2].replace(/\s/g, "");
+    const comune = residenza[3].trim(); 
+    const provinciaResidenza = residenza[4].replace(/\s/g, "");
+
+
+
+    
+
+
   const mese = req.body.mese.replace(/\s/g, "");
   const sesso = req.body.sesso.replace(/\s/g, "");
   const cFiscale = req.body.cFiscale.replace(/\s/g, "");
-  const nCivico = req.body.nCivico.replace(/\s/g, "");
-  const cap = req.body.cap.replace(/\s/g, "");
-  const provinciaResidenza = req.body.provinciaResidenza.replace(/\s/g, "");
+
   const email = req.body.email.replace(/\s/g, "");
   const tel = req.body.tel.replace(/\s/g, "");
   const documento = req.body.documento.replace(/\s/g, "");
@@ -60,9 +81,8 @@ app.post('/payment', async (req, res) =>{
 
   const nome = req.body.nome.trim();
   const cognome = req.body.cognome.trim();
-  const luogoNascita = req.body.luogoNascita.trim();
-  const via = req.body.via.trim();
-  const comune = req.body.comune.trim(); 
+
+
   const giorno = req.body.giorno < 10 ? `0${req.body.giorno}`: req.body.giorno;
   const {anno, paymentMethod} = req.body;
   const oggi = new Date();
@@ -103,7 +123,7 @@ app.post('/payment', async (req, res) =>{
       "cFiscale": cFiscale,
       "nome": nome,
       "cognome": cognome,
-      "nascita.comune": luogoNascita,
+      "nascita.comune": comuneNascita,
       "nascita.provincia": provinciaNascita,
       "nascita.data": `${giorno}/${mese}/${anno}`,
       "sesso": sesso,
@@ -142,7 +162,7 @@ app.post('/payment', async (req, res) =>{
           "cFiscale": cFiscale,
           "nome": nome,
           "cognome": cognome,
-          "nascita.comune": luogoNascita,
+          "nascita.comune": comuneNascita,
           "nascita.provincia": provinciaNascita,
           "nascita.data": `${giorno}/${mese}/${anno}`,
           "sesso": sesso
@@ -267,9 +287,6 @@ app.post('/payment', async (req, res) =>{
 });
 
 
-app.get('/autocomplete', async (req, res) => {
-  res.render('autocomplete');
-});
 
 
 

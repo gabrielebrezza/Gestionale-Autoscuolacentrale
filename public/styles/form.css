@@ -128,3 +128,20 @@ header img{
         max-width: 100vw;
     }
 }
+
+
+input.autocomplete{
+    max-width: 600px !important;
+    width: max-content !important;
+}
+input.pac-target-input{
+    max-width: 600px !important;
+    width: 100% !important;
+}
+.pac-container {
+    position: absolute;
+    left: 50% !important;
+    transform: translateX(-50%);
+    width: max-content !important;
+    height: max-content;
+}
