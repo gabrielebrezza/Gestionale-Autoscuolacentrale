@@ -193,7 +193,6 @@ function fillInLuogoNascita(place) {
 
 
 function fillInResidenza(place) {
-    console.log(place)
     const residenzaInput = document.getElementById('locality-input');
     residenzaInput.value = `${getComponentName('route', place)}, ${getComponentName('street_number', place)}, ${getComponentName('postal_code', place)}, ${getComponentName('administrative_area_level_3', place)}, ${getComponentName('administrative_area_level_2', place)}`;
 }
