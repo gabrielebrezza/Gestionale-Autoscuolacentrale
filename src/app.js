@@ -139,7 +139,7 @@ app.post('/payment', async (req, res) =>{
       "nDocumento": nDocumento,
       "patente": [{
         tipo: tipoPatente,
-        pagato: false
+        pagato: true
       }],
       "teoria":[
         {
@@ -191,7 +191,7 @@ app.post('/payment', async (req, res) =>{
           $addToSet: {
             "patente": {
               tipo: tipoPatente,
-              pagato: false
+              pagato: true
             }
           }
         },
@@ -205,8 +205,8 @@ app.post('/payment', async (req, res) =>{
       return res.status(500).send('Si è verificato un errore');
     }
   }
-  
-
+  res.redirect('/');
+/*
   if(paymentMethod == 'stripe'){
     try {
       const session = await stripe.checkout.sessions.create({
@@ -285,7 +285,7 @@ app.post('/payment', async (req, res) =>{
       console.log('si è verificato un errore con il pagamento con stripe, errore: ', error);
       res.status(500).json({error: error.message});
     }
-  }
+  }*/
 });
 
 
