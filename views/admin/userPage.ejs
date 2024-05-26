@@ -53,10 +53,10 @@
             margin-block: 15px;
         }
         .imageForm img{
-            width: 50%;
+            /* width: 50%; */
             /* object-fit: cover; */
             object-position: center;
-            height: 100px;
+            /* height: 100px; */
             margin-top: 40px;
             margin-bottom: 10px;
         }
@@ -127,8 +127,16 @@
         button.deleteButton:hover {
             background: rgb(119, 64, 64);
         }
+        #cropContainer {
+            display: none;
+            max-width: 100%;
+            /* margin-top: 10px; */
+        }
     </style>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+    
 </head>
 <body>
     <a href="/admin">Torna alla Lista Utenti</a>
@@ -142,12 +150,15 @@
                 <button type="submit">Salva</button>
                 <input type="hidden" name="intent" value="firma">
                 <button type="button" class="deleteButton">
-                    <span class="material-symbols-outlined">
-                        delete
-                    </span>
+                    <span class="material-symbols-outlined">delete</span>
                 </button>
             </div>
+            <div id="cropContainer">
+                <img id="cropImage" style="max-width: 100%;">
+            </div>
+            <input type="hidden" id="croppedImage" name="croppedImage">
         </form>
+        
         <form class="imageForm" action="/uploadUserImage" method="post" enctype="multipart/form-data">
             <input type="hidden" name="cf" value="<%= user.cFiscale %>">
             <img id="profilePic" src="/img/profileImages/<%= user.immagineProfilo ? user.immagineProfilo : 'profile.png' %>" alt="Immagine Profilo">
@@ -201,12 +212,49 @@
             profilePic.src = URL.createObjectURL(inputProfileFile.files[0]);
         }
 
-        const signPic = document.getElementById('signPic');
-        const inputSigningFile = document.getElementById('inputSigningFile');
-        inputSigningFile.onchange = function() {
-            signPic.src = URL.createObjectURL(inputSigningFile.files[0]);
-        }
+        // const signPic = document.getElementById('signPic');
+        // const inputSigningFile = document.getElementById('inputSigningFile');
+        // inputSigningFile.onchange = function() {
+        //     signPic.src = URL.createObjectURL(inputSigningFile.files[0]);
+        // }
     </script>
+    <script>
+    const inputSigningFile = document.getElementById('inputSigningFile');
+    const cropImage = document.getElementById('cropImage');
+    const croppedImageInput = document.getElementById('croppedImage');
+    let cropper;
+
+    inputSigningFile.onchange = function(event) {
+        const files = event.target.files;
+        if (files && files.length > 0) {
+            const file = files[0];
+            const url = URL.createObjectURL(file);
+            cropImage.src = url;
+
+            if (cropper) {
+                cropper.destroy();
+            }
+
+            cropper = new Cropper(cropImage, {
+                aspectRatio: 236 / 47,
+                viewMode: 1,
+                autoCropArea: 1,
+                move: (0, -30),
+                crop(event) {
+                    const canvas = cropper.getCroppedCanvas({
+                        width: 236,
+                        height: 47
+                    });
+                    
+                    croppedImageInput.value = canvas.toDataURL('image/jpeg');
+                },
+            });
+
+            document.getElementById('cropContainer').style.display = 'block';
+        }
+    };
+</script>
+
     <form action="/updateUser" method="post">
         <table>
             <thead>

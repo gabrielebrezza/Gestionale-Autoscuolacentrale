@@ -88,43 +88,42 @@ const uploadFirmaPic = multer({
   }
 }).single('inputSigningFile');
 
-router.post('/uploadUserFirma', (req, res) => {
-
+router.post('/uploadUserFirma', async (req, res) => {
   uploadFirmaPic(req, res, async function (err) {
     if (err) {
       return res.status(400).send(err.message);
     }
-    if(!req.file){
-        return res.render('errorPage',{error: 'Nessuna immagine caricata'});
+    const { cf, croppedImage } = req.body;
+
+    if (!croppedImage) {
+      return res.render('errorPage', { error: 'Nessuna immagine caricata' });
     }
-    const cf = req.body.cf; 
-    const file = req.file;
- 
-    const webpBuffer = await sharp(file.buffer)
-      .resize({ width: 236, height: 47, fit: 'cover', position: 'center' })
+
+    const matches = croppedImage.match(/^data:image\/(jpeg|png);base64,(.+)$/);
+    if (!matches) {
+      return res.status(400).send('Formato immagine non valido');
+    }
+
+    const imageBuffer = Buffer.from(matches[2], 'base64');
+
+    const fileName = `${cf}_${Date.now()}.jpg`;
+    const filePath = `public/img/firme/${fileName}`;
+
+    await sharp(imageBuffer)
       .toFormat('jpg')
-      .toBuffer();
+      .toFile(filePath);
 
-    const fileName = cf + '_' + Date.now() + '.jpg';
-    const filePath = 'public/img/firme/' + fileName;
-
-    fs.writeFile(filePath, webpBuffer, async (err) => {
-      if (err) {
-        console.error('Errore durante il salvataggio del file:', err);
-        return res.status(500).send('Errore durante il salvataggio del file');
+    const existingUser = await utenti.findOne({ cFiscale: cf });
+    if (existingUser && existingUser.firma) {
+      const imagePath = `public/img/firme/${existingUser.firma}`;
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
       }
+    }
 
-      const existingUser = await utenti.findOne({ cFiscale: cf });
-      if (existingUser && existingUser.firma) {
-        const imagePath = 'public/img/firme/' + existingUser.firma;
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-        }
-      }
-      await utenti.findOneAndUpdate({ cFiscale: cf }, { firma: fileName });
-      
-      res.redirect(req.get('referer'));
-    });
+    await utenti.findOneAndUpdate({ cFiscale: cf }, { firma: fileName });
+
+    res.redirect(req.get('referer'));
   });
 });
 
