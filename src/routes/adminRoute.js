@@ -252,4 +252,8 @@ router.post('/deleteUserImage', async (req, res) => {
   }
   res.redirect(`/userPage?cf=${cf}`);
 });
+
+router.get('/crop', async (req, res) => {
+  res.render('crop');
+})
 module.exports = router;

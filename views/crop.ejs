@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+</head>
+<body>
+    <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
+    <div id="cropContainer">
+        <img id="cropImage" style="max-width: 100%;">
+    </div>
+    <input type="hidden" id="croppedImage" name="croppedImage">
+    <div id="croppedImagePreviewContainer" style="margin-top: 20px;">
+        <img id="croppedImagePreview" style="max-width: 100%;">
+    </div>
+
+    <script>
+        const inputSigningFile = document.getElementById('inputSigningFile');
+        const cropImage = document.getElementById('cropImage');
+        const croppedImageInput = document.getElementById('croppedImage');
+        const croppedImagePreview = document.getElementById('croppedImagePreview');
+        let cropper;
+
+        inputSigningFile.onchange = function(event) {
+            const files = event.target.files;
+            if (files && files.length > 0) {
+                const file = files[0];
+                const url = URL.createObjectURL(file);
+                cropImage.src = url;
+
+                if (cropper) {
+                    cropper.destroy();
+                }
+
+                cropper = new Cropper(cropImage, {
+                    aspectRatio: 236 / 47,
+                    viewMode: 1,
+                    autoCropArea: 1,
+                    crop(event) {
+                        const canvas = cropper.getCroppedCanvas({
+                            width: 236,
+                            height: 47
+                        });
+                        
+                        const croppedDataUrl = canvas.toDataURL('image/jpeg');
+                        croppedImageInput.value = croppedDataUrl;
+                        croppedImagePreview.src = croppedDataUrl;
+                    },
+                });
+
+                document.getElementById('cropContainer').style.display = 'block';
+            }
+        };
+    </script>
+
+</body>
+</html>
