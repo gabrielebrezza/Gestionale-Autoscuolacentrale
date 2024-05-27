@@ -204,8 +204,7 @@ app.post('/payment', async (req, res) =>{
       return res.status(500).send('Si è verificato un errore');
     }
   }
-  res.redirect('/');
-/*
+  const price = 5;
   if(paymentMethod == 'stripe'){
     try {
       const session = await stripe.checkout.sessions.create({
@@ -218,7 +217,7 @@ app.post('/payment', async (req, res) =>{
               product_data:{
                 name: `Iscrizione Scuola Guida per la patente ${tipoPatente}`
               },
-              unit_amount: 1000
+              unit_amount: price * 100
             },
             quantity: 1
           }
@@ -244,7 +243,7 @@ app.post('/payment', async (req, res) =>{
               payment_method: "paypal"
           },
           redirect_urls: {
-              return_url: `${process.env.SERVER_URL}/successPayment/paypal`,
+              return_url: `${process.env.SERVER_URL}/successPayment/paypal?&price=${encodeURIComponent(price)}`,
               cancel_url: `${process.env.SERVER_URL}/cancelPayment`,
           },
           transactions: [
@@ -254,7 +253,7 @@ app.post('/payment', async (req, res) =>{
                           {
                               name: `Iscrizione Scuola Guida per la patente ${tipoPatente}`,
                               sku: 1,
-                              price: 6,
+                              price: price,
                               currency: "EUR",
                               quantity: 1
                           }
@@ -262,7 +261,7 @@ app.post('/payment', async (req, res) =>{
                   },
                   amount: {
                       currency: "EUR",
-                      total: 6
+                      total: price
                   },
                   custom: JSON.stringify({cFiscale: cFiscale, patente: tipoPatente, email: email}),
                   description: `Iscrizione a Scuola Guida per la patente di tipo ${tipoPatente}`
@@ -281,10 +280,10 @@ app.post('/payment', async (req, res) =>{
           }
       });
     } catch (error) {
-      console.log('si è verificato un errore con il pagamento con stripe, errore: ', error);
+      console.log('si è verificato un errore con il pagamento con Paypal, errore: ', error);
       res.status(500).json({error: error.message});
     }
-  }*/
+  }
 });
 
 

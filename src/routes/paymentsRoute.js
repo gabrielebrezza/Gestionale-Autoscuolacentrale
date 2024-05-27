@@ -24,8 +24,9 @@ router.post('/stripeHooks', bodyParser.raw({type: 'application/json'}), async (r
   
     if(event.type == 'checkout.session.completed') {
         const paymentIntentSucceeded = event.data.object;
+        const price = paymentIntentSucceeded.amount_total/100;
         const {cFiscale, patente, email} = paymentIntentSucceeded.metadata;
-        await setPayment(cFiscale, patente);
+        await setPayment(cFiscale, patente, price);
         try{
           const result = await sendEmail(email, 'Iscrizione effettuata con successo', `Grazie per esserti iscritto alla patente ${patente}. Ti chiediamo gentilmente in caso tu non l'avessi ancora fatto di inviarci la scansione della tua firma e della fototessera che apparirà sulla patente`);
         }catch (error){
@@ -35,7 +36,7 @@ router.post('/stripeHooks', bodyParser.raw({type: 'application/json'}), async (r
     res.json({success: true});
   })
   
-  async function setPayment(cFiscale, patente) {
+  async function setPayment(cFiscale, patente, price) {
         try {
             const setPaid = await utenti.findOneAndUpdate(
               {
@@ -53,6 +54,20 @@ router.post('/stripeHooks', bodyParser.raw({type: 'application/json'}), async (r
                 }
               }
             );
+            const today = new Date();
+            const DD = String(today.getDate()).padStart(2, '0'); 
+            const MM = String(today.getMonth() + 1).padStart(2, '0'); 
+            const YYYY = today.getFullYear(); 
+            const dataFatturazione = `${DD}/${MM}/${YYYY}`;
+            await utenti.findOneAndUpdate(
+                {"cFiscale": cFiscale},
+                {
+                    $addToSet: {
+                        "fatture": {"data": dataFatturazione, "importo": price, "emessa": false},
+                    }
+                },
+                {new: true}
+            );
             console.log(`l'utente con codice fiscale ${cFiscale} ha completato il pagamento con successo per la patente ${patente}`);
         } catch (error) {
             console.error('Errore durante il recupero dei dati dell\'utente:', error);
@@ -63,11 +78,11 @@ router.post('/stripeHooks', bodyParser.raw({type: 'application/json'}), async (r
   router.get('/successPayment/paypal', async (req, res) => {
   
       const payerId = req.query.PayerID;
-      const paymentId = req.query.paymentId;
+      const paymentId = req.query.paymentId; 
+      const price = req.query.price;
       if(!paymentId || !payerId){
         return res.render('errorPage' ,{error: 'non hai effettuato nessun pagamento'});
       }
-      const price = 6;
       const execute_payment_json = {
           payer_id: payerId,
           transactions: [
@@ -87,7 +102,7 @@ router.post('/stripeHooks', bodyParser.raw({type: 'application/json'}), async (r
           }else{
             try{
               const {cFiscale, patente, email} = JSON.parse(payment.transactions[0].custom);
-              await setPayment(cFiscale, patente);
+              await setPayment(cFiscale, patente, price);
               try{
                 const result = await sendEmail(email, 'Iscrizione effettuata con successo', `Grazie per esserti iscritto alla patente ${patente}. Ti chiediamo gentilmente in caso tu non l'avessi ancora fatto di inviarci la scansione della tua firma e della fototessera che apparirà sulla patente`);
                 console.log(result);

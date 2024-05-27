@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Prezzi</title>
+</head>
+<body>
+    <form action="/updatePrice" method="POST">
+        <label for="price">Prezzo Iscrizione</label>
+        <input name="price" type="number" min="0" value="<%= price %>" step="any" >
+        <button type="submit">Aggiorna</button>
+    </form>
+</body>
+</html>

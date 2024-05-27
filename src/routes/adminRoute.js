@@ -9,7 +9,7 @@ const router = express.Router();
 //databases
 const admins = require('../DB/Admin');
 const utenti = require('../DB/User');
-
+const prezzi = require('../DB/Prezzi');
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
 const sendMessage = require('../utils/messagesUtils.js');
@@ -251,5 +251,20 @@ router.post('/deleteUserImage', async (req, res) => {
   }
   res.redirect(`/userPage?cf=${cf}`);
 });
+
+router.get('/admin/price', async (req, res) => {
+  const prezzo = await prezzi.findOne({});
+  res.render('admin/pricePage', {price: prezzo.prezzo});
+});
+router.post('/updatePrice', async (req, res) => {
+  const price = req.body.price;
+  await prezzi.updateOne({"prezzo": price});
+  console.log(`Il prezzo è stato aggiornato a ${price}€`)
+  res.redirect('/admin/price');
+});
+// router.get('/fattureDaEmettere', async (req, res)=> {
+//   const dati = await utenti.findOne({"cFiscale": req.query.cf, "fatture": 1})
+//   res.render('admin/fattureDaEmettere', {dati});
+// });
 
 module.exports = router;

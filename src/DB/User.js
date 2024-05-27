@@ -147,6 +147,22 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    fatture: [
+        {
+            data: {
+                type: String,
+                required: false
+            },
+            importo: {
+                type: Number,
+                required: false
+            },
+            emessa: {
+                type: Boolean,
+                required: false
+            },
+        }
+    ],
     archiviato:{
         type: Boolean,
         required: false
