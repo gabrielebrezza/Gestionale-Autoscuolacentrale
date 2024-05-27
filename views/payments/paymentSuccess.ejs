@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pagamento effetuato con successo</title>
     <link rel="stylesheet" href="/styles/paymentStatus.css">
+    <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 </head>
 <body>
     <header>
@@ -19,6 +21,10 @@
                 <div class="field">
                     <label for="inputSigningFile">Carica Firma:</label>
                     <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
+                    <div class="crop" id="cropContainer">
+                        <img id="cropImage" style="max-width: 100%;">
+                    </div>
+                    <input type="hidden" id="croppedImage" name="croppedImage">
                 </div>
                 <div class="field">
                     <label for="inputProfileFile">Carica Fototessera:</label>
@@ -26,7 +32,42 @@
                 </div>
                 <button type="submit">Salva</button>
             </form>
+            <script>
+                const inputSigningFile = document.getElementById('inputSigningFile');
+                const cropImage = document.getElementById('cropImage');
+                const croppedImageInput = document.getElementById('croppedImage');
+                let cropper;
         
+                inputSigningFile.onchange = function(event) {
+                    const files = event.target.files;
+                    if (files && files.length > 0) {
+                        const file = files[0];
+                        const url = URL.createObjectURL(file);
+                        cropImage.src = url;
+        
+                        if (cropper) {
+                            cropper.destroy();
+                        }
+        
+                        cropper = new Cropper(cropImage, {
+                            aspectRatio: 236 / 47,
+                            viewMode: 1,
+                            autoCropArea: 1,
+                            crop(event) {
+                                const canvas = cropper.getCroppedCanvas({
+                                    width: 236,
+                                    height: 47
+                                });
+                                
+                                const croppedDataUrl = canvas.toDataURL('image/jpeg');
+                                croppedImageInput.value = croppedDataUrl;
+                            },
+                        });
+        
+                        document.getElementById('cropContainer').style.display = 'block';
+                    }
+                };
+            </script>
             <script>
                 document.getElementById('combinedForm').addEventListener('submit', async function(event) {
                     event.preventDefault();
@@ -36,7 +77,7 @@
                     const formDataImage = new FormData();
         
                     formDataFirma.append('cf', form.querySelector('input[name="cf"]').value);
-                    formDataFirma.append('inputSigningFile', form.querySelector('input[name="inputSigningFile"]').files[0]);
+                    formDataFirma.append('croppedImage', form.querySelector('input[name="croppedImage"]').value);
         
                     formDataImage.append('cf', form.querySelector('input[name="cf"]').value);
                     formDataImage.append('inputProfileFile', form.querySelector('input[name="inputProfileFile"]').files[0]);

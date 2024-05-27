@@ -103,3 +103,7 @@ h2, p{
     text-align: center;
     line-height: 25px;
 }
+.crop{
+    margin-block: 25px;
+    display: none;
+}

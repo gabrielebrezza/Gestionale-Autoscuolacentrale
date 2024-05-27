@@ -200,27 +200,18 @@
         });
     });
     </script>
-    <div id="croppedImagePreviewContainer" style="margin-top: 20px;">
-        <img id="croppedImagePreview" style="max-width: 100%;">
-    </div>
     <script>
         const profilePic = document.getElementById('profilePic');
         const inputProfileFile = document.getElementById('inputProfileFile');
         inputProfileFile.onchange = function() {
             profilePic.src = URL.createObjectURL(inputProfileFile.files[0]);
         }
-
-        // const signPic = document.getElementById('signPic');
-        // const inputSigningFile = document.getElementById('inputSigningFile');
-        // inputSigningFile.onchange = function() {
-        //     signPic.src = URL.createObjectURL(inputSigningFile.files[0]);
-        // }
     </script>
     <script>
         const inputSigningFile = document.getElementById('inputSigningFile');
         const cropImage = document.getElementById('cropImage');
         const croppedImageInput = document.getElementById('croppedImage');
-        const croppedImagePreview = document.getElementById('croppedImagePreview');
+        const croppedImagePreview = document.getElementById('signPic');
         let cropper;
 
         inputSigningFile.onchange = function(event) {

@@ -103,7 +103,6 @@ router.post('/uploadUserFirma', async (req, res) => {
     if (!matches) {
       return res.status(400).send('Formato immagine non valido');
     }
-
     const imageBuffer = Buffer.from(matches[2], 'base64');
 
     const fileName = `${cf}_${Date.now()}.jpg`;
@@ -253,7 +252,4 @@ router.post('/deleteUserImage', async (req, res) => {
   res.redirect(`/userPage?cf=${cf}`);
 });
 
-router.get('/crop', async (req, res) => {
-  res.render('crop');
-})
 module.exports = router;
