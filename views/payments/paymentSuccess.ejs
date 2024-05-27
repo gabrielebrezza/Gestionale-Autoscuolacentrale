@@ -51,12 +51,13 @@
         
                         cropper = new Cropper(cropImage, {
                             aspectRatio: 236 / 47,
-                            viewMode: 1,
+                            viewMode: 0,
                             autoCropArea: 1,
                             crop(event) {
                                 const canvas = cropper.getCroppedCanvas({
                                     width: 236,
-                                    height: 47
+                                    height: 47,
+                                    fillColor: 'white'
                                 });
                                 
                                 const croppedDataUrl = canvas.toDataURL('image/jpeg');
