@@ -42,7 +42,7 @@
 }
 
 
-    .filterBox {
+    .filterBox details {
     background-color: #f9f9f9;
     border: 1px solid #ccc;
     padding: 20px;
@@ -55,40 +55,40 @@
 }
 
 .filterField {
-    padding: 25px;
+    padding: 5px;
     margin-inline: 25px;
     display: flex;
     flex-direction: column;
-    border: 2px solid #1f1f1f5e;
+    border: 1px solid #1f1f1f5e;
     border-radius: 5px;
 }
 
-.filterField h3 {
+details h3 {
     margin: 0;
     margin-bottom: 10px;
-    font-size: 1.3em;
+    font-size: 1.2em;
     color: #1f1f1f;
 }
 
-.filterField label {
+details label {
     margin-bottom: 5px;
     font-weight: bold;
     color: #646464a6;
 }
 
-.filterField input[type="text"],
-.filterField input[type="date"],
-.filterField select {
+details input[type="text"],
+details input[type="date"],
+details select {
     max-width: 150px;
     width: 100%;
-    padding: 10px;
+    padding: 5px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box;
 }
 
-.filterField input[type="checkbox"] {
+details input[type="checkbox"] {
     margin-left: 5px;
 }
 .btn{
@@ -110,53 +110,76 @@
 .btn:hover{
     opacity: .8;
 }
+        summary{
+            cursor: pointer;
+        }
+        details > *:not(summary) {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            overflow: hidden;
+        }
+        details[open] > * {
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        .archiviato{
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="filterBox">
-        <div class="filterField">
-            <label for="filterNome">Nome</label>
-            <input type="text" name="filterNome" id="filterNome" placeholder="Nome">
-        </div>
-        <div class="filterField">
-            <label for="filterNome">Cognome</label>
-            <input type="text" id="filterCognome" placeholder="Cognome">
-        </div>
-        <div class="filterField">
-            <h3>Visita Medica</h3>
-            <label for="filterVisitaFrom">Da</label>
-            <input type="date" id="filterVisitaFrom" name="filterVisitaFrom">
-            <label for="filterVisitaTo">A</label>
-            <input type="date" id="filterVisitaTo" name="filterVisitaTo">
-            <div class="checkboxField">
-                <label for="filterVisitaMancante">visita Mancante</label>
-                <input type="checkbox" id="filterVisitaMancante" name="filterVisitaMancante">
+        <details>
+            <summary>Filtri</summary>
+            <div class="filterField">
+                <input type="text" name="filterNome" id="filterNome" placeholder="Nome">
+                <input type="text" id="filterCognome" placeholder="Cognome">
             </div>
-        </div>
-        <div class="filterField">
-            <label for="filterPatente">Patente</label>
-            <select id="filterPatente" name="filterPatente">
-                <option value="all">Tutte</option>
-                <option value="AM">AM</option>
-                <option value="A1">A1</option>
-                <option value="B">B</option>
-                <option value="estensioneA1B">estensione A1B</option>
-            </select>
-        </div>
-        <div class="filterField">
-            <h3>Registrazione</h3>
-            <label for="filterRegistrazioneFrom">Da</label>
-            <input type="date" id="filterRegistrazioneFrom" name="filterRegistrazioneFrom">
-            <label for="filterRegistrazioneTo">A</label>
-            <input type="date" id="filterRegistrazioneTo" name="filterRegistrazioneTo">
-        </div>
-        <div class="filterField">
-            <h3>Esame Teoria</h3>
-            <label for="filterEsameFrom">Da</label>
-            <input type="date" id="filterEsameFrom" name="filterEsameFrom">
-            <label for="filterEsameTo">A</label>
-            <input type="date" id="filterEsameTo" name="filterEsameTo">
-        </div>
+
+    
+            <div class="filterField">
+                <label for="filterPatente">Patente</label>
+                <select id="filterPatente" name="filterPatente">
+                    <option value="all">Tutte</option>
+                    <option value="AM">AM</option>
+                    <option value="A1">A1</option>
+                    <option value="B">B</option>
+                    <option value="estensioneA1B">estensione A1B</option>
+                </select>
+            </div>
+            <div class="filterField">
+                <div class="checkboxField">
+                    <label for="archiviato">archiviato</label>
+                    <input type="checkbox" id="archiviato">
+                </div>
+            </div>
+            <div class="filterField">
+                <h3>Registrazione</h3>
+                <label for="filterRegistrazioneFrom">Da</label>
+                <input type="date" id="filterRegistrazioneFrom" name="filterRegistrazioneFrom">
+                <label for="filterRegistrazioneTo">A</label>
+                <input type="date" id="filterRegistrazioneTo" name="filterRegistrazioneTo">
+            </div>
+            <div class="filterField">
+                <h3>Visita Medica</h3>
+                <label for="filterVisitaFrom">Da</label>
+                <input type="date" id="filterVisitaFrom" name="filterVisitaFrom">
+                <label for="filterVisitaTo">A</label>
+                <input type="date" id="filterVisitaTo" name="filterVisitaTo">
+                <div class="checkboxField">
+                    <label for="filterVisitaMancante">visita Mancante</label>
+                    <input type="checkbox" id="filterVisitaMancante" name="filterVisitaMancante">
+                </div>
+            </div>
+            <div class="filterField">
+                <h3>Esame Teoria</h3>
+                <label for="filterEsameFrom">Da</label>
+                <input type="date" id="filterEsameFrom" name="filterEsameFrom">
+                <label for="filterEsameTo">A</label>
+                <input type="date" id="filterEsameTo" name="filterEsameTo">
+            </div>
+        </details>
+        
     </div>
     <table>
         <thead>
@@ -174,7 +197,7 @@
         </thead>
         <tbody id="usersTableBody">
             <% users.forEach(function(user, index) { %>
-                <tr id="row<%= index %>">
+                <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %>" data-archiviato="<%= user.archiviato %>">
                     <td><a href="<%=`/userPage?cf=${encodeURIComponent(user.cFiscale)}`%>"><%= user.nome %></a></td>
                     <td><%= user.cognome %></td>
                     <td><%= user.contatti.email %></td>
@@ -213,6 +236,7 @@
         const filterVisitaTo = document.getElementById('filterVisitaTo');
         const filterVisitaMancante = document.getElementById('filterVisitaMancante');
         const filterPatente = document.getElementById('filterPatente');
+        const filterArchiviato = document.getElementById('archiviato');
         const filterRegistrazioneFrom = document.getElementById('filterRegistrazioneFrom');
         const filterRegistrazioneTo = document.getElementById('filterRegistrazioneTo');
         const filterEsameFrom = document.getElementById('filterEsameFrom');
@@ -231,6 +255,7 @@
             const visitaMancante = filterVisitaMancante.checked;
             const dataEsameDa = filterEsameFrom.value;
             const dataEsameA = filterEsameTo.value;
+            const archiviato = filterArchiviato.checked;
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
                 const nomeTd = row.getElementsByTagName('td')[0].textContent.toLowerCase();
@@ -239,7 +264,7 @@
                 const patenteTd = row.getElementsByTagName('td')[5].textContent.toLowerCase();
                 const dataRegTd = row.getElementsByTagName('td')[6].textContent.toLowerCase();
                 const dataEsamiTd = row.getElementsByTagName('td')[7].textContent.toLowerCase().replace(/\s+/g, ' ').trim().split(' ');
-                
+                const isArchiviato = Boolean(row.dataset.archiviato);
                 let isDateEsameInRange;
                 for (const esame of dataEsamiTd) {
                     const dataEsame = new Date(esame.split('/').reverse().join('-'));
@@ -269,9 +294,10 @@
                     (dataRegistrazioneDa === '' || dataRegistrazioneA === '' || isDateRegInRange) &&
                     (dataVisitaDa === '' || dataVisitaA === '' || isDateVisitaInRange) &&
                     (!visitaMancante || isVisitaMancante) &&
-                    (dataEsameDa === '' || dataEsameA === '' || isDateEsameInRange)
+                    (dataEsameDa === '' || dataEsameA === '' || isDateEsameInRange) &&
+                    ((archiviato && isArchiviato) || !archiviato)
                 ) {
-                    row.style.display = '';
+                    row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';
                 }
@@ -288,6 +314,7 @@
         filterVisitaMancante.addEventListener('input', filterTable);
         filterEsameFrom.addEventListener('input', filterTable);
         filterEsameTo.addEventListener('input', filterTable);
+        filterArchiviato.addEventListener('input', filterTable);
     });
 </script>
 
