@@ -10,6 +10,7 @@ const router = express.Router();
 const admins = require('../DB/Admin');
 const utenti = require('../DB/User');
 const prezzi = require('../DB/Prezzi');
+const numeroFattura = require('../DB/numeroFattura');
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
 const sendMessage = require('../utils/messagesUtils.js');
@@ -262,9 +263,34 @@ router.post('/updatePrice', async (req, res) => {
   console.log(`Il prezzo è stato aggiornato a ${price}€`)
   res.redirect('/admin/price');
 });
-// router.get('/fattureDaEmettere', async (req, res)=> {
-//   const dati = await utenti.findOne({"cFiscale": req.query.cf, "fatture": 1})
-//   res.render('admin/fattureDaEmettere', {dati});
-// });
+router.get('/admin/fattureDaEmettere', async (req, res)=> {
+  try{
+    const cf = req.query.cf; 
+    const dati = await utenti.findOne(
+      {"cFiscale": cf},
+      {"fatture": 1}
+    );
+    res.render('admin/fatture/fattureDaEmettere', {dati, cf});
+  }catch(error){
+    res.render('errorPage', {error: 'Utente non trovato'})
+  }
+});
+
+router.get('/admin/emettiFattura', async (req, res)=> {
+  try{
+    const cf = req.query.cf; 
+    const data = req.query.data.split('/').reverse().join('-'); 
+    const importo = req.query.importo; 
+    const nFattura = await numeroFattura.findOne();
+    const datiUtente = await utenti.findOne(
+      { "cFiscale": cf },
+      { nome: 1, cognome: 1, cFiscale: 1, residenza: 1 }
+    );
+    res.render('admin/fatture/emettiFattura', {numeroFattura: nFattura.numero, dati: datiUtente, cf, data, importo});
+  }catch(error){
+    res.render('errorPage', {error: 'Utente non trovato'})
+  }
+});
+
 
 module.exports = router;

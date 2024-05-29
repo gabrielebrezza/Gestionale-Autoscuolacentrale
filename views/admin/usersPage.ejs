@@ -216,12 +216,12 @@ details input[type="checkbox"] {
                     </td>
                     <%  
                     const fatturaEmessa = user.fatture.find(function(fattura) {
-                        return fattura.emessa;
+                        return fattura.emessa === false;
                     });
                     const daEmettere = !!fatturaEmessa;
                     
                     %>
-                    <td> <a href=""><button class="btn <%= daEmettere ? 'fatturaDaEmettere' : 'fattureEmesse' %>">Fatture</button></a></td>
+                    <td> <a href="<%= `/admin/fattureDaEmettere?cf=${encodeURIComponent(user.cFiscale)}` %>"><button class="btn <%= daEmettere ? 'fatturaDaEmettere' : 'fattureEmesse' %>" <%= daEmettere ? '' : 'disabled' %>>Fatture</button></a></td>
                 </tr>
             <% }); %>
         </tbody>
@@ -295,7 +295,7 @@ details input[type="checkbox"] {
                     (dataVisitaDa === '' || dataVisitaA === '' || isDateVisitaInRange) &&
                     (!visitaMancante || isVisitaMancante) &&
                     (dataEsameDa === '' || dataEsameA === '' || isDateEsameInRange) &&
-                    ((archiviato && isArchiviato) || !archiviato)
+                    ((archiviato && isArchiviato) || (!archiviato && !isArchiviato))
                 ) {
                     row.style.display = 'table-row';
                 } else {

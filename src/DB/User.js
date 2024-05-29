@@ -63,6 +63,10 @@ const UserSchema = new mongoose.Schema({
         provincia: {
             type: String,
             required: false
+        },
+        stato: {
+            type: String,
+            required: false
         }
     },
     contatti: {

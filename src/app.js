@@ -8,7 +8,7 @@ const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 
 const utenti = require('./DB/User');
-
+const prezzi = require('./DB/Prezzi');
 
 
 
@@ -35,7 +35,7 @@ app.set('views', 'views');
 app.use(express.static('public'));
 
 paypal.configure({
-  mode: "sandbox",
+  mode: process.env.PAYPAL_MODE,
   client_id: process.env.PAYPAL_CLIENT_ID,
   client_secret: process.env.PAYPAL_CLIENT_SECRET
 });
@@ -204,7 +204,7 @@ app.post('/payment', async (req, res) =>{
       return res.status(500).send('Si è verificato un errore');
     }
   }
-  const price = 5;
+  const { prezzo } = await prezzi.findOne({});
   if(paymentMethod == 'stripe'){
     try {
       const session = await stripe.checkout.sessions.create({
@@ -217,7 +217,7 @@ app.post('/payment', async (req, res) =>{
               product_data:{
                 name: `Iscrizione Scuola Guida per la patente ${tipoPatente}`
               },
-              unit_amount: price * 100
+              unit_amount: prezzo * 100
             },
             quantity: 1
           }
@@ -243,7 +243,7 @@ app.post('/payment', async (req, res) =>{
               payment_method: "paypal"
           },
           redirect_urls: {
-              return_url: `${process.env.SERVER_URL}/successPayment/paypal?&price=${encodeURIComponent(price)}`,
+              return_url: `${process.env.SERVER_URL}/successPayment/paypal?&price=${encodeURIComponent(prezzo)}`,
               cancel_url: `${process.env.SERVER_URL}/cancelPayment`,
           },
           transactions: [
@@ -253,7 +253,7 @@ app.post('/payment', async (req, res) =>{
                           {
                               name: `Iscrizione Scuola Guida per la patente ${tipoPatente}`,
                               sku: 1,
-                              price: price,
+                              price: prezzo,
                               currency: "EUR",
                               quantity: 1
                           }
@@ -261,7 +261,7 @@ app.post('/payment', async (req, res) =>{
                   },
                   amount: {
                       currency: "EUR",
-                      total: price
+                      total: prezzo
                   },
                   custom: JSON.stringify({cFiscale: cFiscale, patente: tipoPatente, email: email}),
                   description: `Iscrizione a Scuola Guida per la patente di tipo ${tipoPatente}`

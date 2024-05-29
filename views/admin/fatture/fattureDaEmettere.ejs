@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Emetti Fattura</title>
     <style>
         main{
             margin-top: 200px;
@@ -52,20 +52,24 @@
 </head>
 <body>
     <main>
-    <% for (let i = 0; i < dati.length; i++) { %>
-        <% if (!dati[i].emessa) { %>
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Fattura <%= i + 1 %></h5>
-                    <p class="card-text">Data: <%= dati[i].data %></p>
-                    <p class="card-text">Importo: <%= dati[i].importo %>€</p>
-                    <% let dataEncoded = encodeURIComponent(dati[i].data); %>
-                    <% let link = `/admin/emettiFattura/${userName}/${dati[i].tipo}/${dataEncoded}/${dati[i].importo}` %>
-                    <a href="<%= link %>" class="btn btn-primary">Emetti Fattura</a>
+        <% let i = 1; %>
+        <% for (const fattura of dati.fatture) { %>
+            <% if (!fattura.emessa) { %>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Fattura <%= i++ %></h5>
+                        <p class="card-text">Data: <%= fattura.data %></p>
+                        <p class="card-text">Importo: <%= fattura.importo %>€</p>
+                        <% let dataEncoded = encodeURIComponent(fattura.data); %>
+                        <% let link = `/admin/emettiFattura?cf=${encodeURIComponent(cf)}&data=${dataEncoded}&importo=${encodeURIComponent(fattura.importo)}` %>
+                        <a href="<%= link %>" class="btn btn-primary">Emetti Fattura</a>
+                    </div>
                 </div>
-            </div>
-            <br>
+                <br>
+            <% } %>
         <% } %>
+    <% for (let i = 0; i < dati.length; i++) { %>
+        
     <% } %>
     </main>
 </body>
