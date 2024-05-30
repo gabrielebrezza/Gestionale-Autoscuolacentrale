@@ -41,7 +41,6 @@ paypal.configure({
 });
 
 app.get('/', async (req, res) =>{
-    console.log(req.ip)
     res.render('getData');
 });
 
