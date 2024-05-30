@@ -41,7 +41,7 @@ paypal.configure({
 });
 
 app.get('/', async (req, res) =>{
-    console.log(process.env.SERVER_URL)  
+    console.log('qualcuno ha effettuato l\'accesso al form')
     res.render('getData');
 });
 
