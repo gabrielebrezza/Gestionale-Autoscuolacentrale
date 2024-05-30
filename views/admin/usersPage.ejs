@@ -197,32 +197,37 @@ details input[type="checkbox"] {
         </thead>
         <tbody id="usersTableBody">
             <% users.forEach(function(user, index) { %>
-                <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %>" data-archiviato="<%= user.archiviato %>">
-                    <td><a href="<%=`/userPage?cf=${encodeURIComponent(user.cFiscale)}`%>"><%= user.nome %></a></td>
-                    <td><%= user.cognome %></td>
-                    <td><%= user.contatti.email %></td>
-                    <td class="telBtn" onclick="showForm('<%= user.contatti.tel%>', 'row<%= index %>')"><%= user.contatti.tel %></td>
-                    <td><%= user.visita ? user.visita : 'Mancante' %></td>
-                    <td>
-                        <% user.patente.forEach(function(patente) { %>
-                            <%= patente.tipo %> (<%= patente.pagato ? 'Pagata' : 'Non pagata' %>)<br>
-                        <% }); %>
-                    </td>
-                    <td><%= user.dataRegistrazione %></td>
-                    <td>
-                        <% user.teoria.forEach(function(esame) { %>
-                            <%= esame.data %> <br>
-                        <% }); %>
-                    </td>
-                    <%  
-                    const fatturaEmessa = user.fatture.find(function(fattura) {
-                        return fattura.emessa === false;
-                    });
-                    const daEmettere = !!fatturaEmessa;
-                    
-                    %>
-                    <td> <a href="<%= `/admin/fattureDaEmettere?cf=${encodeURIComponent(user.cFiscale)}` %>"><button class="btn <%= daEmettere ? 'fatturaDaEmettere' : 'fattureEmesse' %>" <%= daEmettere ? '' : 'disabled' %>>Fatture</button></a></td>
-                </tr>
+                <% const pagato = user.patente.some(patenti => patenti.pagato);%>
+                <% if(pagato){ %>
+                    <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %>" data-archiviato="<%= user.archiviato %>">
+                        <td><a href="<%=`/userPage?cf=${encodeURIComponent(user.cFiscale)}`%>"><%= user.nome %></a></td>
+                        <td><%= user.cognome %></td>
+                        <td><%= user.contatti.email %></td>
+                        <td class="telBtn" onclick="showForm('<%= user.contatti.tel%>', 'row<%= index %>')"><%= user.contatti.tel %></td>
+                        <td><%= user.visita ? user.visita : 'Mancante' %></td>
+                        <td>
+                            <% user.patente.forEach(function(patente) { %>
+                                <% if(patente.pagato){ %>
+                                <%= patente.tipo %><br>
+                                <% } %>
+                            <% }); %>
+                        </td>
+                        <td><%= user.dataRegistrazione %></td>
+                        <td>
+                            <% user.teoria.forEach(function(esame) { %>
+                                <%= esame.data %> <br>
+                            <% }); %>
+                        </td>
+                        <%  
+                        const fatturaEmessa = user.fatture.find(function(fattura) {
+                            return fattura.emessa === false;
+                        });
+                        const daEmettere = !!fatturaEmessa;
+                        
+                        %>
+                        <td> <a href="<%= `/admin/fattureDaEmettere?cf=${encodeURIComponent(user.cFiscale)}` %>"><button class="btn <%= daEmettere ? 'fatturaDaEmettere' : 'fattureEmesse' %>" <%= daEmettere ? '' : 'disabled' %>>Fatture</button></a></td>
+                    </tr>
+                <% } %>
             <% }); %>
         </tbody>
     </table>

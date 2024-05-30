@@ -33,7 +33,7 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 app.use(express.static('public'));
-
+app.set('trust proxy', true);
 paypal.configure({
   mode: process.env.PAYPAL_MODE,
   client_id: process.env.PAYPAL_CLIENT_ID,
@@ -41,7 +41,7 @@ paypal.configure({
 });
 
 app.get('/', async (req, res) =>{
-    console.log('qualcuno ha effettuato l\'accesso al form')
+    console.log(req.ip)
     res.render('getData');
 });
 
@@ -287,13 +287,6 @@ app.post('/payment', async (req, res) =>{
   }
 });
 
-
-
-
-
-
-
-
-const PORT = 80;
+const PORT = process.env.PORT || 80;
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
