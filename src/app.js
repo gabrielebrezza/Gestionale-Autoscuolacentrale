@@ -138,7 +138,7 @@ app.post('/payment', async (req, res) =>{
       "nDocumento": nDocumento,
       "patente": [{
         tipo: tipoPatente,
-        pagato: true
+        pagato: false
       }],
       "teoria":[
         {
@@ -190,7 +190,7 @@ app.post('/payment', async (req, res) =>{
           $addToSet: {
             "patente": {
               tipo: tipoPatente,
-              pagato: true
+              pagato: false
             }
           }
         },
