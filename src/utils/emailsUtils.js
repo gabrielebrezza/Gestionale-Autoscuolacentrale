@@ -1,7 +1,9 @@
 const nodemailer = require('nodemailer');
 const tls = require('tls');
+const fs = require('fs');
+const path = require('path');
 
-const sendEmail = async (email, subject, text) => {
+const sendEmail = async (email, subject, text, attachment = null) => {
     return new Promise((resolve, reject) => {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -14,13 +16,16 @@ const sendEmail = async (email, subject, text) => {
             }
         });
         
-        const mailOptions = {
+        let mailOptions = {
             from: process.env.EMAIL,
             to: email,
             subject: subject,
             text: text
         };
-    
+
+        if (attachment) {
+            mailOptions.attachments = { path: attachment};
+        }
         transporter.sendMail(mailOptions, async function(error, info) {
             if (error) {
                 reject(new Error('Errore nell\'invio dell\'email:'));

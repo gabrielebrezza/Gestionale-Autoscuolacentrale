@@ -19,10 +19,12 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.13",
     "paypal-rest-sdk": "^1.8.1",
+    "pdfkit": "^0.15.0",
     "sharp": "^0.33.3",
     "stripe": "^15.4.0",
     "tls": "^0.0.1",
-    "twilio": "^5.0.4"
+    "twilio": "^5.0.4",
+    "xmlbuilder2": "^3.1.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.0"
