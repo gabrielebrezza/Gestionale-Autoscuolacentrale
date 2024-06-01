@@ -159,48 +159,49 @@ router.post('/sendMessage', async (req, res) => {
 
 router.post('/updateUser', async (req, res) =>{
     try {
+        const dati = req.body;
         const userData= {
-            nome: req.body.nome,
-            cognome: req.body.cognome,
+            nome: dati.nome,
+            cognome: dati.cognome,
             nascita:{
-                comune: req.body.comuneNascita,
-                provincia: req.body.provinciaNascita,
-                data: req.body.dataNascita,
+                comune: dati.comuneNascita,
+                provincia: dati.provinciaNascita,
+                data: dati.dataNascita,
             },
-            sesso: req.body.sesso,
+            sesso: dati.sesso,
             residenza: {
-                via: req.body.viaResidenza,
-                nCivico: req.body.civicoResidenza,
-                cap: req.body.capResidenza,
-                comune: req.body.comuneResidenza,
-                provincia: req.body.provinciaResidenza,
+                via: dati.viaResidenza,
+                nCivico: dati.civicoResidenza,
+                cap: dati.capResidenza,
+                comune: dati.comuneResidenza,
+                provincia: dati.provinciaResidenza,
             },
             contatti: {
-                email: req.body.email,
-                tel: req.body.tel,
+                email: dati.email,
+                tel: dati.tel,
             },
-            documento: req.body.documento,
-            nDocumento: req.body.nDocumento,
-            visita: (req.body.visita).split('-').reverse().join('/'),
+            documento: dati.documento,
+            nDocumento: dati.nDocumento,
+            visita: (dati.visita).split('-').reverse().join('/'),
             protocollo:{
-              numero: req.body.nProtocollo,
-              dataEmissione: (req.body.dataNProtocollo).split('-').reverse().join('/')
+              numero: dati.nProtocollo,
+              dataEmissione: (dati.dataNProtocollo).split('-').reverse().join('/')
             },
-            numeroPatente: req.body.nPatente,
+            numeroPatente: dati.nPatente,
             teoria: []
         };
         const emailSent = !!(await utenti.findOne({
-          'cFiscale': req.body.cf,
+          'cFiscale': dati.cf,
           "teoria": {
               $elemMatch: { "emailSent": true }
           }
       }));    
         let respinto, idoneo, assente;
-        for (let i = 0; i < req.body.teoriaLength && i < 2 + req.body.countTeoriaAssente; i++) {
-          const esameData = req.body[`dataEsame${i}`];
-          idoneo = req.body[`esitoEsame${i}`] === 'idoneo';
-          respinto = req.body[`esitoEsame${i}`] === 'respinto';
-          assente = req.body[`esitoEsame${i}`] === 'assente';
+        for (let i = 0; i < dati.teoriaLength && i < 2 + dati.countTeoriaAssente; i++) {
+          const esameData = dati[`dataEsame${i}`];
+          idoneo = dati[`esitoEsame${i}`] === 'idoneo';
+          respinto = dati[`esitoEsame${i}`] === 'respinto';
+          assente = dati[`esitoEsame${i}`] === 'assente';
           userData.teoria.push({
               data: esameData ? esameData.split('-').reverse().join('/') : '',
               esito: idoneo ? true : respinto ? false : null,
@@ -208,7 +209,7 @@ router.post('/updateUser', async (req, res) =>{
               emailSent: emailSent ? true : false
           });
         }
-        if(respinto && req.body.teoriaLength - 2 == req.body.countTeoriaAssente){
+        if(respinto && dati.teoriaLength - 2 == dati.countTeoriaAssente){
           userData.archiviato = true;
         }else if(respinto || assente){
           userData.teoria.push({
@@ -217,10 +218,10 @@ router.post('/updateUser', async (req, res) =>{
           });
         }else if(idoneo && !emailSent){
           try{
-            const result = await sendEmail(req.body.email, 'Superamento Esame Teoria', `Complimenti ${req.body.nome} hai superato l'esame di teoria, vai sul sito agenda-autoscuolacentrale.com e registrati per poter iniziare a prenotare le lezioni di guida`);
+            const result = await sendEmail(dati.email, 'Superamento Esame Teoria', `Complimenti ${dati.nome} hai superato l'esame di teoria, vai sul sito agenda-autoscuolacentrale.com e registrati per poter iniziare a prenotare le lezioni di guida`);
             console.log(result);
-            userData.teoria[req.body.teoriaLength-1] = {
-              ...userData.teoria[req.body.teoriaLength-1],
+            userData.teoria[dati.teoriaLength-1] = {
+              ...userData.teoria[dati.teoriaLength-1],
               emailSent: true
             };
             userData.archiviato = true;
@@ -228,8 +229,8 @@ router.post('/updateUser', async (req, res) =>{
             console.error('Errore durante l\'invio dell\'email:', error);
           }
         }
-        await utenti.findOneAndUpdate({"cFiscale": req.body.cf}, userData);
-        res.redirect(`/userPage?cf=${req.body.cf}`);
+        await utenti.findOneAndUpdate({"cFiscale": dati.cf}, userData);
+        res.redirect(`/userPage?cf=${dati.cf}`);
     } catch (error) {
         console.error('Errore durante l\'aggiornamento dei dati dell\'utente:', error);
         res.status(500).send({ error: 'Si è verificato un errore durante l\'aggiornamento dei dati dell\'utente' });
