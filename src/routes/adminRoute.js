@@ -10,7 +10,7 @@ const router = express.Router();
 const admins = require('../DB/Admin');
 const utenti = require('../DB/User');
 const prezzi = require('../DB/Prezzi');
-const numeroFattura = require('../DB/NumeroFattura.js');
+const numeroFattura = require('../DB/numeroFattura.js');
 const storicoFatture = require('../DB/storicoFatture')
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
