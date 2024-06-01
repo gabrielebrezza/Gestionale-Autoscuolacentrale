@@ -15,6 +15,6 @@ const NumeroFatturaSchema = new mongoose.Schema({
         required: true
     }
 });
-const numeroFattura = new mongoose.model('numeroFattura', NumeroFatturaSchema);
+const NumeroFattura = new mongoose.model('numeroFattura', NumeroFatturaSchema);
 
-module.exports = numeroFattura;
+module.exports = NumeroFattura;
