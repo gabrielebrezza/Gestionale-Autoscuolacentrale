@@ -193,7 +193,8 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
               dataEmissione: (dati.dataNProtocollo).split('-').reverse().join('/')
             },
             numeroPatente: dati.nPatente,
-            teoria: []
+            teoria: [],
+            note: dati.note
         };
         const emailSent = !!(await utenti.findOne({
           'cFiscale': dati.cf,

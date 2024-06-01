@@ -150,6 +150,8 @@ details input[type="checkbox"] {
                     <option value="AM">AM</option>
                     <option value="A1">A1</option>
                     <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
                     <option value="estensioneA1B">estensione A1B</option>
                 </select>
             </div>
@@ -213,8 +215,8 @@ details input[type="checkbox"] {
                     <% const pagato = user.patente.some(patenti => patenti.pagato);%>
                     <% if(pagato){ %>
                         <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %>" data-archiviato="<%= user.archiviato %>">
-                            <td><%= user.archiviato ? enumArchiviati++ : enumUtenti++ %></td>
                             <td class="elimina"><input type="checkbox" name="codiceFiscale<%= index %>" value="<%= user.cFiscale %>"></td>
+                            <td><%= user.archiviato ? enumArchiviati++ : enumUtenti++ %></td>
                             <td><a href="<%=`/userPage?cf=${encodeURIComponent(user.cFiscale)}`%>"><%= user.nome %></a></td>
                             <td><%= user.cognome %></td>
                             <td><%= user.contatti.email %></td>
@@ -280,7 +282,7 @@ details input[type="checkbox"] {
             let enumeration = 1;
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
-                const numTd = row.getElementsByTagName('td')[0].textContent.toLowerCase();
+                const numTd = row.getElementsByTagName('td')[1].textContent.toLowerCase();
                 const nomeTd = row.getElementsByTagName('td')[2].textContent.toLowerCase();
                 const cognomeTd = row.getElementsByTagName('td')[3].textContent.toLowerCase();
                 const visitaTd = row.getElementsByTagName('td')[6].textContent.toLowerCase();
@@ -321,7 +323,7 @@ details input[type="checkbox"] {
                     (dataEsameDa === '' || dataEsameA === '' || isDateEsameInRange) &&
                     ((archiviato && isArchiviato) || (!archiviato && !isArchiviato))
                 ) {
-                    row.getElementsByTagName('td')[0].innerText = enumeration++;
+                    row.getElementsByTagName('td')[1].innerText = enumeration++;
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';

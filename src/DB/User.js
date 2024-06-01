@@ -167,6 +167,10 @@ const UserSchema = new mongoose.Schema({
             },
         }
     ],
+    note: {
+        type: String,
+        required: false
+    },
     archiviato:{
         type: Boolean,
         required: false
