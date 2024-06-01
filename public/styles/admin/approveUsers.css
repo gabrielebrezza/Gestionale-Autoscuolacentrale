@@ -1,0 +1,81 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    background: #71a1cb;
+}
+main{
+  margin-top: 200px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+h1{
+  color: #fff;
+}
+#cards{
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
+.user-card {
+    margin-inline: 25px;
+    padding: 15px;
+    min-width: 250px;
+    width: fit-content;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    margin-bottom: 50px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.user-card-header {
+  padding: 16px;
+  font-size: 1.2rem;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 5px;
+}
+.user-info {
+  padding: 10px;
+}
+.user-info li {
+  list-style: none;
+  margin: 15px 0;
+}
+form{
+  padding-inline: 10px;
+
+}
+.buttons{
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+button {
+  font-size: 1rem;
+  padding: 16px 24px;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.approve-button{
+  background: #4075b2;
+}
+.approve-button:hover {
+  background: #1a6dcb;
+}
+.disapprove-button{
+  background: #FF0000;
+}
+.disapprove-button:hover{
+  background: #720707;
+}
+
+
+.approval-list {
+  margin-bottom: 20px;
+}

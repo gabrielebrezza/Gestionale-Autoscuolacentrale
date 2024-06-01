@@ -27,6 +27,10 @@ router.get('/waitingApprovation', async (req, res) =>{
     const {nome, cognome} = admin;
     res.render('admin/auth/waitingApprovation', {nome, cognome}); 
 });
+router.get('/admin/approveUsers', authenticateJWT, async (req, res) =>{
+    const needApprovalAdmins = await admins.find({"approved": false})
+    res.render('admin/auth/approveUsers', {needApprovalAdmins});
+});
 
 router.post('/admin/signup', async (req, res) => {
     const nome = req.body.nome.replace(/\s/g, "");
