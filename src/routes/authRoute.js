@@ -131,9 +131,27 @@ router.post('/admin/login', async (req, res) => {
 });
 
 router.post('/logout', authenticateJWT, async (req, res) => {
-    console.log(`L'istruttore ${req.user.username} ha appena effettuato il logOut`);
-    res.cookie('userName', '', {maxAge: 1});
+    console.log(`L'istruttore ${req.user.email} ha appena effettuato il logOut`);
+    res.cookie('token', '', {maxAge: 1});
     res.redirect('/admin/login');
+});
+
+router.post('/approveAdmin', authenticateJWT, async (req, res) =>{
+    const email = req.body.email;
+    const admin = await admins.findOneAndUpdate({"email": email}, {approved: true});
+    const subject = 'Approvazione Admin Autoscuola';
+    const text = `Gentile ${admin.nome} ${admin.cognome}, la informiamo che il suo account è stato approvato come admin. Per accedere prema qui ${process.env.SERVER_URL}/admin`;
+    try {
+        const result = await sendEmail(email, subject, text);
+        console.log(result)
+    } catch (error) {
+        console.error(error)
+    }
+    res.redirect('/admin/approveUsers')
+});
+router.post('/disapproveAdmin', authenticateJWT, async (req, res) =>{
+    await admins.deleteOne({"email": req.body.email});
+    res.redirect('/admin/approveUsers')
 });
 
 module.exports = router;
