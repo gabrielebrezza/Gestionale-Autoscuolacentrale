@@ -255,6 +255,16 @@ router.post('/deleteUserImage', async (req, res) => {
   res.redirect(`/userPage?cf=${cf}`);
 });
 
+router.post('/deleteUsers', async (req, res) => {
+  const users = req.body;
+  for (const cf of Object.values(users)) {
+      await utenti.deleteOne({"cFiscale": cf});
+      console.log(`utente ${cf} eliminato definitivamente`);
+  }
+  res.redirect('/admin');
+});
+
+
 router.get('/admin/price', async (req, res) => {
   const prezzo = await prezzi.findOne({});
   res.render('admin/pricePage', {price: prezzo.prezzo});

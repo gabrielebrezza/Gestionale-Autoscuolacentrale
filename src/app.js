@@ -138,7 +138,7 @@ app.post('/payment', async (req, res) =>{
       "nDocumento": nDocumento,
       "patente": [{
         tipo: tipoPatente,
-        pagato: true
+        pagato: false
       }],
       "teoria":[
         {
@@ -190,7 +190,7 @@ app.post('/payment', async (req, res) =>{
           $addToSet: {
             "patente": {
               tipo: tipoPatente,
-              pagato: true
+              pagato: false
             }
           }
         },
@@ -204,86 +204,86 @@ app.post('/payment', async (req, res) =>{
       return res.status(500).send('Si è verificato un errore');
     }
   }
-  // const { prezzo } = await prezzi.findOne({});
-  // if(paymentMethod == 'stripe'){
-  //   try {
-  //     const session = await stripe.checkout.sessions.create({
-  //       payment_method_types: ["card"],
-  //       mode: 'payment',
-  //       line_items: [
-  //         {
-  //          price_data:{
-  //             currency: 'eur',
-  //             product_data:{
-  //               name: `Iscrizione Scuola Guida per la patente ${tipoPatente}`
-  //             },
-  //             unit_amount: prezzo * 100
-  //           },
-  //           quantity: 1
-  //         }
-  //       ],
-  //       success_url: `${process.env.SERVER_URL}/successPayment?cf=${encodeURIComponent(cFiscale)}`,
-  //       cancel_url: `${process.env.SERVER_URL}/cancelPayment`,
-  //       metadata: {
-  //         cFiscale: cFiscale,
-  //         patente: tipoPatente,
-  //         email: email
-  //       }
-  //     });
-  //     res.redirect(session.url);
-  //   } catch (error) {
-  //     console.log('si è verificato un errore con il pagamento con stripe, errore: ', error);
-  //     res.status(500).json({error: error.message});
-  //   }
-  // }else if(paymentMethod == 'payPal'){
-  //   try {
-  //     const create_payment_json = {
-  //         intent: "sale",
-  //         payer: {
-  //             payment_method: "paypal"
-  //         },
-  //         redirect_urls: {
-  //             return_url: `${process.env.SERVER_URL}/successPayment/paypal?&price=${encodeURIComponent(prezzo)}`,
-  //             cancel_url: `${process.env.SERVER_URL}/cancelPayment`,
-  //         },
-  //         transactions: [
-  //             {
-  //                 item_list: {
-  //                     items: [
-  //                         {
-  //                             name: `Iscrizione Scuola Guida per la patente ${tipoPatente}`,
-  //                             sku: 1,
-  //                             price: prezzo,
-  //                             currency: "EUR",
-  //                             quantity: 1
-  //                         }
-  //                     ]
-  //                 },
-  //                 amount: {
-  //                     currency: "EUR",
-  //                     total: prezzo
-  //                 },
-  //                 custom: JSON.stringify({cFiscale: cFiscale, patente: tipoPatente, email: email}),
-  //                 description: `Iscrizione a Scuola Guida per la patente di tipo ${tipoPatente}`
-  //             }
-  //         ]
-  //     }; 
-  //     paypal.payment.create(create_payment_json, (error, payment) => {
-  //         if (error) {
-  //             throw error;
-  //         } else {
-  //             for (let i = 0; i < payment.links.length; i++) {
-  //                 if (payment.links[i].rel === "approval_url") {
-  //                     res.redirect(payment.links[i].href);
-  //                 }
-  //             }
-  //         }
-  //     });
-  //   } catch (error) {
-  //     console.log('si è verificato un errore con il pagamento con Paypal, errore: ', error);
-  //     res.status(500).json({error: error.message});
-  //   }
-  // }
+  const { prezzo } = await prezzi.findOne({});
+  if(paymentMethod == 'stripe'){
+    try {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        mode: 'payment',
+        line_items: [
+          {
+           price_data:{
+              currency: 'eur',
+              product_data:{
+                name: `Iscrizione Scuola Guida per la patente ${tipoPatente}`
+              },
+              unit_amount: prezzo * 100
+            },
+            quantity: 1
+          }
+        ],
+        success_url: `${process.env.SERVER_URL}/successPayment?cf=${encodeURIComponent(cFiscale)}`,
+        cancel_url: `${process.env.SERVER_URL}/cancelPayment`,
+        metadata: {
+          cFiscale: cFiscale,
+          patente: tipoPatente,
+          email: email
+        }
+      });
+      res.redirect(session.url);
+    } catch (error) {
+      console.log('si è verificato un errore con il pagamento con stripe, errore: ', error);
+      res.status(500).json({error: error.message});
+    }
+  }else if(paymentMethod == 'payPal'){
+    try {
+      const create_payment_json = {
+          intent: "sale",
+          payer: {
+              payment_method: "paypal"
+          },
+          redirect_urls: {
+              return_url: `${process.env.SERVER_URL}/successPayment/paypal?&price=${encodeURIComponent(prezzo)}`,
+              cancel_url: `${process.env.SERVER_URL}/cancelPayment`,
+          },
+          transactions: [
+              {
+                  item_list: {
+                      items: [
+                          {
+                              name: `Iscrizione Scuola Guida per la patente ${tipoPatente}`,
+                              sku: 1,
+                              price: prezzo,
+                              currency: "EUR",
+                              quantity: 1
+                          }
+                      ]
+                  },
+                  amount: {
+                      currency: "EUR",
+                      total: prezzo
+                  },
+                  custom: JSON.stringify({cFiscale: cFiscale, patente: tipoPatente, email: email}),
+                  description: `Iscrizione a Scuola Guida per la patente di tipo ${tipoPatente}`
+              }
+          ]
+      }; 
+      paypal.payment.create(create_payment_json, (error, payment) => {
+          if (error) {
+              throw error;
+          } else {
+              for (let i = 0; i < payment.links.length; i++) {
+                  if (payment.links[i].rel === "approval_url") {
+                      res.redirect(payment.links[i].href);
+                  }
+              }
+          }
+      });
+    } catch (error) {
+      console.log('si è verificato un errore con il pagamento con Paypal, errore: ', error);
+      res.status(500).json({error: error.message});
+    }
+  }
 });
 
 const PORT = process.env.PORT || 80;
