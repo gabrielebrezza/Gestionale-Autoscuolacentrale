@@ -192,6 +192,7 @@ details input[type="checkbox"] {
         <thead>
             <tr>
                 <th class="elimina">Elimina</th>
+                <td>Numero</td>
                 <th>Nome</th>
                 <th>Cognome</th>
                 <th>Email</th>
@@ -206,10 +207,13 @@ details input[type="checkbox"] {
         <tbody id="usersTableBody">
             <form action="/deleteUsers" method="POST">
                 <button type="submit" class="elimina">Elimina Utenti</button>
+                <% let enumArchiviati = 1 %>
+                <% let enumUtenti = 1 %>
                 <% users.forEach(function(user, index) { %>
                     <% const pagato = user.patente.some(patenti => patenti.pagato);%>
                     <% if(pagato){ %>
                         <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %>" data-archiviato="<%= user.archiviato %>">
+                            <td><%= user.archiviato ? enumArchiviati++ : enumUtenti++ %></td>
                             <td class="elimina"><input type="checkbox" name="codiceFiscale<%= index %>" value="<%= user.cFiscale %>"></td>
                             <td><a href="<%=`/userPage?cf=${encodeURIComponent(user.cFiscale)}`%>"><%= user.nome %></a></td>
                             <td><%= user.cognome %></td>
@@ -273,14 +277,16 @@ details input[type="checkbox"] {
             const dataEsameDa = filterEsameFrom.value;
             const dataEsameA = filterEsameTo.value;
             const archiviato = filterArchiviato.checked;
+            let enumeration = 1;
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
-                const nomeTd = row.getElementsByTagName('td')[0].textContent.toLowerCase();
-                const cognomeTd = row.getElementsByTagName('td')[1].textContent.toLowerCase();
-                const visitaTd = row.getElementsByTagName('td')[4].textContent.toLowerCase();
-                const patenteTd = row.getElementsByTagName('td')[5].textContent.toLowerCase();
-                const dataRegTd = row.getElementsByTagName('td')[6].textContent.toLowerCase();
-                const dataEsamiTd = row.getElementsByTagName('td')[7].textContent.toLowerCase().replace(/\s+/g, ' ').trim().split(' ');
+                const numTd = row.getElementsByTagName('td')[0].textContent.toLowerCase();
+                const nomeTd = row.getElementsByTagName('td')[2].textContent.toLowerCase();
+                const cognomeTd = row.getElementsByTagName('td')[3].textContent.toLowerCase();
+                const visitaTd = row.getElementsByTagName('td')[6].textContent.toLowerCase();
+                const patenteTd = row.getElementsByTagName('td')[7].textContent.toLowerCase();
+                const dataRegTd = row.getElementsByTagName('td')[8].textContent.toLowerCase();
+                const dataEsamiTd = row.getElementsByTagName('td')[9].textContent.toLowerCase().replace(/\s+/g, ' ').trim().split(' ');
                 const isArchiviato = Boolean(row.dataset.archiviato);
                 let isDateEsameInRange;
                 for (const esame of dataEsamiTd) {
@@ -304,6 +310,7 @@ details input[type="checkbox"] {
                 const endRegistrazioneDate = new Date(dataRegistrazioneA);
 
                 const isDateRegInRange = dataRegistrazione >= startRegistrazioneDate && dataRegistrazione <= endRegistrazioneDate;
+                
                 if (
                     (nome === '' || nomeTd.includes(nome)) &&
                     (cognome === '' || cognomeTd.includes(cognome)) &&
@@ -314,6 +321,7 @@ details input[type="checkbox"] {
                     (dataEsameDa === '' || dataEsameA === '' || isDateEsameInRange) &&
                     ((archiviato && isArchiviato) || (!archiviato && !isArchiviato))
                 ) {
+                    row.getElementsByTagName('td')[0].innerText = enumeration++;
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';
