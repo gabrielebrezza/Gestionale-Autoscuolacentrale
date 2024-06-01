@@ -27,6 +27,6 @@ const StoricoFattureSchema = new mongoose.Schema({
         required: true
     }
 });
-const storicoFatture = new mongoose.model('storicoFatture', StoricoFattureSchema);
+const StoricoFatture = new mongoose.model('storicoFatture', StoricoFattureSchema);
 
-module.exports = storicoFatture;
+module.exports = StoricoFatture;
