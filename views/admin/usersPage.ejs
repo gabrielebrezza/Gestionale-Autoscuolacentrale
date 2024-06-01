@@ -337,7 +337,7 @@ details input[type="checkbox"] {
         const usersTd = document.querySelectorAll('.elimina');
         selectUsersBtn.addEventListener('click', () => {
             usersTd.forEach((td) => {
-                td.style.display = td.style.display == 'none' ? 'table-cell' : 'none';
+                td.style.display = td.style.display != 'table-cell' ? 'table-cell' : 'none';
             });
         });
     </script>
