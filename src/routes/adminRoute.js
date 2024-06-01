@@ -5,6 +5,7 @@ const path = require('path');
 const multer  = require('multer');
 const sharp = require('sharp');
 const router = express.Router();
+const cookieParser = require('cookie-parser');
 
 //databases
 const admins = require('../DB/Admin');
@@ -16,11 +17,15 @@ const storicoFatture = require('../DB/StoricoFatture')
 const sendEmail = require('../utils/emailsUtils.js');
 const sendMessage = require('../utils/messagesUtils.js');
 const {creaFatturaElettronica, creaFatturaCortesia} = require('../utils/fattureUtils.js');
-router.get('/admin', async (req, res) =>{
+const { generateToken, authenticateJWT } = require('../utils/authUtils.js');
+
+router.use(cookieParser());
+
+router.get('/admin', authenticateJWT, async (req, res) =>{
     const users = await utenti.find({});
     res.render('admin/usersPage', {users})
 });
-router.get('/userPage', async (req, res) =>{
+router.get('/userPage', authenticateJWT, async (req, res) =>{
     const user = await utenti.findOne({"cFiscale": req.query.cf});
     if(!user){
         return res.render('errorPage',{error: 'utente non trovato'});
@@ -139,7 +144,7 @@ router.post('/uploadUserFirma', async (req, res) => {
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
 
-router.post('/sendMessage', async (req, res) => {
+router.post('/sendMessage', authenticateJWT, async (req, res) => {
   const {tel, content} = req.body;
   const phoneNumbers = tel.trim().split(', ');
   await sendMessage(phoneNumbers, content)
@@ -157,7 +162,7 @@ router.post('/sendMessage', async (req, res) => {
 });
 
 
-router.post('/updateUser', async (req, res) =>{
+router.post('/updateUser', authenticateJWT, async (req, res) =>{
     try {
         const dati = req.body;
         const userData= {
@@ -237,7 +242,7 @@ router.post('/updateUser', async (req, res) =>{
     }
 });
 
-router.post('/deleteUserImage', async (req, res) => {
+router.post('/deleteUserImage', authenticateJWT, async (req, res) => {
   const { cf, intent } = req.body;
   const existingUser = await utenti.findOne({ cFiscale: cf });
   if(intent == 'firma' && existingUser){
@@ -256,7 +261,7 @@ router.post('/deleteUserImage', async (req, res) => {
   res.redirect(`/userPage?cf=${cf}`);
 });
 
-router.post('/deleteUsers', async (req, res) => {
+router.post('/deleteUsers', authenticateJWT, async (req, res) => {
   const users = req.body;
   for (const cf of Object.values(users)) {
       await utenti.deleteOne({"cFiscale": cf});
@@ -266,17 +271,17 @@ router.post('/deleteUsers', async (req, res) => {
 });
 
 
-router.get('/admin/price', async (req, res) => {
+router.get('/admin/price', authenticateJWT, async (req, res) => {
   const prezzo = await prezzi.findOne({});
   res.render('admin/pricePage', {price: prezzo.prezzo});
 });
-router.post('/updatePrice', async (req, res) => {
+router.post('/updatePrice', authenticateJWT, async (req, res) => {
   const price = req.body.price;
   await prezzi.updateOne({"prezzo": price});
   console.log(`Il prezzo è stato aggiornato a ${price}€`)
   res.redirect('/admin/price');
 });
-router.get('/admin/fattureDaEmettere', async (req, res)=> {
+router.get('/admin/fattureDaEmettere', authenticateJWT, async (req, res)=> {
   try{
     const cf = req.query.cf; 
     const dati = await utenti.findOne(
@@ -289,7 +294,7 @@ router.get('/admin/fattureDaEmettere', async (req, res)=> {
   }
 });
 
-router.get('/admin/emettiFattura', async (req, res)=> {
+router.get('/admin/emettiFattura', authenticateJWT, async (req, res)=> {
   try{
     const cf = req.query.cf; 
     const data = req.query.data.split('/').reverse().join('-'); 
@@ -306,7 +311,7 @@ router.get('/admin/emettiFattura', async (req, res)=> {
 });
 
 
-router.post('/createFattura', async (req, res) =>{
+router.post('/createFattura', authenticateJWT, async (req, res) =>{
   const dati = req.body;
 
   try {

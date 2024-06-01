@@ -1,0 +1,67 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    background: #71a1cb;
+    text-align: center;
+}
+header{
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #f1f1f1;
+}
+header img{
+    max-width: 350px;
+    width: 100%;
+    mix-blend-mode: multiply;
+    opacity: 0.8;
+}
+
+h1{
+    color: #fff;
+}
+form {
+    text-align: center;
+}
+
+input[type="number"] {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    margin: 5px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button[type="submit"] {
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #4075b2;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background: #1a6dcb;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Nascondi le frecce per Firefox */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    display: none;
+    /* -moz-appearance: textfield; */
+}

@@ -9,7 +9,7 @@ connect.then(() =>{
 });
 
 const AdminSchema = new mongoose.Schema({
-    cFiscale: {
+    email: {
         type: String,
         required: true
     },
@@ -21,15 +21,17 @@ const AdminSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    contatti: {
-        email: {
-            type: String,
-            required: true
-        },
-        tel: {
-            type: String,
-            required: true
-        }
+    password: {
+        type: String,
+        required: true
+    },
+    otp: {
+        type: String,
+        required: true
+    },
+    approved: {
+        type: Boolean,
+        required: true
     }
 });
 const admins = new mongoose.model('admins', AdminSchema);

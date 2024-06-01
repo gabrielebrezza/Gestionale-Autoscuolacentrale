@@ -4,7 +4,6 @@ const express = require('express');
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const paypal = require('paypal-rest-sdk');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 
 const utenti = require('./DB/User');
@@ -14,15 +13,18 @@ const prezzi = require('./DB/Prezzi');
 
 const app = express();
 
+//utils
+const sendEmail = require('./utils/emailsUtils');
+
 //routes
 const paymentsRoute = require('./routes/paymentsRoute');
 const adminRoute = require('./routes/adminRoute');
-const sendEmail = require('./utils/emailsUtils');
+const authRoute = require('./routes/authRoute');
 
-app.use(paymentsRoute, adminRoute);
+app.use(paymentsRoute, adminRoute, authRoute);
 
 
-app.use(cookieParser());
+
 
 app.use(express.json());
 
