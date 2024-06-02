@@ -313,8 +313,11 @@ router.get('/admin/emettiFattura', authenticateJWT, async (req, res)=> {
 
 
 router.post('/createFattura', authenticateJWT, async (req, res) =>{
-  const dati = req.body;
-
+  let dati = req.body;
+  const {numero} = await numeroFattura.findOne();
+  dati.progressivoInvio = `i00${numero}`;
+  dati.numeroDocumento = `i00${numero}`;
+  
   try {
     const result = await creaFatturaElettronica(dati);
     console.log(result);
@@ -347,11 +350,16 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
       }
   });
   await numeroFattura.updateOne({$inc: {"numero": 1}});
+  const today = new Date();
+  const DD = String(today.getDate()).padStart(2, '0'); 
+  const MM = String(today.getMonth() + 1).padStart(2, '0'); 
+  const YYYY = today.getFullYear(); 
+  const dataFatturazione = `${DD}/${MM}/${YYYY}`;
   try{
     const nuovaFattura = new storicoFatture({
       numero: parseInt(dati.progressivoInvio.replace(/\D/g, ''), 10),
       importo: dati.importoPagamento,
-      data: dati.data,
+      data: dataFatturazione,
       nomeFile: `${dati.IdPaese}${dati.IdCodice}_${dati.progressivoInvio}.xml`,
     });
     await  nuovaFattura.save()                

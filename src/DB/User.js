@@ -96,6 +96,10 @@ const UserSchema = new mongoose.Schema({
             pagato: {
                 type: Boolean,
                 required: true
+            },
+            bocciato: {
+                type: Boolean,
+                required: false
             }
         }
     ],
