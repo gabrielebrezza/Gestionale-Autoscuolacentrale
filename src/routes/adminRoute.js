@@ -163,8 +163,9 @@ router.post('/sendMessage', authenticateJWT, async (req, res) => {
 
 
 router.post('/updateUser', authenticateJWT, async (req, res) =>{
-    try {
+      try {
         const dati = req.body;
+        const utenteDatabase = await utenti.findOne({'cFiscale': dati.cf})
         const userData= {
             nome: dati.nome,
             cognome: dati.cognome,
@@ -187,6 +188,7 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
             },
             documento: dati.documento,
             nDocumento: dati.nDocumento,
+            patente: utenteDatabase.patente,
             visita: (dati.visita).split('-').reverse().join('/'),
             protocollo:{
               numero: dati.nProtocollo,
@@ -203,6 +205,7 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
           }
       }));    
         let respinto, idoneo, assente;
+
         for (let i = 0; i < dati.teoriaLength && i < 2 + dati.countTeoriaAssente; i++) {
           const esameData = dati[`dataEsame${i}`];
           idoneo = dati[`esitoEsame${i}`] === 'idoneo';
@@ -216,6 +219,12 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
           });
         }
         if(respinto && dati.teoriaLength - 2 == dati.countTeoriaAssente){
+          
+          userData.patente.forEach((patente, index) => {
+            if (patente.bocciato === null && patente.tipo == dati.patente) {
+              userData.patente[index].bocciato = true;
+            }
+          });
           userData.archiviato = true;
         }else if(respinto || assente){
           userData.teoria.push({
@@ -230,11 +239,20 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
               ...userData.teoria[dati.teoriaLength-1],
               emailSent: true
             };
+            userData.patente.forEach((patente, index) => {
+              console.log(patente)
+              console.log(dati.patente)
+              if (patente.bocciato === null && patente.tipo == dati.patente) {
+                userData.patente[index].bocciato = false;
+                console.log('fatto')
+              }
+            });
             userData.archiviato = true;
           }catch (error){
             console.error('Errore durante l\'invio dell\'email:', error);
           }
         }
+        
         await utenti.findOneAndUpdate({"cFiscale": dati.cf}, userData);
         res.redirect(`/userPage?cf=${dati.cf}`);
     } catch (error) {

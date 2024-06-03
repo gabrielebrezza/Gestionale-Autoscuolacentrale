@@ -57,7 +57,7 @@ app.post('/payment', async (req, res) =>{
     }
     const comuneNascita = luogoNascita[0].trim();
     const provinciaNascita = luogoNascita[1].replace(/\s/g, "");
-    const statoNascita = luogoNascita[2].replace(/\s/g, "") == 'Italy' || luogoNascita[2].replace(/\s/g, "") == 'Italia' ? luogoNascita[2].replace(/\s/g, "") : 'EE';
+    const statoNascita = luogoNascita[2].replace(/\s/g, "");
     
     const via = residenza[0].trim();
     const nCivico = residenza[1].replace(/\s/g, "");
@@ -72,16 +72,16 @@ app.post('/payment', async (req, res) =>{
 
   const mese = req.body.mese.replace(/\s/g, "");
   const sesso = req.body.sesso.replace(/\s/g, "");
-  const cFiscale = req.body.cFiscale.replace(/\s/g, "");
+  const cFiscale = req.body.cFiscale.toLowerCase().replace(/\s/g, "");
 
-  const email = req.body.email.replace(/\s/g, "");
+  const email = req.body.email.toLowerCase().replace(/\s/g, "");
   const tel = req.body.tel.replace(/\s/g, "");
   const documento = req.body.documento.replace(/\s/g, "");
   const nDocumento = req.body.nDocumento.replace(/\s/g, "");
   const tipoPatente = req.body.tipoPatente.replace(/\s/g, "");
 
-  const nome = req.body.nome.trim();
-  const cognome = req.body.cognome.trim();
+  const nome = req.body.nome.toLowerCase().trim();
+  const cognome = req.body.cognome.toLowerCase().trim();
 
 
   const giorno = req.body.giorno < 10 ? `0${req.body.giorno}`: req.body.giorno;
@@ -94,22 +94,16 @@ app.post('/payment', async (req, res) =>{
   const dataRegistrazione = `${giornoReg}/${meseReg}/${annoReg}`;
 
   const existingUser = await utenti.findOne({"cFiscale": cFiscale});
-  if(existingUser){
-    const existingPatente = await utenti.findOne({
-      "cFiscale": cFiscale,
-      "patente": { 
-        "$elemMatch": { 
-          "tipo": tipoPatente, 
-          "pagato": true 
-        } 
-      }
-    });
-
-    if(existingPatente){
-      return res.status(500).json({errore: 'Possiedi già questa patente'});
+  const takingPatenteNow = await utenti.findOne({
+    "cFiscale": cFiscale,
+    "patente": { 
+      "$elemMatch": { 
+        "tipo": tipoPatente, 
+        "pagato": true,
+        "bocciato": null
+      } 
     }
-  }
-
+  });
   const existingPatenteDaPagare = await utenti.findOne({
     "cFiscale": cFiscale,
     "patente": { 
@@ -119,6 +113,35 @@ app.post('/payment', async (req, res) =>{
       } 
     }
   });
+  if(takingPatenteNow && !existingPatenteDaPagare){
+    return res.status(500).json({errore: 'Sei già iscritto in questo momento.'});
+  }
+  const existingPatentePromosso = await utenti.findOne({
+    "cFiscale": cFiscale,
+    "patente": { 
+      "$elemMatch": { 
+        "tipo": tipoPatente, 
+        "pagato": true,
+        "bocciato": false
+      } 
+    }
+  });
+  if(existingPatentePromosso){
+    return res.status(500).json({errore: 'Sei già stato promosso per questa patente'});
+  }
+  const existingPatenteBocciato = await utenti.findOne({
+    "cFiscale": cFiscale,
+    "patente": { 
+      "$elemMatch": { 
+        "tipo": tipoPatente, 
+        "pagato": true,
+        "bocciato": true
+      } 
+    }
+  });
+
+
+
   if(!existingUser){
     const saveUser = new utenti({
       "cFiscale": cFiscale,
@@ -140,7 +163,8 @@ app.post('/payment', async (req, res) =>{
       "nDocumento": nDocumento,
       "patente": [{
         tipo: tipoPatente,
-        pagato: false
+        pagato: false,
+        bocciato: null
       }],
       "teoria":[
         {
@@ -159,7 +183,7 @@ app.post('/payment', async (req, res) =>{
     });
   }else if(!existingPatenteDaPagare){
     try{
-      const updateUser = await utenti.findOneAndUpdate(
+      await utenti.findOneAndUpdate(
         {
           "cFiscale": cFiscale
         },
@@ -187,12 +211,20 @@ app.post('/payment', async (req, res) =>{
                 esito: null
               }
             ],
-            "dataRegistrazione": dataRegistrazione
+            "dataRegistrazione": dataRegistrazione,
+            "numeroPatente" : "",
+            "protocollo": {
+              "numero": "",
+              "dataEmissione": ""
+            },
+            "visita": "",
+            "archiviato": null
           },
           $addToSet: {
             "patente": {
               tipo: tipoPatente,
-              pagato: false
+              pagato: false,
+              bocciato: null
             }
           }
         },
@@ -206,7 +238,11 @@ app.post('/payment', async (req, res) =>{
       return res.status(500).send('Si è verificato un errore');
     }
   }
-  const { prezzo } = await prezzi.findOne({});
+  let { prezzo } = await prezzi.findOne({});
+  if(existingPatenteBocciato){
+      prezzo = 300;
+  }
+  
   if(paymentMethod == 'stripe'){
     try {
       const session = await stripe.checkout.sessions.create({

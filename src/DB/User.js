@@ -99,7 +99,8 @@ const UserSchema = new mongoose.Schema({
             },
             bocciato: {
                 type: Boolean,
-                required: false
+                required: false,
+                default: null
             }
         }
     ],

@@ -350,11 +350,15 @@
                     <td>
                         <ul>
                             <% user.patente.forEach(function(patente) { %>
-                                <% if(patente.pagato){ %>
+                                <% if(patente.pagato == true){ %>
                                     <li><%= patente.tipo %></li>
+                                    <% if (patente.bocciato === null) { %>
+                                        <input type="hidden" name="patente" value="<%= patente.tipo %>">
+                                    <% } %>
                                 <% } %>
                             <% }); %>
                         </ul>
+                        
                     </td>
                 </tr>
                 <tr>
