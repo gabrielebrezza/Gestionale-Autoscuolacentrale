@@ -15,9 +15,8 @@ const numeroFattura = require('../DB/NumeroFattura');
 const storicoFatture = require('../DB/StoricoFatture')
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
-const sendMessage = require('../utils/messagesUtils.js');
 const {creaFatturaElettronica, creaFatturaCortesia} = require('../utils/fattureUtils.js');
-const { generateToken, authenticateJWT } = require('../utils/authUtils.js');
+const { authenticateJWT } = require('../utils/authUtils.js');
 
 router.use(cookieParser());
 
@@ -136,31 +135,18 @@ router.post('/uploadUserFirma', async (req, res) => {
 
 
 
-
+router.get('/admin/pagamenti', async (req, res) => {
+    const pagamenti = await utenti.findOne({"cFiscale": req.query.cf}, {"fatture": 1}); 
+    if(pagamenti.fatture == '') return res.render('errorPage', {error: "Questo utente non ha effetuato ancora un pagamento"});
+    
+    res.render('admin/payments/storicoPagamenti',{pagamenti: pagamenti.fatture})
+});
 
 
 
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: true }));
-
-router.post('/sendMessage', authenticateJWT, async (req, res) => {
-  const {tel, content} = req.body;
-  const phoneNumbers = tel.trim().split(', ');
-  await sendMessage(phoneNumbers, content)
-    .then(({ results, errorNumbers }) => {
-        console.log('Numeri con errori:', errorNumbers);
-        if(errorNumbers){
-           return res.render('errorPage',{error: `errore nell\'invio dei messaggi ai numeri ${errorNumbers.join(', ')}`})
-        }
-        res.redirect('/admin');
-    })
-    .catch(error => {
-        console.log('Si è verificato un errore:', error);
-    });
-
-});
-
 
 router.post('/updateUser', authenticateJWT, async (req, res) =>{
       try {

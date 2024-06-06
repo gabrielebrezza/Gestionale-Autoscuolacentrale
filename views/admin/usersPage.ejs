@@ -92,7 +92,7 @@ details input[type="checkbox"] {
     margin-left: 5px;
 }
 .btn{
-    padding: 15px;
+    padding: 10px;
     color: #333;
     cursor: pointer;
     border-radius: 5px;
@@ -100,12 +100,21 @@ details input[type="checkbox"] {
     border: none;
     outline: none;
 }
-.fatturaDaEmettere{
+a{
+    text-decoration: none;
+}
+.buttonCell{
+    display: flex;
+    justify-content: center;
+}
+.fatturaDaEmettere, .fatturaDaEmettere a{
     background: orange;
     color: #fff;
 }
-.fattureEmesse{
+
+.pagamenti, .pagamenti a{
     background: lightblue;
+    color: #1f1f1f;
 }
 .btn:hover{
     opacity: .8;
@@ -220,7 +229,7 @@ details input[type="checkbox"] {
                             <td><a href="<%=`/userPage?cf=${encodeURIComponent(user.cFiscale)}`%>"><%= user.nome %></a></td>
                             <td><%= user.cognome %></td>
                             <td><%= user.contatti.email %></td>
-                            <td class="telBtn" onclick="showForm('<%= user.contatti.tel%>', 'row<%= index %>')"><%= user.contatti.tel %></td>
+                            <td><%= user.contatti.tel %></td>
                             <td><%= user.visita ? user.visita : 'Mancante' %></td>
                             <td>
                                 <% user.patente.forEach(function(patente) { %>
@@ -242,7 +251,13 @@ details input[type="checkbox"] {
                             const daEmettere = !!fatturaEmessa;
 
                             %>
-                            <td> <a href="<%= `/admin/fattureDaEmettere?cf=${encodeURIComponent(user.cFiscale)}` %>"><button class="btn <%= daEmettere ? 'fatturaDaEmettere' : 'fattureEmesse' %>" <%= daEmettere ? '' : 'disabled' %>>Fatture</button></a></td>
+                            <td class="buttonCell">
+                                <% if (daEmettere) { %>
+                                     <button class="btn fatturaDaEmettere" ><a href="<%= `/admin/fattureDaEmettere?cf=${encodeURIComponent(user.cFiscale)}` %>">Fatture</a></button>
+                                <% }else{ %>
+                                    <button class="btn pagamenti" ><a href="<%= `/admin/pagamenti?cf=${encodeURIComponent(user.cFiscale)}` %>">Pagamenti</a></button>
+                                <% } %>
+                            </td>
                         </tr>
                     <% } %>
                 <% }); %>
@@ -353,25 +368,5 @@ details input[type="checkbox"] {
             });
         });
     </script>
-    <script>
-        
-        function showForm(tel, rowId) {
-            document.getElementById('messageForm').style.display = 'block';
-            var telInput = document.getElementById('telInput')
-            if(!telInput.value.includes(tel)){
-                telInput.value += `${tel}, `;
-            }else{
-                telInput.value = telInput.value.split(`${tel}, `).join(' ');
-            }
-            const row = document.getElementById(rowId)
-            row.style.background = row.style.background == 'lightblue' ? '#fff': 'lightblue';
-        }
-    </script>
-
-    <form action="/sendMessage" method="POST" id="messageForm" style="display: none;">
-        <input type="tel" id="telInput" name="tel" value="" required>
-        <input type="text" name="content" required>
-        <button type="submit">invia</button>
-    </form>
 </body>
 </html>
