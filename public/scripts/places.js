@@ -24,9 +24,13 @@
     function getComponentName(componentType, place) {
     for (const component of place.address_components || []) {
         if (component.types[0] === componentType) {
-            return SHORT_NAME_ADDRESS_COMPONENT_TYPES.has(componentType) ?
+            if(componentType == 'country'){
+                return component.short_name
+            }else{
+                return SHORT_NAME_ADDRESS_COMPONENT_TYPES.has(componentType) ?
                 component.short_name :
                 component.long_name;
+            }
         }
     }
     return '';

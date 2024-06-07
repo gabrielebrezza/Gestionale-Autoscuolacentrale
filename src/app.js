@@ -15,7 +15,7 @@ const app = express();
 
 //utils
 const sendEmail = require('./utils/emailsUtils');
-
+const compilaTt2112 = require('./utils/compileUtils');
 //routes
 const paymentsRoute = require('./routes/paymentsRoute');
 const adminRoute = require('./routes/adminRoute');
@@ -56,7 +56,7 @@ app.post('/payment', async (req, res) =>{
       return res.render('errorPage', { error: `Dato mancante all'interno dell'indirizzo di residenza` });
     }
     const comuneNascita = luogoNascita[0].trim();
-    const provinciaNascita = luogoNascita[1].replace(/\s/g, "");
+    const provinciaNascita = luogoNascita[2].replace(/\s/g, "") != 'IT' ? 'EE' : luogoNascita[2].replace(/\s/g, "");
     const statoNascita = luogoNascita[2].replace(/\s/g, "");
     
     const via = residenza[0].trim();
@@ -323,6 +323,10 @@ app.post('/payment', async (req, res) =>{
     }
   }
 });
+
+
+
+
 
 const PORT = process.env.PORT || 80;
 
