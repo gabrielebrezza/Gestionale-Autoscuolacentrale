@@ -238,9 +238,13 @@ app.post('/payment', async (req, res) =>{
       return res.status(500).send('Si è verificato un errore');
     }
   }
-  let { prezzo } = await prezzi.findOne({});
-  if(existingPatenteBocciato){
-      prezzo = 300;
+  const prices = await prezzi.findOne({"tipo": tipoPatente});
+  
+  let prezzo;
+  if (!existingPatenteBocciato) {
+    prezzo = prices.prezzoPrimaIscrizione;
+  } else {
+    prezzo = prices.prezzoIscrizioniSuccessive;
   }
   
   if(paymentMethod == 'stripe'){

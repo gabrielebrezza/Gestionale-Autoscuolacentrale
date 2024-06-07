@@ -6,10 +6,22 @@
     <title>Admin - Prezzi</title>
 </head>
 <body>
-    <form action="/updatePrice" method="POST">
-        <label for="price">Prezzo Iscrizione</label>
-        <input name="price" type="number" min="0" value="<%= price %>" step="any" >
-        <button type="submit">Aggiorna</button>
-    </form>
+    <% prices.forEach(prezzi => { %>
+        <h1><%= prezzi.tipo %></h1>
+        <form action="/updatePrice" method="POST">
+            <input type="hidden" name="tipo" value="<%= prezzi.tipo %>">
+            <input type="hidden" name="iscrizione" value="1">
+            <label for="price">Prezzo Iscrizione 1:</label>
+            <input name="price" type="number" min="0" value="<%= prezzi.prezzoPrimaIscrizione %>" step="any" >
+            <button type="submit">Aggiorna</button>
+        </form>
+        <form action="/updatePrice" method="POST">
+            <input type="hidden" name="tipo" value="<%= prezzi.tipo %>">
+            <input type="hidden" name="iscrizione" value="2">
+            <label for="price">Prezzo Iscrizioni Successive:</label>
+            <input name="price" type="number" min="0" value="<%= prezzi.prezzoIscrizioniSuccessive %>" step="any" >
+            <button type="submit">Aggiorna</button>
+        </form>
+    <% }) %>
 </body>
 </html>

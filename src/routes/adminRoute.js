@@ -277,13 +277,18 @@ router.post('/deleteUsers', authenticateJWT, async (req, res) => {
 
 
 router.get('/admin/price', authenticateJWT, async (req, res) => {
-  const prezzo = await prezzi.findOne({});
-  res.render('admin/pricePage', {price: prezzo.prezzo});
+  const prices = await prezzi.find();
+  res.render('admin/pricePage', {prices});
 });
 router.post('/updatePrice', authenticateJWT, async (req, res) => {
-  const price = req.body.price;
-  await prezzi.updateOne({"prezzo": price});
-  console.log(`Il prezzo è stato aggiornato a ${price}€`)
+  const {tipo, iscrizione, price} = req.body;
+  if(iscrizione == 1){
+    await prezzi.findOneAndUpdate({"tipo": tipo}, {"prezzoPrimaIscrizione": price});
+  }else{
+    await prezzi.findOneAndUpdate({"tipo": tipo}, {"prezzoIscrizioniSuccessive": price});
+  }
+  
+  console.log(`Il prezzo della ${iscrizione} iscrizione della patente ${tipo} è stato aggiornato a ${price}€`)
   res.redirect('/admin/price');
 });
 router.get('/admin/fattureDaEmettere', authenticateJWT, async (req, res)=> {

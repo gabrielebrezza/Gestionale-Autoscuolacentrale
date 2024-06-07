@@ -10,8 +10,17 @@ connect.then(() =>{
 });
 
 const PrezziSchema = new mongoose.Schema({
-    prezzo: {
+    tipo:{
+        type: String,
+        required: true,
+        unique: true
+    },
+    prezzoPrimaIscrizione: {
         type: Number,
+        required: true
+    },
+    prezzoIscrizioniSuccessive: {
+        type: Number, 
         required: true
     }
 });
