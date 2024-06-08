@@ -24,7 +24,16 @@ const sendEmail = async (email, subject, text, attachment = null) => {
         };
 
         if (attachment) {
-            mailOptions.attachments = { path: attachment};
+            if (Array.isArray(attachment)) {
+                const attachments = [];
+
+                attachment.forEach(fileName => {
+                    attachments.push({path: fileName});
+                });
+                mailOptions.attachments = attachments;
+            }else{
+                mailOptions.attachments = {path: attachment};
+            }
         }
         transporter.sendMail(mailOptions, async function(error, info) {
             if (error) {

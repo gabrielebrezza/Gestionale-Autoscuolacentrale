@@ -1,6 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
-const { PDFDocument } = require('pdf-lib');
+const { PDFDocument, rgb } = require('pdf-lib');
 
 const utenti = require('../DB/User');
 
@@ -45,4 +45,79 @@ async function compilaTt2112(cFiscale) {
     }
   }
 
-module.exports = compilaTt2112
+
+  async function compilaCertResidenza(cFiscale) {
+    return new Promise(async (resolve, reject) => {
+      try {
+          const data = await utenti.findOne({"cFiscale": cFiscale});
+  
+          const existingPdfBytes = await fs.readFile('./public/download/autocertificazioneResidenza.pdf');
+  
+          const pdfDoc = await PDFDocument.load(existingPdfBytes);
+  
+          const pages = pdfDoc.getPages();
+          const firstPage = pages[0];
+  
+          const nomeCognomePosition = { x: 190, y: 605 };
+          const luogoNascitaPosition = { x: 100, y: 583 };
+          const provinciaNascitaPosition = { x: 263, y: 583 };
+          const dataNascitaPosition = { x: 310, y: 583 };
+          const comuneResidenzaPosition = { x: 240, y: 375 };
+          const provinciaResidenzaPosition = { x: 470, y: 375 };
+          const indirizzoPosition = { x: 140, y: 355 };
+
+          firstPage.drawText(`${data.cognome} ${data.nome}`, {
+            x: nomeCognomePosition.x,
+            y: nomeCognomePosition.y,
+            size: 12,
+            color: rgb(0, 0, 0),
+          });
+          firstPage.drawText(data.nascita.comune, {
+            x: luogoNascitaPosition.x,
+            y: luogoNascitaPosition.y,
+            size: 12,
+            color: rgb(0, 0, 0),
+          });
+          firstPage.drawText(data.nascita.provincia, {
+            x: provinciaNascitaPosition.x,
+            y: provinciaNascitaPosition.y,
+            size: 12,
+            color: rgb(0, 0, 0),
+          });
+          firstPage.drawText(data.nascita.data, {
+            x: dataNascitaPosition.x,
+            y: dataNascitaPosition.y,
+            size: 12,
+            color: rgb(0, 0, 0),
+          });
+          firstPage.drawText(data.residenza.comune, {
+            x: comuneResidenzaPosition.x,
+            y: comuneResidenzaPosition.y,
+            size: 12,
+            color: rgb(0, 0, 0),
+          });
+          firstPage.drawText(data.residenza.provincia, {
+            x: provinciaResidenzaPosition.x,
+            y: provinciaResidenzaPosition.y,
+            size: 12,
+            color: rgb(0, 0, 0),
+          });
+          firstPage.drawText(`${data.residenza.via} ${data.residenza.nCivico}`, {
+            x: indirizzoPosition.x,
+            y: indirizzoPosition.y,
+            size: 12,
+            color: rgb(0, 0, 0),
+          });
+        
+          const pdfBytes = await pdfDoc.save();
+          await fs.writeFile(`./certificati/residenza/autocertificazioneResidenza_${cFiscale}.pdf`, pdfBytes);
+          resolve(`autocertificazione di residenza salvata con successo`);
+        }catch (error) {
+          reject(error);
+      }
+    });
+  }
+
+
+
+module.exports = {compilaTt2112, compilaCertResidenza}
