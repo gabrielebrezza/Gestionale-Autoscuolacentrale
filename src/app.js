@@ -8,14 +8,14 @@ const jwt = require('jsonwebtoken');
 
 const utenti = require('./DB/User');
 const prezzi = require('./DB/Prezzi');
-
+const codes = require('./DB/Codes');
 
 
 const app = express();
 
 //utils
 const sendEmail = require('./utils/emailsUtils');
-const compilaTt2112 = require('./utils/compileUtils');
+const setPayment = require('./utils/paymentsUtils.js');
 //routes
 const paymentsRoute = require('./routes/paymentsRoute');
 const adminRoute = require('./routes/adminRoute');
@@ -325,6 +325,20 @@ app.post('/payment', async (req, res) =>{
       console.log('si è verificato un errore con il pagamento con Paypal, errore: ', error);
       res.status(500).json({error: error.message});
     }
+  }else if(paymentMethod == 'code'){
+    const code = req.body.code;
+    const codeExist = await codes.findOne({"cFiscale": cFiscale, "code": code, "email": email, "importo": prezzo});
+    if(!codeExist){
+      return res.render('errorPage', {error: 'Il Codice inserito è errato o altrimenti codice fiscale, email o patente sono diversi da quelli con cui è stato creato il codice.'});
+    }
+    try {
+      await setPayment(cFiscale, tipoPatente, prezzo, email);
+    } catch (error) {
+      console.log(`errore durante il pagamento con codice ${error}`);
+      return res.render('errorPage', {error: 'Si è verificato un errore con il pagamento riprova.'})
+    }
+    await codes.deleteOne({"cFiscale": cFiscale, "code": code, "email": email, "importo": prezzo});
+    res.redirect(`/successPayment?cf=${encodeURIComponent(cFiscale)}`);
   }
 });
 

@@ -16,7 +16,7 @@
     <gmpx-api-loader key="AIzaSyA4iu52UT4JEx3Reh5fk0VI6WCafwqZwtM" solution-channel="GMP_QB_addressselection_v3_cA">
     </gmpx-api-loader>
     <div class="container">
-        <form action="/payment" method="POST">
+        <form id="subscriptionForm" action="/payment" method="POST">
             <h1>Inserisci i tuoi dati per poterti registrare</h1>
             <div class="field">
                 <label for="nome">Nome:</label>
@@ -133,10 +133,14 @@
                 <input type="hidden" name="paymentMethod" id="paymentMethod" value="">
                 <button type="submit" id="payPal"><i class="fa fa-paypal"></i> Paga con PayPal</button>
                 <!-- <button type="submit" id="stripe"><i class="fa fa-cc-stripe"></i> Paga con Carta </button> -->
+                <!-- <button id="codeBtn">Paga con Codice</button> -->
+            </div>
+            <div class="field" id="codeContainer" style="display: none;">
+                <input type="text" name="code" id="code">
+                <button type="submit" id="codeSubmitBtn">Conferma</button>
             </div>
         </form>
     </div>
-
     <script defer src="/scripts/subscriptionForm.js"></script>
 </body>
 </html>

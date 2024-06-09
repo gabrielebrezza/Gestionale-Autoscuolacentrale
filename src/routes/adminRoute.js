@@ -11,8 +11,9 @@ const cookieParser = require('cookie-parser');
 const admins = require('../DB/Admin');
 const utenti = require('../DB/User');
 const prezzi = require('../DB/Prezzi');
+const codes = require('../DB/Codes');
 const numeroFattura = require('../DB/NumeroFattura');
-const storicoFatture = require('../DB/StoricoFatture')
+const storicoFatture = require('../DB/StoricoFatture');
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
 const {creaFatturaElettronica, creaFatturaCortesia} = require('../utils/fattureUtils.js');
@@ -291,6 +292,44 @@ router.post('/updatePrice', authenticateJWT, async (req, res) => {
   console.log(`Il prezzo della ${iscrizione} iscrizione della patente ${tipo} è stato aggiornato a ${price}€`)
   res.redirect('/admin/price');
 });
+
+router.post('/createCode', async (req, res) => {
+  try {
+    const {email, cf, patente, iscrizione} = req.body;
+    let importo;
+    if (iscrizione == 1) {
+      const result = await prezzi.findOne({ tipo: patente }, { prezzoPrimaIscrizione: 1 });
+      importo = result.prezzoPrimaIscrizione;
+    } else {
+      const result = await prezzi.findOne({ tipo: patente }, { prezzoIscrizioniSuccessive: 1 });
+      importo = result.prezzoIscrizioniSuccessive;
+    }
+    
+    const length = 15;
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let code = '';
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+        code += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    await codes.create({"cFiscale": cf.toLowerCase(), "code": code, "email": email.toLowerCase(), "importo": importo});
+    
+    const subject = `Codice per pagamento AutoscuolaCentrale`;
+    const text = `${code} Questo è il codice che dovrai usare per iscriverti alla patente ${patente}. Per iscriverti visita il sito iscrizione-autoscuolacentrale.com`;
+    try{
+      const result = await sendEmail(email, subject, text);
+      console.log(result);
+    }catch(error){
+      console.log('errore: ', error);
+    }
+    res.json({success: true, code: code, importo: importo});
+  } catch (error) {
+    console.log(error);
+    res.json({success: false, message: "errore nella generazione del codice"});
+  }
+
+});
+
 router.get('/admin/fattureDaEmettere', authenticateJWT, async (req, res)=> {
   try{
     const cf = req.query.cf; 
