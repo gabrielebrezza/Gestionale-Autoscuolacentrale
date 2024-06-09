@@ -7,7 +7,7 @@
     // stripe.addEventListener('click', () => paymentMethod.value = 'stripe')
     codeBtn.addEventListener('click', event => {
         event.preventDefault();
-        codeContainer.style.display = 'block';
+        codeContainer.style.display = 'flex';
         paymentMethod.value = 'code';
     });
 
