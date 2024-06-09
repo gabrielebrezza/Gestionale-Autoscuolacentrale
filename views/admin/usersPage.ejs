@@ -123,6 +123,10 @@ a{
         .elimina{
             display: none;
         }
+        #codesForm h2{
+            text-transform: uppercase;
+            color: #fff;
+        }
         #codesForm {
             background-color: #4298f3;
             padding: 20px;
@@ -161,7 +165,7 @@ a{
     <form action="/logout" method="POST"><button type="submit">LOGOUT</button></form>
     <div class="codes">
         <form id="codesForm">
-            <h4>Generatore di codici</h4>
+            <h2>Generatore di codici</h2>
             <label for="email">Email:</label>
             <input type="email" name="email" id="email">
             <label for="cf">Codice Fiscale:</label>
