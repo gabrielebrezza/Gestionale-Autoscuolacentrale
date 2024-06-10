@@ -27,6 +27,7 @@
     "stripe": "^15.4.0",
     "tls": "^0.0.1",
     "twilio": "^5.0.4",
+    "useragent": "^2.3.0",
     "xmlbuilder2": "^3.1.1"
   },
   "devDependencies": {

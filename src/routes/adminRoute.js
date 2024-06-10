@@ -6,6 +6,7 @@ const multer  = require('multer');
 const sharp = require('sharp');
 const cookieParser = require('cookie-parser');
 const { exec } = require('child_process');
+const useragent = require('useragent');
 const router = express.Router();
 
 //databases
@@ -337,12 +338,11 @@ router.post('/stampa', async (req, res)=> {
   
   const filePath = path.resolve(__dirname, '../../certificati', `${modulo}` , `${modulo}_${cf}.pdf`);
   let printCommand;
-  console.log(process.platform)
-  if (process.platform === 'win32') {
-    console.log('sto eseguendo win32');
+  const userOs = useragent.parse(req.headers['user-agent']).os;
+  console.log(userOs)
+  if (userOs.family.toLowerCase().includes('windows')){
     printCommand = `rundll32 printui.dll,PrintUIEntry /y /n "${filePath}"`;
-  } else if (process.platform === 'darwin' || process.platform === 'linux') {
-    console.log('sto eseguendo linux e mac');
+  } else if (userOs.family.toLowerCase().includes('mac') || userOs.family.toLowerCase().includes('linux')){
     printCommand = `lp ${filePath}`;
     
   } else {
