@@ -337,9 +337,12 @@ router.post('/stampa', async (req, res)=> {
   
   const filePath = path.resolve(__dirname, '../../certificati', `${modulo}` , `${modulo}_${cf}.pdf`);
   let printCommand;
+  console.log(process.platform)
   if (process.platform === 'win32') {
+    console.log('sto eseguendo win32');
     printCommand = `rundll32 printui.dll,PrintUIEntry /y /n "${filePath}"`;
   } else if (process.platform === 'darwin' || process.platform === 'linux') {
+    console.log('sto eseguendo linux e mac');
     printCommand = `lp ${filePath}`;
     
   } else {
