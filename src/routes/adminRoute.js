@@ -340,7 +340,7 @@ router.post('/stampa', async (req, res)=> {
   let printCommand;
   const userOs = useragent.parse(req.headers['user-agent']).os;
   console.log(userOs)
-  if (userOs.family.toLowerCase().includes('windows')){
+  if (userOs.family == 'Windows'){
     printCommand = `rundll32 printui.dll,PrintUIEntry /y /n "${filePath}"`;
   } else if (userOs.family.toLowerCase().includes('mac') || userOs.family.toLowerCase().includes('linux')){
     printCommand = `lp ${filePath}`;
