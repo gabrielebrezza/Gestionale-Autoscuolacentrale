@@ -33,9 +33,9 @@ router.get('/admin/approveUsers', authenticateJWT, async (req, res) =>{
 });
 
 router.post('/admin/signup', async (req, res) => {
-    const nome = req.body.nome.replace(/\s/g, "");
-    const cognome = req.body.cognome.replace(/\s/g, "");
-    const email = req.body.email.replace(/\s/g, "");
+    const nome = req.body.nome.replace(/\s/g, "").toLoweCase();
+    const cognome = req.body.cognome.replace(/\s/g, "").toLoweCase();
+    const email = req.body.email.replace(/\s/g, "").toLoweCase();
     const password = req.body.password;
     const username = nome+' '+cognome;
 
@@ -100,7 +100,7 @@ router.post('/admin/verificaOTP', async (req, res) =>{
 });
 
 router.post('/admin/login', async (req, res) => {
-    const email = (req.body.email).replace(/\s/g, "");
+    const email = (req.body.email).replace(/\s/g, "").toLoweCase();
     const password = req.body.password;
     const admin = await admins.findOne({ "email": email });
 
