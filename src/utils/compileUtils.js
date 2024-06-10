@@ -110,7 +110,7 @@ async function compilaTt2112(cFiscale) {
           });
         
           const pdfBytes = await pdfDoc.save();
-          await fs.writeFile(`./certificati/residenza/autocertificazioneResidenza_${cFiscale}.pdf`, pdfBytes);
+          await fs.writeFile(`./certificati/residenza/residenza_${cFiscale}.pdf`, pdfBytes);
           resolve(`autocertificazione di residenza salvata con successo`);
         }catch (error) {
           reject(error);

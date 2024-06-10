@@ -1,11 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 const multer  = require('multer');
 const sharp = require('sharp');
-const router = express.Router();
 const cookieParser = require('cookie-parser');
+const { exec } = require('child_process');
+const os = require('os');
+const router = express.Router();
 
 //databases
 const admins = require('../DB/Admin');
@@ -18,6 +20,7 @@ const storicoFatture = require('../DB/StoricoFatture');
 const sendEmail = require('../utils/emailsUtils.js');
 const {creaFatturaElettronica, creaFatturaCortesia} = require('../utils/fattureUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
+const {compilaTt2112, compilaCertResidenza} = require('../utils/compileUtils');
 
 router.use(cookieParser());
 
@@ -328,6 +331,75 @@ router.post('/createCode', async (req, res) => {
     res.json({success: false, message: "errore nella generazione del codice"});
   }
 
+});
+
+router.post('/stampa', async (req, res)=> {
+  const { cf, modulo } = req.body;
+  
+  const filePath = path.resolve(__dirname, '../../certificati', `${modulo}` , `${modulo}_${cf}.pdf`);
+  let printCommand;
+  if (os.platform() === 'win32') {
+    printCommand = `rundll32 printui.dll,PrintUIEntry /y /n "${filePath}"`;
+  } else if (os.platform() === 'darwin' || os.platform() === 'linux') {
+    printCommand = `lp ${filePath}`;
+  } else {
+    return res.render('errorPage',{error: 'Sistema operativo non supportato per la stampa'});
+  }
+  try {
+    await fs.access(filePath);
+    exec(printCommand, (err, stdout, stderr) => {
+      if (err) {
+        console.error(`Errore durante la stampa: ${stderr}`);
+        return res.render('errorPage', {error: 'errore durante la stampa'});
+      }
+
+      console.log(`Stampa avviata: ${stdout}`);
+      res.redirect(`/userPage?cf=${cf}`);
+    });
+  } catch (err) {
+    if(modulo == 'residenza'){
+      await compilaCertResidenza(cf);
+    }else{
+      await compilaTt2112(cf);
+    }
+    exec(printCommand, (err, stdout, stderr) => {
+      if (err) {
+        console.error(`Errore durante la stampa: ${stderr}`);
+        return res.render('errorPage', {error: 'errore durante la stampa'});
+      }
+
+      console.log(`Stampa avviata: ${stdout}`);
+      res.redirect(`/userPage?cf=${cf}`);
+    });
+  }
+});
+
+router.post('/visualizza', async (req, res)=> {
+  const { cf, modulo } = req.body;
+  
+  const filePath = path.resolve(__dirname, '../../certificati', `${modulo}` , `${modulo}_${cf}.pdf`);
+  try {
+      await fs.access(filePath);
+      res.setHeader('Content-Type', 'application/pdf');
+
+      res.sendFile(filePath, { 
+        headers: {
+          'Content-Disposition': `inline; filename=${modulo}_${cf}.pdf`
+        }
+      });
+  } catch (err) {
+      if(modulo == 'residenza'){
+        await compilaCertResidenza(cf);
+      }else{
+        await compilaTt2112(cf);
+      }
+      res.setHeader('Content-Type', 'application/pdf');
+      res.sendFile(filePath, { 
+        headers: {
+          'Content-Disposition': `inline; filename=${modulo}_${cf}.pdf`
+        }
+      });
+  }
 });
 
 router.get('/admin/fattureDaEmettere', authenticateJWT, async (req, res)=> {

@@ -48,7 +48,7 @@ async function setPayment(cFiscale, patente, price, email) {
         }
         const fileNames = [
           `certificati/tt2112/tt2112_${cFiscale}.pdf`,
-          `certificati/residenza/autocertificazioneResidenza_${cFiscale}.pdf`
+          `certificati/residenza/residenza_${cFiscale}.pdf`
         ];
         try{
           const result = await sendEmail(email, 'Iscrizione effettuata con successo', `Grazie per esserti iscritto alla patente ${patente}. Ti chiediamo gentilmente in caso tu non l'avessi ancora fatto di inviarci la scansione della tua firma e della fototessera che apparirà sulla patente`, fileNames );
