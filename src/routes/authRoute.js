@@ -100,7 +100,7 @@ router.post('/admin/verificaOTP', async (req, res) =>{
 });
 
 router.post('/admin/login', async (req, res) => {
-    const email = (req.body.email).replace(/\s/g, "").toLoweCase();
+    const email = (req.body.email).replace(/\s/g, "").toLowerCase();
     const password = req.body.password;
     const admin = await admins.findOne({ "email": email });
 
