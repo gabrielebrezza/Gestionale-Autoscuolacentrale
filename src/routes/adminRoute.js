@@ -6,7 +6,6 @@ const multer  = require('multer');
 const sharp = require('sharp');
 const cookieParser = require('cookie-parser');
 const { exec } = require('child_process');
-const os = require('os');
 const router = express.Router();
 
 //databases
@@ -338,10 +337,9 @@ router.post('/stampa', async (req, res)=> {
   
   const filePath = path.resolve(__dirname, '../../certificati', `${modulo}` , `${modulo}_${cf}.pdf`);
   let printCommand;
-  console.log(os.platform())
-  if (os.platform() === 'win32') {
+  if (process.platform === 'win32') {
     printCommand = `rundll32 printui.dll,PrintUIEntry /y /n "${filePath}"`;
-  } else if (os.platform() === 'darwin' || os.platform() === 'linux') {
+  } else if (process.platform === 'darwin' || process.platform === 'linux') {
     printCommand = `lp ${filePath}`;
     
   } else {
