@@ -2,9 +2,9 @@
     const payPal = document.getElementById('payPal');
     const codeBtn = document.getElementById('codeBtn');
     const codeContainer = document.getElementById('codeContainer');
-    // const stripe = document.getElementById('stripe')
+    const stripe = document.getElementById('stripe');
     payPal.addEventListener('click', () => paymentMethod.value = 'payPal');
-    // stripe.addEventListener('click', () => paymentMethod.value = 'stripe')
+    stripe.addEventListener('click', () => paymentMethod.value = 'stripe');
     codeBtn.addEventListener('click', event => {
         event.preventDefault();
         codeContainer.style.display = 'flex';
