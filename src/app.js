@@ -342,6 +342,10 @@ app.post('/payment', async (req, res) =>{
   }
 });
 
+app.use((req, res, next) => {
+  res.render('errorPage', {error: 'pagina non trovata'});
+});
+
 const PORT = process.env.PORT || 80;
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
