@@ -5,8 +5,6 @@ const path = require('path');
 const multer  = require('multer');
 const sharp = require('sharp');
 const cookieParser = require('cookie-parser');
-const { exec } = require('child_process');
-const useragent = require('useragent');
 const router = express.Router();
 
 //databases
@@ -334,50 +332,6 @@ router.post('/createCode', async (req, res) => {
 });
 
 router.post('/stampa', async (req, res)=> {
-  const { cf, modulo } = req.body;
-  
-  const filePath = path.resolve(__dirname, '../../certificati', `${modulo}` , `${modulo}_${cf}.pdf`);
-  let printCommand;
-  const userOs = useragent.parse(req.headers['user-agent']).os;
-  console.log(userOs)
-  if (userOs.family == 'Windows'){
-    printCommand = `print "${filePath}"`;
-  } else if (userOs.family.toLowerCase().includes('mac') || userOs.family.toLowerCase().includes('linux')){
-    printCommand = `lp ${filePath}`;
-    
-  } else {
-    return res.render('errorPage',{error: 'Sistema operativo non supportato per la stampa'});
-  }
-  try {
-    await fs.access(filePath);
-    exec(printCommand, (err, stdout, stderr) => {
-      if (err) {
-        console.error(`Errore durante la stampa: ${stderr}`);
-        return res.render('errorPage', {error: 'errore durante la stampa'});
-      }
-
-      console.log(`Stampa avviata: ${stdout}`);
-      res.redirect(`/userPage?cf=${cf}`);
-    });
-  } catch (err) {
-    if(modulo == 'residenza'){
-      await compilaCertResidenza(cf);
-    }else{
-      await compilaTt2112(cf);
-    }
-    exec(printCommand, (err, stdout, stderr) => {
-      if (err) {
-        console.error(`Errore durante la stampa: ${stderr}`);
-        return res.render('errorPage', {error: 'errore durante la stampa'});
-      }
-
-      console.log(`Stampa avviata: ${stdout}`);
-      res.redirect(`/userPage?cf=${cf}`);
-    });
-  }
-});
-
-router.post('/visualizza', async (req, res)=> {
   const { cf, modulo } = req.body;
   
   const filePath = path.resolve(__dirname, '../../certificati', `${modulo}` , `${modulo}_${cf}.pdf`);

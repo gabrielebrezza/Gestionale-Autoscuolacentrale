@@ -265,15 +265,6 @@
                 </span>
             </button>
         </form>
-        <form action="/visualizza" method="POST"> 
-            <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
-            <input type="hidden" name="modulo" value="tt2112"> 
-            <button type="submit">
-                <span class="material-symbols-outlined">
-                    picture_as_pdf
-                </span>
-            </button>
-        </form>
         <h2>AUTOCERTIFICAZIONE DI RESIDENZA</h2>
         <form action="/stampa" method="POST"> 
             <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
@@ -281,15 +272,6 @@
             <button type="submit">
                 <span class="material-symbols-outlined">
                     print
-                </span>
-            </button>
-        </form>
-        <form action="/visualizza" method="POST">
-            <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
-            <input type="hidden" name="modulo" value="residenza"> 
-            <button type="submit">
-                <span class="material-symbols-outlined">
-                    picture_as_pdf
                 </span>
             </button>
         </form>
