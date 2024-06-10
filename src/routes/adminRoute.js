@@ -338,10 +338,12 @@ router.post('/stampa', async (req, res)=> {
   
   const filePath = path.resolve(__dirname, '../../certificati', `${modulo}` , `${modulo}_${cf}.pdf`);
   let printCommand;
+  console.log(os.platform())
   if (os.platform() === 'win32') {
     printCommand = `rundll32 printui.dll,PrintUIEntry /y /n "${filePath}"`;
   } else if (os.platform() === 'darwin' || os.platform() === 'linux') {
     printCommand = `lp ${filePath}`;
+    
   } else {
     return res.render('errorPage',{error: 'Sistema operativo non supportato per la stampa'});
   }
