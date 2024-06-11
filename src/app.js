@@ -65,11 +65,6 @@ app.post('/payment', async (req, res) =>{
     const comune = residenza[3].trim(); 
     const provinciaResidenza = residenza[4].replace(/\s/g, "");
 
-
-
-    
-
-
   const mese = req.body.mese.replace(/\s/g, "");
   const sesso = req.body.sesso.replace(/\s/g, "");
   const cFiscale = req.body.cFiscale.toLowerCase().replace(/\s/g, "");
