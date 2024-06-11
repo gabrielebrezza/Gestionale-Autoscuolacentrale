@@ -2,6 +2,7 @@
     const payPal = document.getElementById('payPal');
     const codeBtn = document.getElementById('codeBtn');
     const codeContainer = document.getElementById('codeContainer');
+    const codeInput = document.getElementById('code');
     const stripe = document.getElementById('stripe');
     payPal.addEventListener('click', () => paymentMethod.value = 'payPal');
     stripe.addEventListener('click', () => paymentMethod.value = 'stripe');
@@ -9,6 +10,7 @@
         event.preventDefault();
         codeContainer.style.display = 'flex';
         paymentMethod.value = 'code';
+        codeInput.required = true;
     });
 
     const year = document.getElementById('anno');

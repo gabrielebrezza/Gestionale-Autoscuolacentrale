@@ -116,14 +116,17 @@ header img{
     background: #fff;
     transform: scale(1.2);
 }
-#stripe{
-    background: #9966ff;
+/* #stripe{
     display: flex;
     justify-content: space-between;
+} */
+.submitBtn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-#stripe:hover{
-    color: #9966ff;
-    background: #fff;
+.submitBtn i, .submitBtn span{
+    margin-right: 10px;
 }
 @media (max-width: 775px) {
     .container form{

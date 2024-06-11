@@ -6,8 +6,8 @@
     <title>Iscrizione Scuola Guida</title>
     <link rel="stylesheet" href="/styles/form.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <script type="module" src="/scripts/places.js"></script>
-
 </head>
 <body>
     <header>
@@ -131,9 +131,23 @@
             </div>
             <div class="field">
                 <input type="hidden" name="paymentMethod" id="paymentMethod" value="">
-                <button type="submit" id="payPal"><i class="fa fa-paypal"></i> Paga con PayPal</button>
-                <button type="submit" id="stripe"> Paga con Carta <img class="cardsIconsImg" src="/img/cardsIcon.png" alt=""> </button>
-                <button id="codeBtn">Paga con Codice</button>
+                <button class="submitBtn" type="submit" id="stripe">
+                    <span class="material-symbols-outlined">
+                        credit_card
+                    </span>
+                    Paga con Carta
+                    <!-- <img class="cardsIconsImg" src="/img/cardsIcon.png" alt=""> -->
+                </button>
+                <button class="submitBtn" type="submit" id="payPal">
+                    <i class="fa fa-paypal"></i>
+                    Paga con PayPal
+                </button>
+                <button class="submitBtn" id="codeBtn">
+                    <span class="material-symbols-outlined">
+                        vpn_key
+                    </span>
+                    Paga con Codice
+                </button>
             </div>
             <div class="field" id="codeContainer" style="display: none;">
                 <label for="code">Codice:</label>
