@@ -118,6 +118,8 @@ header img{
 }
 #stripe{
     background: #9966ff;
+    display: flex;
+    justify-content: space-between;
 }
 #stripe:hover{
     color: #9966ff;
@@ -148,4 +150,9 @@ input.pac-target-input{
 .codeContainer{
     align-items: center;
     justify-content: center;
+}
+
+.cardsIconsImg{
+    width: auto;
+    height: 20px;
 }
