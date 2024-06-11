@@ -59,18 +59,18 @@ button:hover{
     flex-wrap: wrap;
 }
 .imageForm{
-    max-width: 300px;
+    max-width: 500px;
     width: 100%;
     background: #fff;
     height: fit-content;
     padding: 10px;
-    border-radius: 15px;
+    border-radius: 5px;
     text-align: center;
     color: #333;
     display: flex;
     align-items: center;
-    flex-direction: column;
-    border: 2px solid #333;
+    justify-content: center;
+    flex-wrap: wrap;
     margin-block: 15px;
 }
 
@@ -79,7 +79,7 @@ button:hover{
     background-color: #71a1cb;
     color: #fff;
     padding: 12px 30px;
-    margin: 10px auto;
+    margin: 10px 25px;
     border-radius: 5px;
     border: none;
     outline: none;
@@ -87,7 +87,13 @@ button:hover{
     transition: .5s;
     font-size: 1rem;
 }
-.imageForm button:hover, .imageForm label:hover {
+.imageForm button{
+    background: rgb(26, 163, 26);
+}
+.imageForm button:hover {
+    background-color: green;
+}
+.imageForm label:hover {
     background-color: #5681a9;
 }
 .imageForm input{
@@ -106,4 +112,10 @@ h2, p{
 .crop{
     margin-block: 25px;
     display: none;
+}
+ul{
+    color: #fff;
+}
+ul li{
+    margin-block: 10px;
 }

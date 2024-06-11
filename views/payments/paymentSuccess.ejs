@@ -14,7 +14,7 @@
     </header>
     <section>
         <h1><%= text %></h1>
-        <p>Per completare la registrazione online, ti preghiamo di inviarci la scansione della foto tessera (deve essere la stessa che porterai in duplice copia in autoscuola) e il modulo TT2112 (<a href="/download/tt2112.pdf" download="tt2112">scaricalo qui</a>), opportunamente firmato</p>
+        <p>Per completare la registrazione online, ti preghiamo di caricare la scansione della foto tessera (deve essere la stessa che porterai in duplice copia originale in autoscuola) e la scansione della tua firma (è quella che verrà riportata sulla patente)</p>
         <div class="imageForms">
             <form id="combinedForm" class="imageForm" enctype="multipart/form-data">
                 <input type="hidden" name="cf" value="<%= cf %>">
@@ -108,7 +108,13 @@
             </script>
         </div>
         <h2>Documenti da portare in autoscuola</h2>
-        <p>Copia della carta d'identità, copia del codice fiscale (o tessera sanitaria), modulo TT2112 firmato, autocertificazione di residenza (<a href="/download/autocertificazioneResidenza.pdf" download="autocertificazioneResidenza">scaricala qui</a>) firmata, 2 foto tessere.</p>
+        <p>
+            <ul>
+                <li>Copia della carta d'identità</li>
+                <li>Copia del codice fiscale (o tessera sanitaria)</li>
+                <li>2 foto tessere</li>
+                <li>I moduli che ti abbiamo inviato via email firmati</li>
+            </ul>
         <a href="/"><button>Torna alla home</button></a>
     </section>
 </body>
