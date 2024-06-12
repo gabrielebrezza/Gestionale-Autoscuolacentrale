@@ -100,11 +100,12 @@
             height: 50px;
             margin-bottom: 10px;
         }
+
         .imageForm button, .imageForm label{
             width: fit-content;
             background-color: #71a1cb;
             color: #fff;
-            padding: 12px 30px;
+            padding: 12px 12px;
             margin: 10px auto;
             border-radius: 5px;
             border: none;
@@ -112,6 +113,9 @@
             cursor: pointer;
             transition: .5s;
             font-size: 1rem;
+        }
+        .uploadBtn{
+            padding: 12px 20px;
         }
         .imageForm button:hover, .imageForm label:hover {
             background-color: #5681a9;
@@ -205,7 +209,7 @@
             <form class="imageForm" action="/uploadUserFirma" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="cf" value="<%= user.cFiscale %>">
                 <img id="signPic" src="/img/firme/<%= user.firma ? user.firma : 'default.png' %>" alt="Scansione Firma">
-                <label for="inputSigningFile">Carica Firma:</label>
+
                 <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
                 <div class="formField">
                     <button type="submit">
@@ -213,6 +217,11 @@
                             save
                         </span>
                     </button>
+                    <label class="uploadBtn" for="inputSigningFile">
+                        <span class="material-symbols-outlined">
+                            upload
+                        </span>
+                    </label>
                     <input type="hidden" name="intent" value="firma">
                     <button type="button" class="deleteButton">
                         <span class="material-symbols-outlined">delete</span>
@@ -227,7 +236,7 @@
             <form class="imageForm" action="/uploadUserImage" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="cf" value="<%= user.cFiscale %>">
                 <img id="profilePic" src="/img/profileImages/<%= user.immagineProfilo ? user.immagineProfilo : 'profile.png' %>" alt="Immagine Profilo">
-                <label for="inputProfileFile">Carica Immagine:</label>
+
                 <input type="file" id="inputProfileFile" name="inputProfileFile" accept="image/*">
                 <div class="formField">
                     <button type="submit">
@@ -235,6 +244,11 @@
                             save
                         </span>
                     </button>
+                    <label class="uploadBtn" for="inputProfileFile">
+                        <span class="material-symbols-outlined">
+                            upload
+                        </span>
+                    </label>
                     <input type="hidden" name="intent" value="profilo">
                     <button type="button" class="deleteButton">
                         <span class="material-symbols-outlined">
