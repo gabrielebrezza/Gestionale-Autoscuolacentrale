@@ -1,0 +1,143 @@
+#filterMenu::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+#filterMenu::-webkit-scrollbar-track {
+    background: #5681a9;
+    border-radius: 10px;
+}
+
+#filterMenu::-webkit-scrollbar-thumb {
+    background: #71a1cb;
+    border-radius: 10px;
+}
+
+#filterMenu::-webkit-scrollbar-thumb:hover {
+    background: #2c98f6;
+}
+
+#filterMenu {
+    z-index: 2;
+    position: fixed;
+    right: 0;
+    top: 0;
+    background-color: #5681a9;
+    color: #f1f1f1;
+    padding: 20px;
+    transition: 0.5s;
+}
+#filterMenu:not([open]) {
+    padding: 50px;
+}
+#filterMenu[open] {
+    max-width: 300px;
+    width: 100%;
+    height: 100vh;
+    overflow: auto;
+}
+#filterMenu > summary {
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.closeFilters {
+    font-size: 2rem;
+    display: none !important;
+}
+.openFilters {
+    font-size: 2.5rem;
+    display: block;
+}
+
+#filterMenu[open] .closeFilters {
+    display: block !important;
+}
+#filterMenu[open] .openFilters {
+    display: none;
+}
+#filterMenu[open] > summary {
+    margin-left: 90%;
+}
+#filterMenu[open] > summary::before {
+    content: "FILTRI";
+    max-width: 250px;
+    width: 100%;
+    position: absolute;
+    right: 25px;
+    top: 60px;
+    font-size: 2rem;
+}
+
+#filterMenu > *:not(summary) {
+    opacity: 0;
+    transition: 0.5s ease;
+}
+#filterMenu[open] > * {
+    opacity: 1;
+}
+
+#filterMenu .filters {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.filterField {
+    width: 100%;
+    padding-block: 10px;
+    border-bottom: 2px solid #fff;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+.filterField:first-child {
+    border-top: 2px solid #fff;
+}
+
+#filterMenu h3 {
+    font-family: "Archivo Black", sans-serif;
+    margin: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+#filterMenu label {
+    font-family: "Archivo Black", sans-serif;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #f2f2f2;
+}
+
+#filterMenu input[type="text"],
+#filterMenu input[type="date"],
+#filterMenu select {
+    font-family: "Archivo Black", sans-serif;
+    max-width: 150px;
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+#filterMenu input[type="checkbox"] {
+    margin-left: 5px;
+}
+
+@media (max-height: 870px) {
+    #filterMenu:not([open]) {
+        padding: 25px;
+    }
+    .closeFilters {
+        font-size: 1.5rem;
+    }
+    .openFilters {
+        font-size: 2rem;
+    }
+}

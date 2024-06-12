@@ -1,30 +1,40 @@
+@import url("https://fonts.googleapis.com/css2?family=Reddit+Mono:wght@200..900&display=swap");
+
+* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    font-family: "Reddit Mono", monospace;
+    font-optical-sizing: auto;
+}
+
 .header {
     top: 0;
     position: fixed;
     width: 100%;
     height: 150px;
     background: #5681a9;
-    color: #fff; 
+    color: #fff;
     padding: 10px 20px;
     display: flex;
-    align-items: center; 
+    align-items: center;
     justify-content: space-between;
     margin-bottom: 50px;
     z-index: 1;
 }
-#toggleMenuBtn{
-    font-size: 3.5rem ;
+#toggleMenuBtn {
+    font-size: 3.5rem;
     cursor: pointer;
-    transition: .5s;
+    transition: 0.5s;
     user-select: none;
 }
-#navBar{
+#navBar {
     position: fixed;
     top: 150px;
     background: #5681a9;
     height: 100vh;
     width: 0;
-    transition: .5s;
+    transition: 0.5s;
     display: flex;
     align-items: center;
     justify-content: start;
@@ -33,38 +43,39 @@
     overflow: hidden;
 }
 
-#navBar ul{
+#navBar ul {
     position: relative;
     width: 100%;
     display: none;
-    transition: .5s;
+    transition: 0.5s;
     opacity: 0;
 }
 
-#navBar ul li{
+#navBar ul li {
     width: 100%;
     border-bottom: 1px solid #fff;
     padding: 25px 10px;
     list-style: none;
     transition: 1s;
 }
-#navBar ul li a, .logoutBtn{
+#navBar ul li a,
+.logoutBtn {
     cursor: pointer;
     text-decoration: none;
     color: #fff;
     font-weight: 750;
     text-transform: capitalize;
     margin-block: 25px;
-    transition: .5s;
+    transition: 0.5s;
 }
-#navBar ul li:hover{
+#navBar ul li:hover {
     transform: translateX(10px);
     background: #fff;
 }
-#navBar ul li:hover a{
+#navBar ul li:hover a {
     color: #5681a9;
 }
-#navBar ul li:last-child{
+#navBar ul li:last-child {
     width: 300px;
     border-top: 1px solid #fff;
     border-bottom: none;
@@ -73,11 +84,11 @@
     display: flex;
     justify-content: center;
 }
-#navBar ul li:last-child:hover{
+#navBar ul li:last-child:hover {
     transform: translateX(-10px);
     background: #923232;
 }
-.logoutBtn{
+.logoutBtn {
     height: 0;
     background: #0000;
     border: none;
@@ -94,25 +105,25 @@
     .header {
         height: 75px;
     }
-    #toggleMenuBtn{
+    #toggleMenuBtn {
         font-size: 3rem !important;
     }
-    #navBar{
+    #navBar {
         top: 75px;
     }
-    #navBar ul li{
-        padding:  15px 10px;
+    #navBar ul li {
+        padding: 15px 10px;
     }
-    @media (max-height: 596px){
-        #navBar ul li{
-            font-size: .8rem;
+    @media (max-height: 596px) {
+        #navBar ul li {
+            font-size: 0.8rem;
         }
-        #navBar ul li{
-            padding:  7px 10px;
+        #navBar ul li {
+            padding: 7px 10px;
         }
-        @media (max-height: 409px){
-            #navBar ul li{
-                padding:  3px 10px;
+        @media (max-height: 409px) {
+            #navBar ul li {
+                padding: 3px 10px;
             }
         }
     }

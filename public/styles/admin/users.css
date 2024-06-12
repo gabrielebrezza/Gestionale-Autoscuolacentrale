@@ -1,0 +1,94 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap");
+
+body {
+    background: #71a1cb;
+}
+
+table {
+    margin-top: 150px;
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 2px solid #ddd;
+}
+
+th {
+    position: sticky;
+    top: 150px;
+    color: #fff;
+    background: #5681a9;
+    text-transform: uppercase;
+}
+
+tr {
+    background-color: #fff;
+    color: #333;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    transition: 0.35s;
+}
+
+tbody tr:hover {
+    background-color: #ede7e7;
+    color: #71a1cb;
+    font-size: 16px;
+    letter-spacing: 0.55px;
+}
+
+tbody tr:hover a {
+    color: red;
+}
+
+a {
+    text-decoration: none;
+    color: #000;
+}
+
+.cellContent {
+    display: flex;
+}
+
+.numero {
+    margin-left: 5px;
+}
+
+.fatturaDaEmettere {
+    color: orange;
+}
+
+.pagamenti {
+    color: rgb(18, 161, 209);
+}
+
+.archiviato {
+    display: none;
+}
+
+.elimina {
+    margin-left: 10px;
+    cursor: pointer;
+    user-select: none;
+    display: none;
+    color: red;
+    outline: none;
+    border: none;
+    background: #0000;
+}
+#selectUsers {
+    cursor: pointer;
+    user-select: none;
+}
+
+@media (max-height: 870px) {
+    table {
+        margin-top: 75px;
+    }
+    th {
+        top: 75px;
+    }
+}

@@ -5,13 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Allievi</title>
     <style>
+        body{
+            background: #71a1cb;
+        }
+        .certificatiActions{
+            margin-top: 150px;
+        }
+        .printForm{
+            margin: 10px;
+            width: 300px;
+            color: #f1f1f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+        .printForm button{
+            cursor: pointer;
+            background: #0000;
+            outline: none;
+            border: none;
+            color: #f1f1f1;
+        }
+        #updateUserForm{
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
         table {
-            width: 100%;
+            width: 50%;
             border-collapse: collapse;
             border-spacing: 0;
-        }
-        form{
-            width: 50%;
+            background: #f1f1f1;
         }
         th, td {
             padding: 12px 15px;
@@ -20,18 +45,27 @@
         }
 
         th {
-            background-color: #f2f2f2;
-            color: #333;
+            color: #fff;
+            background: #5681a9;
             text-transform: uppercase;
         }
-
-        body{
-            display: flex;
-            align-items: center;
-            flex-direction: column;
+        #submitFormBtn{
+            width: 50%;
+            margin-top: 5px;
+            cursor: pointer;
+            padding: 10px 20px;
+            background: green;
+            color: #fff;
+            transition: .5s;
+            outline: none;
+            border: none;
+            border-radius: 5px;
+        }
+        #submitFormBtn:hover{
+            opacity: .8;
         }
         .imageForms{
-            width: 100%;
+            width: 50%;
             display: flex;
             justify-content: space-evenly;
             align-items: center;
@@ -143,7 +177,34 @@
     
 </head>
 <body>
-    <a href="/admin">Torna alla Lista Utenti</a>
+    <%- include('components/header.ejs') %>
+
+    <div class="certificatiActions">
+        
+        <form class="printForm" action="/stampa" method="POST"> 
+            <label for="printTT2112">TT2112:</label>
+            <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
+            <input type="hidden" name="modulo" value="tt2112"> 
+            <button id="printTT2112" type="submit">
+                <span class="material-symbols-outlined">
+                    print
+                </span>
+            </button>
+        </form>
+        
+        <form class="printForm" action="/stampa" method="POST"> 
+            <label for="printResidenza">RESIDENZA:</label>
+            <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
+            <input type="hidden" name="modulo" value="residenza"> 
+            <button id="printResidenza" type="submit">
+                <span class="material-symbols-outlined">
+                    print
+                </span>
+            </button>
+        </form>
+    </div>
+
+
     <div class="imageForms">
         <form class="imageForm" action="/uploadUserFirma" method="post" enctype="multipart/form-data">
             <input type="hidden" name="cf" value="<%= user.cFiscale %>">
@@ -254,32 +315,8 @@
             }
         };
     </script>
-    <div class="certificatiActions">
-        <h2>TT2112</h2>
-        <form action="/stampa" method="POST"> 
-            <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
-            <input type="hidden" name="modulo" value="tt2112"> 
-            <button type="submit">
-                <span class="material-symbols-outlined">
-                    print
-                </span>
-            </button>
-        </form>
-        <h2>AUTOCERTIFICAZIONE DI RESIDENZA</h2>
-        <form action="/stampa" method="POST"> 
-            <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
-            <input type="hidden" name="modulo" value="residenza"> 
-            <button type="submit">
-                <span class="material-symbols-outlined">
-                    print
-                </span>
-            </button>
-        </form>
-    </div>
-
-
-
-    <form action="/updateUser" method="post">
+    
+    <form id="updateUserForm" action="/updateUser" method="post">
         <table>
             <thead>
                 <tr>
@@ -355,11 +392,11 @@
                 </tr>
                 <tr>
                     <td>Email</td>
-                    <td><input type="email" id="email" name="email" value="<%= user.contatti.email %>"></td>
+                    <td><input type="email" id="email" name="email" value="<%= user.contatti.email %>" autocomplete="false"></td>
                 </tr>
                 <tr>
                     <td>Telefono</td>
-                    <td><input type="tel" id="tel" name="tel" value="<%= user.contatti.tel %>"></td>
+                    <td><input type="tel" id="tel" name="tel" value="<%= user.contatti.tel %>" autocomplete="false"></td>
                 </tr>
                 <tr>
                     <td>Tipo di Documento</td>
@@ -429,7 +466,7 @@
                         <td>
                             Esame di Teoria <%= i+1 %><br>
                             <label for="dataEsame<%= i %>">Data: </label>
-                            <input type="date" name="dataEsame<%= i %>" value="<%= esame.data != null ? (esame.data).split('/').reverse().join('-') : '' %>"> <br>
+                            <input type="date" id="dataEsame<%= i %>" name="dataEsame<%= i %>" value="<%= esame.data != null ? (esame.data).split('/').reverse().join('-') : '' %>"> <br>
                             <label for="esitoEsame<%= i %>">Idoneo: </label>
                             <input type="radio" name="esitoEsame<%= i %>" <%= esame.esito ? 'checked' : '' %> value="idoneo"><br>
                             <label for="esitoEsame<%= i %>">Respinto: </label>
@@ -449,7 +486,7 @@
                 </tr>
             </tbody>
         </table>
-        <button type="submit">Salva</button>
+        <button id="submitFormBtn" type="submit">Salva</button>
     </form>
 
     <script>

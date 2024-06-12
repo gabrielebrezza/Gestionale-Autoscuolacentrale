@@ -15,19 +15,21 @@
     flex-direction: column;
     color: #f1f1f1;
 }
-#closeCodeFormBtn{
+#closeCodeFormBtn {
     margin-left: auto;
     cursor: pointer;
 }
-#codesForm h2{
+#codesForm h2 {
     text-align: center;
     text-transform: uppercase;
     margin-bottom: 10px;
 }
-#codesForm label{
+#codesForm label {
     font-size: 1.2rem;
 }
-#codesForm input, #codesForm select, #codesForm button {
+#codesForm input,
+#codesForm select,
+#codesForm button {
     max-width: 200px;
     width: 100%;
     padding: 10px;
@@ -44,9 +46,9 @@
     display: flex;
     align-items: center;
     font-size: 1.1rem;
-    transition: .5s;
+    transition: 0.5s;
 }
-#codesForm button span{
+#codesForm button span {
     margin-right: 10px;
 }
 #codesForm button:hover {
