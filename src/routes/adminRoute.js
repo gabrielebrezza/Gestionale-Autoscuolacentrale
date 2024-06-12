@@ -278,8 +278,10 @@ router.get('/images', authenticateJWT, async (req, res) => {
     res.sendFile(imagePath);
   } catch (err) {
     if (err.code === 'ENOENT') {
+      console.log('Immagine non trovata.')
       res.status(404).send('Immagine non trovata.');
     } else {
+      console.log('errore server')
       res.status(500).send('Errore del server.');
     }
   }
