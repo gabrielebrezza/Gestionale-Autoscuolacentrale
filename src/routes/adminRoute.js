@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const fs = require('fs').promises;
+const fsp = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 const multer  = require('multer');
 const sharp = require('sharp');
@@ -74,14 +75,12 @@ router.post('/uploadUserImage', (req, res) => {
       const existingUser = await utenti.findOne({ cFiscale: cf });
       if (existingUser && existingUser.immagineProfilo) {
         const imagePath = path.resolve(__dirname, '../../privateImages', 'profileImages' , existingUser.immagineProfilo);
-        console.log('cisiamoquasi')
-        if (fs.stat(imagePath)) {
-          console.log('cristo')
-          fs.unlink(imagePath);
+        if (fs.existsSync(imagePath)) {
+          fs.unlinkSync(imagePath);
         }
       }
       await utenti.findOneAndUpdate({ cFiscale: cf }, { immagineProfilo: fileName });
-      console.log('madonna')
+      
 
       res.redirect(req.get('referer'));
     });
@@ -274,7 +273,7 @@ router.get('/images', authenticateJWT, async (req, res) => {
   const imageName = req.query.dir; 
   const imagePath = path.resolve(__dirname, '../../privateImages', imageName);
   try {
-    await fs.access(imagePath);
+    await fsp.access(imagePath);
     res.sendFile(imagePath);
   } catch (err) {
     if (err.code === 'ENOENT') {
@@ -354,7 +353,7 @@ router.post('/stampa', async (req, res)=> {
   
   const filePath = path.resolve(__dirname, '../../certificati', `${modulo}` , `${modulo}_${cf}.pdf`);
   try {
-      await fs.access(filePath);
+      await fsp.access(filePath);
       res.setHeader('Content-Type', 'application/pdf');
 
       res.sendFile(filePath, { 
