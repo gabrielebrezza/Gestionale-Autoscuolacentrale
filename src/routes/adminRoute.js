@@ -74,8 +74,8 @@ router.post('/uploadUserImage', (req, res) => {
       const existingUser = await utenti.findOne({ cFiscale: cf });
       if (existingUser && existingUser.immagineProfilo) {
         const imagePath = path.resolve(__dirname, '../../privateImages', 'profileImages' , existingUser.immagineProfilo);
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
+        if (fs.stat(imagePath)) {
+          fs.unlink(imagePath);
         }
       }
       await utenti.findOneAndUpdate({ cFiscale: cf }, { immagineProfilo: fileName });
