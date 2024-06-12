@@ -3,8 +3,6 @@ const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const paypal = require('paypal-rest-sdk');
 const bodyParser = require('body-parser');
 
-const utenti = require('../DB/User');
-
 //functions
 const setPayment = require('../utils/paymentsUtils.js');
 const router = express.Router();
@@ -24,7 +22,8 @@ router.post('/stripeHooks', bodyParser.raw({type: 'application/json'}), async (r
         return res.status(400).json({success: false});
     }
   
-    if(event.type == 'checkout.session.completed') {
+    if(event.type == 'payment_intent.succeeded') {
+      console.log('proprio io')
         const paymentIntentSucceeded = event.data.object;
         const price = paymentIntentSucceeded.amount_total/100;
         const {cFiscale, patente, email} = paymentIntentSucceeded.metadata;
