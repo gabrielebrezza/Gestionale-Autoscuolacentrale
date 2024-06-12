@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const setPayment = require('../utils/paymentsUtils.js');
 const router = express.Router();
 
-router.post('/stripeHooks', bodyParser.raw({type: 'application/json'}), async (req, res) =>{
+router.post('/stripeHooks', express.raw({type: 'application/json'}), async (req, res) =>{
     console.log('sono stato chiamato');
     const payload = req.body;
     const sig = req.headers['stripe-signature'];
