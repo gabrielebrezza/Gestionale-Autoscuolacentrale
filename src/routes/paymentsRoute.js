@@ -23,7 +23,7 @@ router.post('/stripeHooks', express.raw({type: 'application/json'}), async (req,
     }
   
     if(event.type == 'payment_intent.succeeded') {
-      console.log('proprio io')
+        console.log('proprio io')
         const paymentIntentSucceeded = event.data.object;
         const price = paymentIntentSucceeded.amount_total/100;
         const {cFiscale, patente, email} = paymentIntentSucceeded.metadata;

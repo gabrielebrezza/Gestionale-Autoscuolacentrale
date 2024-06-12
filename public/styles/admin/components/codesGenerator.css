@@ -1,0 +1,54 @@
+#codesForm {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    background-color: #5681a9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+    width: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #f1f1f1;
+}
+#closeCodeFormBtn{
+    margin-left: auto;
+    cursor: pointer;
+}
+#codesForm h2{
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+#codesForm label{
+    font-size: 1.2rem;
+}
+#codesForm input, #codesForm select, #codesForm button {
+    max-width: 200px;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    outline: none;
+    border-radius: 5px;
+}
+#codesForm button {
+    background-color: #4075b2;
+    color: #f1f1f1;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    transition: .5s;
+}
+#codesForm button span{
+    margin-right: 10px;
+}
+#codesForm button:hover {
+    background-color: #0056b3;
+}
