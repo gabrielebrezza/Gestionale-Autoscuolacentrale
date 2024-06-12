@@ -12,10 +12,12 @@
             margin-top: 150px;
             display: flex;
             justify-content: space-between;
+            flex-wrap: wrap;
         }
         .printForm{
             margin: 10px;
-            width: 300px;
+            max-width: 200px;
+            width: 100%;
             color: #f1f1f1;
             display: flex;
             justify-content: space-between;
@@ -185,7 +187,7 @@
                 <label for="printTT2112">TT2112:</label>
                 <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
                 <input type="hidden" name="modulo" value="tt2112"> 
-                <button id="printTT2112" type="submit">
+                <button id="printTT2112" type="submit" title="Stampa TT2112">
                     <span class="material-symbols-outlined">
                         print
                     </span>
@@ -196,7 +198,7 @@
                 <label for="printResidenza">RESIDENZA:</label>
                 <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
                 <input type="hidden" name="modulo" value="residenza"> 
-                <button id="printResidenza" type="submit">
+                <button id="printResidenza" type="submit"  title="Stampa Autocertificazione di Residenza">
                     <span class="material-symbols-outlined">
                         print
                     </span>
