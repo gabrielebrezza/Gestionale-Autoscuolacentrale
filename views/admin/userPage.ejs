@@ -210,8 +210,9 @@
         <div class="imageForms">
             <form class="imageForm" action="/uploadUserFirma" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="cf" value="<%= user.cFiscale %>">
-                <img id="signPic" src="/img/firme/<%= user.firma ? user.firma : 'default.png' %>" alt="Scansione Firma">
-
+                <% const link = `/images?dir=${encodeURIComponent('firme/')}${encodeURIComponent(user.firma ? user.firma : 'default.png')}` %>
+                <img id="signPic" src="<%= link %>" alt="Scansione Firma">
+ 
                 <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
                 <div class="formField">
                     <button type="submit" title="Salva Immagine">

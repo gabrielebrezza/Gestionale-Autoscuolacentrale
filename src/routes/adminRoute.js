@@ -268,6 +268,22 @@ router.post('/deleteUserImage', authenticateJWT, async (req, res) => {
   res.redirect(`/userPage?cf=${cf}`);
 });
 
+router.get('/images', authenticateJWT, async (req, res) => {
+  const imageName = req.query.dir; 
+  const imagePath = path.join(__dirname, 'privateImages', imageName);
+  console.log('ci sono')
+  try {
+    await fs.access(imagePath);
+    res.sendFile(imagePath);
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      res.status(404).send('Immagine non trovata.');
+    } else {
+      res.status(500).send('Errore del server.');
+    }
+  }
+});
+
 router.post('/deleteUsers', authenticateJWT, async (req, res) => {
   const users = req.body;
   for (const cf of Object.values(users)) {
