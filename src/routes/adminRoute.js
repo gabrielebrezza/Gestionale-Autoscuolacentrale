@@ -63,7 +63,7 @@ router.post('/uploadUserImage', (req, res) => {
       .toBuffer();
 
     const fileName = cf + '_' + Date.now() + '.jpg';
-    const filePath = 'privateImages/profileImages/' + fileName;
+    const filePath = path.resolve(__dirname, '../../privateImages', 'profileImages' , fileName);
 
     fs.writeFile(filePath, webpBuffer, async (err) => {
       if (err) {
@@ -73,7 +73,7 @@ router.post('/uploadUserImage', (req, res) => {
 
       const existingUser = await utenti.findOne({ cFiscale: cf });
       if (existingUser && existingUser.immagineProfilo) {
-        const imagePath = 'privateImages/profileImages/' + existingUser.immagineProfilo;
+        const imagePath = path.resolve(__dirname, '../../privateImages', 'profileImages' , existingUser.immagineProfilo);
         if (fs.existsSync(imagePath)) {
           fs.unlinkSync(imagePath);
         }
@@ -115,7 +115,7 @@ router.post('/uploadUserFirma', async (req, res) => {
     const imageBuffer = Buffer.from(matches[2], 'base64');
 
     const fileName = `${cf}_${Date.now()}.jpg`;
-    const filePath = `privateImages/firme/${fileName}`;
+    const filePath = path.resolve(__dirname, '../../privateImages', 'firme', fileName);
 
     await sharp(imageBuffer)
       .toFormat('jpg')
@@ -123,7 +123,7 @@ router.post('/uploadUserFirma', async (req, res) => {
 
     const existingUser = await utenti.findOne({ cFiscale: cf });
     if (existingUser && existingUser.firma) {
-      const imagePath = `privateImages/firme/${existingUser.firma}`;
+      const imagePath = path.resolve(__dirname, '../../privateImages', 'firme', existingUser.firma);
       if (fs.existsSync(imagePath)) {
         fs.unlinkSync(imagePath);
       }
@@ -253,13 +253,13 @@ router.post('/deleteUserImage', authenticateJWT, async (req, res) => {
   const { cf, intent } = req.body;
   const existingUser = await utenti.findOne({ cFiscale: cf });
   if(intent == 'firma' && existingUser){
-    const imagePath = 'privateImages/firme/' + existingUser.firma;
+    const imagePath = path.resolve(__dirname, '../../privateImages', 'firme', existingUser.firma);
     if (fs.existsSync(imagePath)) {
       fs.unlinkSync(imagePath);
     }
     await utenti.findOneAndUpdate({ "cFiscale": cf }, {$unset : {"firma" : ""}});
   }else if(intent == 'profilo' && existingUser){
-    const imagePath = 'privateImages/profileImages/' + existingUser.immagineProfilo;
+    const imagePath = path.resolve(__dirname, '../../privateImages', 'profileImages', existingUser.immagineProfilo);
     if (fs.existsSync(imagePath)) {
       fs.unlinkSync(imagePath);
     }
