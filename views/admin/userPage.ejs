@@ -8,8 +8,10 @@
         body{
             background: #71a1cb;
         }
-        .certificatiActions{
+        .documentSection{
             margin-top: 150px;
+            display: flex;
+            justify-content: space-between;
         }
         .printForm{
             margin: 10px;
@@ -86,17 +88,9 @@
             border: 2px solid #333;
             margin-block: 15px;
         }
-        #signPic{
-            width: 236px;
-            height: 47px;
-            object-fit: contain;
-            margin-bottom: 10px;
-        } 
-        #profilePic{
-            object-fit: contain;
-            width: 150px;
-            height: 150px;
-            margin-bottom: 10px;
+        .imageForm img{
+            width: 50px;
+            height: 50px;
         }
         .imageForm button, .imageForm label{
             width: fit-content;
@@ -165,11 +159,6 @@
         button.deleteButton:hover {
             background: rgb(119, 64, 64);
         }
-        /* #cropContainer {
-            display: none;
-            max-width: 100%;
-            margin-top: 10px; 
-        } */
     </style>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" rel="stylesheet">
@@ -178,144 +167,143 @@
 </head>
 <body>
     <%- include('components/header.ejs') %>
-
-    <div class="certificatiActions">
-        
-        <form class="printForm" action="/stampa" method="POST"> 
-            <label for="printTT2112">TT2112:</label>
-            <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
-            <input type="hidden" name="modulo" value="tt2112"> 
-            <button id="printTT2112" type="submit">
-                <span class="material-symbols-outlined">
-                    print
-                </span>
-            </button>
-        </form>
-        
-        <form class="printForm" action="/stampa" method="POST"> 
-            <label for="printResidenza">RESIDENZA:</label>
-            <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
-            <input type="hidden" name="modulo" value="residenza"> 
-            <button id="printResidenza" type="submit">
-                <span class="material-symbols-outlined">
-                    print
-                </span>
-            </button>
-        </form>
-    </div>
-
-
-    <div class="imageForms">
-        <form class="imageForm" action="/uploadUserFirma" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="cf" value="<%= user.cFiscale %>">
-            <img id="signPic" src="/img/firme/<%= user.firma ? user.firma : 'default.png' %>" alt="Scansione Firma">
-            <label for="inputSigningFile">Carica Firma:</label>
-            <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
-            <div class="formField">
-                <button type="submit">Salva</button>
-                <input type="hidden" name="intent" value="firma">
-                <button type="button" class="deleteButton">
-                    <span class="material-symbols-outlined">delete</span>
-                </button>
-            </div>
-            <div id="cropContainer">
-                <img id="cropImage" style="max-width: 100%;">
-            </div>
-            <input type="hidden" id="croppedImage" name="croppedImage">
-        </form>
-        
-        <form class="imageForm" action="/uploadUserImage" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="cf" value="<%= user.cFiscale %>">
-            <img id="profilePic" src="/img/profileImages/<%= user.immagineProfilo ? user.immagineProfilo : 'profile.png' %>" alt="Immagine Profilo">
-            <label for="inputProfileFile">Carica Immagine:</label>
-            <input type="file" id="inputProfileFile" name="inputProfileFile" accept="image/*">
-            <div class="formField">
-                <button type="submit">Salva</button>
-                <input type="hidden" name="intent" value="profilo">
-                <button type="button" class="deleteButton">
+    <section class="documentSection">
+        <div class="certificatiActions">
+            <form class="printForm" action="/stampa" method="POST"> 
+                <label for="printTT2112">TT2112:</label>
+                <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
+                <input type="hidden" name="modulo" value="tt2112"> 
+                <button id="printTT2112" type="submit">
                     <span class="material-symbols-outlined">
-                        delete
+                        print
                     </span>
                 </button>
-            </div>
-        </form>
-    </div>
+            </form>
 
-    <script>
-    document.querySelectorAll('.deleteButton').forEach(function(button) {
-        button.addEventListener('click', function() {
-          var form = this.closest('form');
-          var cf = form.querySelector('input[name="cf"]').value;
-          var intent = form.querySelector('input[name="intent"]').value;
+            <form class="printForm" action="/stampa" method="POST"> 
+                <label for="printResidenza">RESIDENZA:</label>
+                <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
+                <input type="hidden" name="modulo" value="residenza"> 
+                <button id="printResidenza" type="submit">
+                    <span class="material-symbols-outlined">
+                        print
+                    </span>
+                </button>
+            </form>
+        </div>
 
-          var deleteForm = document.createElement('form');
-          deleteForm.action = '/deleteUserImage';
-          deleteForm.method = 'post';
 
-          var inputCf = document.createElement('input');
-          inputCf.type = 'hidden';
-          inputCf.name = 'cf';
-          inputCf.value = cf;
-          deleteForm.appendChild(inputCf);
+        <div class="imageForms">
+            <form class="imageForm" action="/uploadUserFirma" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="cf" value="<%= user.cFiscale %>">
+                <img id="signPic" src="/img/firme/<%= user.firma ? user.firma : 'default.png' %>" alt="Scansione Firma">
+                <label for="inputSigningFile">Carica Firma:</label>
+                <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
+                <div class="formField">
+                    <button type="submit">Salva</button>
+                    <input type="hidden" name="intent" value="firma">
+                    <button type="button" class="deleteButton">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </div>
+                <div id="cropContainer">
+                    <img id="cropImage" style="max-width: 100%;">
+                </div>
+                <input type="hidden" id="croppedImage" name="croppedImage">
+            </form>
 
-          var inputIntent = document.createElement('input');
-          inputIntent.type = 'hidden';
-          inputIntent.name = 'intent';
-          inputIntent.value = intent;
-          deleteForm.appendChild(inputIntent);
+            <form class="imageForm" action="/uploadUserImage" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="cf" value="<%= user.cFiscale %>">
+                <img id="profilePic" src="/img/profileImages/<%= user.immagineProfilo ? user.immagineProfilo : 'profile.png' %>" alt="Immagine Profilo">
+                <label for="inputProfileFile">Carica Immagine:</label>
+                <input type="file" id="inputProfileFile" name="inputProfileFile" accept="image/*">
+                <div class="formField">
+                    <button type="submit">Salva</button>
+                    <input type="hidden" name="intent" value="profilo">
+                    <button type="button" class="deleteButton">
+                        <span class="material-symbols-outlined">
+                            delete
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
 
-          document.body.appendChild(deleteForm);
-          deleteForm.submit();
+        <script>
+        document.querySelectorAll('.deleteButton').forEach(function(button) {
+            button.addEventListener('click', function() {
+              var form = this.closest('form');
+              var cf = form.querySelector('input[name="cf"]').value;
+              var intent = form.querySelector('input[name="intent"]').value;
+
+              var deleteForm = document.createElement('form');
+              deleteForm.action = '/deleteUserImage';
+              deleteForm.method = 'post';
+
+              var inputCf = document.createElement('input');
+              inputCf.type = 'hidden';
+              inputCf.name = 'cf';
+              inputCf.value = cf;
+              deleteForm.appendChild(inputCf);
+
+              var inputIntent = document.createElement('input');
+              inputIntent.type = 'hidden';
+              inputIntent.name = 'intent';
+              inputIntent.value = intent;
+              deleteForm.appendChild(inputIntent);
+
+              document.body.appendChild(deleteForm);
+              deleteForm.submit();
+            });
         });
-    });
-    </script>
-    <script>
-        const profilePic = document.getElementById('profilePic');
-        const inputProfileFile = document.getElementById('inputProfileFile');
-        inputProfileFile.onchange = function() {
-            profilePic.src = URL.createObjectURL(inputProfileFile.files[0]);
-        }
-    </script>
-    <script>
-        const inputSigningFile = document.getElementById('inputSigningFile');
-        const cropImage = document.getElementById('cropImage');
-        const croppedImageInput = document.getElementById('croppedImage');
-        const croppedImagePreview = document.getElementById('signPic');
-        let cropper;
-
-        inputSigningFile.onchange = function(event) {
-            const files = event.target.files;
-            if (files && files.length > 0) {
-                const file = files[0];
-                const url = URL.createObjectURL(file);
-                cropImage.src = url;
-
-                if (cropper) {
-                    cropper.destroy();
-                }
-
-                cropper = new Cropper(cropImage, {
-                    aspectRatio: 236 / 47,
-                    viewMode: 0,
-                    autoCropArea: 1,
-                    crop(event) {
-                        const canvas = cropper.getCroppedCanvas({
-                            width: 236,
-                            height: 47,
-                            fillColor: 'white'
-                        });
-                        
-                        const croppedDataUrl = canvas.toDataURL('image/jpeg');
-                        croppedImageInput.value = croppedDataUrl;
-                        croppedImagePreview.src = croppedDataUrl;
-                    },
-                });
-
-                document.getElementById('cropContainer').style.display = 'block';
+        </script>
+        <script>
+            const profilePic = document.getElementById('profilePic');
+            const inputProfileFile = document.getElementById('inputProfileFile');
+            inputProfileFile.onchange = function() {
+                profilePic.src = URL.createObjectURL(inputProfileFile.files[0]);
             }
-        };
-    </script>
-    
+        </script>
+        <script>
+            const inputSigningFile = document.getElementById('inputSigningFile');
+            const cropImage = document.getElementById('cropImage');
+            const croppedImageInput = document.getElementById('croppedImage');
+            const croppedImagePreview = document.getElementById('signPic');
+            let cropper;
+
+            inputSigningFile.onchange = function(event) {
+                const files = event.target.files;
+                if (files && files.length > 0) {
+                    const file = files[0];
+                    const url = URL.createObjectURL(file);
+                    cropImage.src = url;
+
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+
+                    cropper = new Cropper(cropImage, {
+                        aspectRatio: 236 / 47,
+                        viewMode: 0,
+                        autoCropArea: 1,
+                        crop(event) {
+                            const canvas = cropper.getCroppedCanvas({
+                                width: 236,
+                                height: 47,
+                                fillColor: 'white'
+                            });
+
+                            const croppedDataUrl = canvas.toDataURL('image/jpeg');
+                            croppedImageInput.value = croppedDataUrl;
+                            croppedImagePreview.src = croppedDataUrl;
+                        },
+                    });
+
+                    document.getElementById('cropContainer').style.display = 'block';
+                }
+            };
+        </script>
+    </section>
     <form id="updateUserForm" action="/updateUser" method="post">
         <table>
             <thead>
