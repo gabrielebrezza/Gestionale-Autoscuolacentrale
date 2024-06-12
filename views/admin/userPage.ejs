@@ -210,8 +210,7 @@
         <div class="imageForms">
             <form class="imageForm" action="/uploadUserFirma" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="cf" value="<%= user.cFiscale %>">
-                <% const link = `/images?dir=${encodeURIComponent('firme/')}${encodeURIComponent(user.firma ? user.firma : 'default.png')}` %>
-                <img id="signPic" src="<%= link %>" alt="Scansione Firma">
+                <img id="signPic" src="<%= `/images?dir=${encodeURIComponent('firme/')}${encodeURIComponent(user.firma ? user.firma : 'default.png')}` %>" alt="Scansione Firma">
  
                 <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
                 <div class="formField">
@@ -238,7 +237,7 @@
 
             <form class="imageForm" action="/uploadUserImage" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="cf" value="<%= user.cFiscale %>">
-                <img id="profilePic" src="/img/profileImages/<%= user.immagineProfilo ? user.immagineProfilo : 'profile.png' %>" alt="Immagine Profilo">
+                <img id="profilePic" src="<%= `/images?dir=${encodeURIComponent('profileImages/')}${encodeURIComponent(user.immagineProfilo ? user.immagineProfilo : 'profile.png')}` %>" alt="Immagine Profilo">
 
                 <input type="file" id="inputProfileFile" name="inputProfileFile" accept="image/*">
                 <div class="formField">

@@ -270,15 +270,12 @@ router.post('/deleteUserImage', authenticateJWT, async (req, res) => {
 
 router.get('/images', authenticateJWT, async (req, res) => {
   const imageName = req.query.dir; 
-  const imagePath = path.join(__dirname, 'privateImages', imageName);
-  console.log(imagePath)
+  const imagePath = path.resolve(__dirname, '../../privateImages', imageName);
   try {
     await fs.access(imagePath);
-    console.log('fatto')
     res.sendFile(imagePath);
   } catch (err) {
     if (err.code === 'ENOENT') {
-      console.log('Immagine non trovata.')
       res.status(404).send('Immagine non trovata.');
     } else {
       console.log('errore server')
