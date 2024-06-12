@@ -274,6 +274,7 @@ router.get('/images', authenticateJWT, async (req, res) => {
   console.log('ci sono')
   try {
     await fs.access(imagePath);
+    console.log('fatto')
     res.sendFile(imagePath);
   } catch (err) {
     if (err.code === 'ENOENT') {
