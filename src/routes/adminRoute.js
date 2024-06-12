@@ -271,7 +271,7 @@ router.post('/deleteUserImage', authenticateJWT, async (req, res) => {
 router.get('/images', authenticateJWT, async (req, res) => {
   const imageName = req.query.dir; 
   const imagePath = path.join(__dirname, 'privateImages', imageName);
-  console.log('ci sono')
+  console.log(imagePath)
   try {
     await fs.access(imagePath);
     console.log('fatto')
