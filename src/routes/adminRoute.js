@@ -74,12 +74,14 @@ router.post('/uploadUserImage', (req, res) => {
       const existingUser = await utenti.findOne({ cFiscale: cf });
       if (existingUser && existingUser.immagineProfilo) {
         const imagePath = path.resolve(__dirname, '../../privateImages', 'profileImages' , existingUser.immagineProfilo);
+        console.log('cisiamoquasi')
         if (fs.stat(imagePath)) {
+          console.log('cristo')
           fs.unlink(imagePath);
         }
       }
       await utenti.findOneAndUpdate({ cFiscale: cf }, { immagineProfilo: fileName });
-      
+      console.log('madonna')
 
       res.redirect(req.get('referer'));
     });
