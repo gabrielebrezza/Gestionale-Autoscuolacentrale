@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storico Fatture</title>
+    <style>
+        form{
+            margin-top: 175px;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../components/header.ejs') %>
+    <form class="filters" action="/downloadFatture" method="POST">
+        <label for="fromDate">Da</label>
+        <input type="date" name="fromDate" id="fromDate">
+        <label for="toDate">Da</label>
+        <input type="date" name="toDate" id="toDate">
+        <button type="submit">
+            <span class="material-symbols-outlined">
+                download
+            </span>
+        </button>
+    </form>
+    <table>
+        <thead>
+            <th>numero</th>
+            <th>data</th>
+            <th>importo</th>
+            <th>File</th>
+        </thead>
+        <tbody>
+            <% for(const fattura of fatture){ %>
+                <tr class="row">
+                    <td><%= fattura.numero %></td>
+                    <td><%= fattura.data %></td>
+                    <td><%= fattura.importo %></td>
+                    <td><%= fattura.nomeFile %></td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+
+
+    <script>
+        const fromDateInput = document.getElementById('fromDate');
+        const toDateInput = document.getElementById('toDate');
+        const rows = document.querySelectorAll('.row');
+
+        const filterFatture = () => {
+            const fromDate = new Date(fromDateInput.value);
+            
+            const toDate = new Date(toDateInput.value); 
+            for(const row of rows){
+                const dataFattura = new Date(row.getElementsByTagName('td')[1].textContent.split('/').reverse().join('-'));
+                if(fromDate <= dataFattura && dataFattura <= toDate){
+                    row.style.display = 'flex'
+                }else{
+                    row.style.display = 'none'
+                }
+            }
+        }
+        fromDateInput.addEventListener('change', filterFatture)
+        toDateInput.addEventListener('change', filterFatture)
+    </script>
+
+
+</body>
+</html>

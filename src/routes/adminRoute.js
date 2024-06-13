@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const multer  = require('multer');
 const sharp = require('sharp');
+const archiver = require('archiver');
 const cookieParser = require('cookie-parser');
 const router = express.Router();
 
@@ -475,5 +476,59 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
   res.redirect(`/admin`);
 });
 
+router.get('/admin/storicoFatture', authenticateJWT, async (req, res)=> {
+  try {
+    const fatture = await storicoFatture.find();
+    res.render('admin/fatture/storicoFatture', { fatture });
+  } catch (error) {
+    console.error('Si è verificato un errore durante il recupero delle fatture:', error);
+    res.render('errorPage', {error: 'Si è verificato un errore durante il recupero delle fatture'});
+  }
+});
+router.post('/downloadFatture', authenticateJWT, async (req, res) => {
+  try {
+    const fromDate = new Date(req.body.fromDate);
+    const toDate = new Date(req.body.toDate);
+    const fatture = await storicoFatture.find();
+    let fattureArr = [];
+    for(const fattura of fatture){
+      const dataFattura = new Date(fattura.data.split('/').reverse().join('-'));
+      if(fromDate <= dataFattura && dataFattura <= toDate){
+        fattureArr.push(fattura.nomeFile);
+        continue;
+      }
+      if( !req.body.fromDate || !req.body.toDate ){
+        fattureArr.push(fattura.nomeFile);
+      }
+    }
+
+
+        // Imposta il nome del file ZIP e la disposizione della risposta HTTP
+        res.set('Content-Type', 'application/zip');
+        res.set('Content-Disposition', 'attachment; filename="fatture_filtrate.zip"');
+
+        //creazione archivio zip
+        const zip = archiver('zip');
+
+        // Reindirizzazione dell'output dell'archivio verso la risposta HTTP
+        zip.pipe(res);
+
+        for (const nomeFile of fattureArr) {
+            const filePath = path.join(__dirname, '../../fatture', 'elettroniche' , nomeFile);
+            if (fs.existsSync(filePath)) {
+                // Aggiunta del file all'archivio ZIP
+                zip.append(fs.createReadStream(filePath), { name: nomeFile });
+            } else {
+                console.warn(`Il file ${nomeFile} non esiste nella cartella fatture.`);
+            }
+        }
+        await zip.finalize();
+
+
+  } catch (error) {
+    console.error('Si è verificato un errore durante il download delle fatture:', error);
+    res.render('errorPage', {error: 'Si è verificato un errore durante il download delle fatture'});
+  }
+})
 
 module.exports = router;
