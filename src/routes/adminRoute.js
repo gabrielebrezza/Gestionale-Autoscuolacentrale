@@ -501,33 +501,24 @@ router.post('/downloadFatture', authenticateJWT, async (req, res) => {
         fattureArr.push(fattura.nomeFile);
       }
     }
-
-    if( !fattureArr ){
+    if(fattureArr == '' ){
       return res.render('errorPage', {error: `Nessuna fattura emessa nell'intervallo di tempo selezionato `});
     }
 
-        // Imposta il nome del file ZIP e la disposizione della risposta HTTP
-        res.set('Content-Type', 'application/zip');
-        res.set('Content-Disposition', 'attachment; filename="fatture_filtrate.zip"');
+    res.set('Content-Type', 'application/zip');
+    res.set('Content-Disposition', 'attachment; filename="fatture_iscrizioni.zip"');
 
-        //creazione archivio zip
-        const zip = archiver('zip');
-
-        // Reindirizzazione dell'output dell'archivio verso la risposta HTTP
-        zip.pipe(res);
-
-        for (const nomeFile of fattureArr) {
-            const filePath = path.join(__dirname, '../../fatture', 'elettroniche' , nomeFile);
-            if (fs.existsSync(filePath)) {
-                // Aggiunta del file all'archivio ZIP
-                zip.append(fs.createReadStream(filePath), { name: nomeFile });
-            } else {
-                console.warn(`Il file ${nomeFile} non esiste nella cartella fatture.`);
-            }
+    const zip = archiver('zip');
+    zip.pipe(res);
+    for (const nomeFile of fattureArr) {
+        const filePath = path.join(__dirname, '../../fatture', 'elettroniche' , nomeFile);
+        if (fs.existsSync(filePath)) {
+            zip.append(fs.createReadStream(filePath), { name: nomeFile });
+        } else {
+            console.warn(`Il file ${nomeFile} non esiste nella cartella fatture.`);
         }
-        await zip.finalize();
-
-
+    }
+    await zip.finalize();
   } catch (error) {
     console.error('Si è verificato un errore durante il download delle fatture:', error);
     res.render('errorPage', {error: 'Si è verificato un errore durante il download delle fatture'});
