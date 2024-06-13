@@ -5,43 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Storico Fatture</title>
     <style>
-        form{
+        main{
             margin-top: 175px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
         }
+        table{
+            border-collapse:collapse;
+        }
+        th, td{
+            margin: 0;
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 2px solid #ddd;
+        }
+        th {
+    position: sticky;
+    top: 150px;
+    color: #fff;
+    background: #5681a9;
+    text-transform: uppercase;
+}
+
+        .filters input[type="date"]{
+            cursor: pointer;
+            padding: 10px;
+            outline: none;
+            border: none;
+            border-radius: 5px;
+        }
+        .filters button{
+            background: #0000;
+            cursor: pointer;
+            color: #f1f1f1;
+            width: 100%;
+            outline: none;
+            border: none;
+            border-radius: 5px;
+            transition: .5s;
+        }
+        .filters button:hover{
+            color: #8ec7f8;
+        }
+        .filters th{
+            text-align: center;
+            border: none;
+        }
+
+        
+
     </style>
 </head>
 <body>
     <%- include('../components/header.ejs') %>
-    <form class="filters" action="/downloadFatture" method="POST">
-        <label for="fromDate">Da</label>
-        <input type="date" name="fromDate" id="fromDate">
-        <label for="toDate">Da</label>
-        <input type="date" name="toDate" id="toDate">
-        <button type="submit">
-            <span class="material-symbols-outlined">
-                download
-            </span>
-        </button>
-    </form>
-    <table>
-        <thead>
-            <th>numero</th>
-            <th>data</th>
-            <th>importo</th>
-            <th>File</th>
-        </thead>
-        <tbody>
-            <% for(const fattura of fatture){ %>
-                <tr class="row">
-                    <td><%= fattura.numero %></td>
-                    <td><%= fattura.data %></td>
-                    <td><%= fattura.importo %></td>
-                    <td><%= fattura.nomeFile %></td>
+    <main>
+        <table>
+            <thead>
+                <tr class="filters">
+                    <form action="/downloadFatture" method="POST">
+                        <th>
+                            <label for="fromDate">Da</label>
+                            <input type="date" name="fromDate" id="fromDate">
+                        </th>
+                        <th>
+                            <label for="toDate">A</label>
+                            <input type="date" name="toDate" id="toDate">
+                        </th>
+                        <th colspan="2">
+                            <button type="submit">
+                                <span class="material-symbols-outlined">
+                                    download
+                                </span>
+                            </button>
+                        </th>
+                    </form>
                 </tr>
-            <% } %>
-        </tbody>
-    </table>
-
+                <tr>
+                    <th>numero</th>
+                    <th>data</th>
+                    <th>importo</th>
+                    <th>File</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                <% for(const fattura of fatture){ %>
+                    <tr class="row">
+                        <td><%= fattura.numero %></td>
+                        <td><%= fattura.data %></td>
+                        <td><%= fattura.importo %></td>
+                        <td><%= fattura.nomeFile %></td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </main>
 
     <script>
         const fromDateInput = document.getElementById('fromDate');
