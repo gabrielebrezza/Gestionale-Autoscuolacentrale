@@ -502,6 +502,9 @@ router.post('/downloadFatture', authenticateJWT, async (req, res) => {
       }
     }
 
+    if( !fattureArr ){
+      return res.render('errorPage', {error: `Nessuna fattura emessa nell'intervallo di tempo selezionato `});
+    }
 
         // Imposta il nome del file ZIP e la disposizione della risposta HTTP
         res.set('Content-Type', 'application/zip');
