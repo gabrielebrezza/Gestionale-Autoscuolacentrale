@@ -1,0 +1,50 @@
+body{
+    background: #71a1cb;
+}
+
+main{
+    margin-top: 175px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.card{
+    width: max-content;
+    margin: 25px;
+    padding: 15px;
+    color: #f1f1f1;
+    background: #5681a9;
+    border-radius: 5px;
+    
+}
+.card form{
+    display: flex;
+    justify-content: space-between;
+    margin-block: 25px;
+}
+.card form input[type="number"]{
+    background: #71a1cb;
+    color: #f1f1f1;
+    border: none;
+    outline: none;
+    padding: 7px;
+    transition: .5s;
+}
+.card form input[type="number"]:hover{
+    background: #588dbc;
+}
+.card form button{
+    cursor: pointer;
+    background: #4075b2;
+    color: #f1f1f1;
+    border: none;
+    outline: none;
+    padding: 10px;
+    transition: .5s;
+}
+
+.card form button:hover{
+    background: #0056b3;
+}

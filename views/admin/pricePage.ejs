@@ -4,25 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Prezzi</title>
-
+    <link rel="stylesheet" href="/styles/admin/price.css">
 </head>
 <body>
-    <% prices.forEach(prezzi => { %>
-        <h1><%= prezzi.tipo %></h1>
-        <form action="/updatePrice" method="POST">
-            <input type="hidden" name="tipo" value="<%= prezzi.tipo %>">
-            <input type="hidden" name="iscrizione" value="1">
-            <label for="price">Prezzo Iscrizione 1:</label>
-            <input name="price" type="number" min="0" value="<%= prezzi.prezzoPrimaIscrizione %>" step="any" >
-            <button type="submit">Aggiorna</button>
-        </form>
-        <form action="/updatePrice" method="POST">
-            <input type="hidden" name="tipo" value="<%= prezzi.tipo %>">
-            <input type="hidden" name="iscrizione" value="2">
-            <label for="price">Prezzo Iscrizioni Successive:</label>
-            <input name="price" type="number" min="0" value="<%= prezzi.prezzoIscrizioniSuccessive %>" step="any" >
-            <button type="submit">Aggiorna</button>
-        </form>
-    <% }) %>
+    <%- include('components/header.ejs') %>
+    <main>
+        <% prices.forEach(prezzi => { %>
+            <div class="card">
+                <h1><%= prezzi.tipo %></h1>
+                <form action="/updatePrice" method="POST">
+                    <input type="hidden" name="tipo" value="<%= prezzi.tipo %>">
+                    <input type="hidden" name="iscrizione" value="1">
+                    <label for="price">Prezzo Iscrizione 1:</label>
+                    <div class="field">
+                        <input name="price" type="number" min="0" value="<%= prezzi.prezzoPrimaIscrizione %>" step="any" >
+                        <button type="submit">Aggiorna</button>
+                    </div>
+                </form>
+                <form action="/updatePrice" method="POST">
+                    <input type="hidden" name="tipo" value="<%= prezzi.tipo %>">
+                    <input type="hidden" name="iscrizione" value="2">
+                    <label for="price">Prezzo Iscrizioni Successive:</label>
+                    <div class="field">
+                        <input name="price" type="number" min="0" value="<%= prezzi.prezzoIscrizioniSuccessive %>" step="any" >
+                        <button type="submit">Aggiorna</button>
+                    </div>
+                </form>
+            </div>
+        <% }) %>
+    </main>
 </body>
 </html>
