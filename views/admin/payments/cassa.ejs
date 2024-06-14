@@ -33,7 +33,22 @@
     </main>
 
     <table>
-
+        <thead>
+            <th>causa</th>
+            <th>data</th>
+            <th>importo</th>
+            <th>tipo</th>
+        </thead>
+        <tbody>
+            <% for(const transazione of cassa){ %>
+                <tr>
+                    <td><%= transazione.causa %></td>
+                    <td><%= transazione.data %></td>
+                    <td><%= Math.abs(transazione.importo) %></td>
+                    <td><%= transazione.importo < 0 ? 'Uscita' : 'Entrata' %></td>
+                </tr>
+            <% } %>
+        </tbody>
     </table>
 </body>
 </html>

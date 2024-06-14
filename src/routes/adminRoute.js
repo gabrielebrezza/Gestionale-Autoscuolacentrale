@@ -529,21 +529,21 @@ router.post('/downloadFatture', authenticateJWT, async (req, res) => {
 router.get('/admin/cassa', authenticateJWT, async (req, res) => {
     const datiCassa = await cassa.find();
 
-    res.render('admin/payments/cassa')
+    res.render('admin/payments/cassa', {cassa : datiCassa})
 });
 
 router.post('/updateCassa', authenticateJWT, async (req, res) => {
   const causa = req.body.causa.trim();
   const data = req.body.data.split('-').reverse().join('/');
   const tipo = req.body.tipoSpesa;
-  let {importo} = Number(req.body);
+  let importo = parseFloat(req.body.importo);
   if(tipo == 'uscita'){
     importo = -importo
   }
-  console.log(importo)
-  const datiCassa = await cassa.find();
-  
-  res.render('admin/payments/cassa', {cassa: datiCassa});
+  const updateCassa = new cassa({causa: causa, data: data, importo: importo});
+  await updateCassa.save()    
+
+  res.redirect('admin/cassa');
 });
 
 module.exports = router;
