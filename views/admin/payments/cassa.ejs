@@ -5,8 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cassa</title>
     <style>
+        body{
+            background: #71a1cb;
+        }
         main{
             margin-top: 175px;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+        table{
+            margin-top: 75px;
+            border-collapse: collapse;
+            border-spacing: 0;
+            max-width: 600px;
+            width: 100%;
+            background: #f1f1f1;
+        }
+        td, th{
+            text-align: left;
+            border-bottom: 2px solid #ccc;
+            padding: 5px;
+        }
+        th{
+            background: #588dbc;
+            color: #f1f1f1;
+            text-transform: uppercase;
+        }
+        #cassaForm{
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            background: #588dbc;
+            padding: 15px;
+            border-radius: 5px;
+            color: #f1f1f1;
+        }
+        .field{
+            display: flex;
+            align-items: center;
+            margin-inline: 10px;
+        }
+        .field input, .field textarea{
+            padding: 10px;
+            border: none;
+            outline: none;
+        }
+        .field input[type="radio"]{
+            margin-inline: 10px;
+            cursor: pointer;
+        }
+        #cassaForm button{
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 15px;
+            background: #71a1cb;
+            color: #f1f1f1;
+            transition: .5s;
+            border-radius: 5px;
+        }
+        #cassaForm button:hover{
+            opacity: .5;
         }
     </style>
 </head>
@@ -14,41 +74,46 @@
     <%- include('../components/header.ejs') %>
 
     <main>
-        <form action="/updateCassa" method="POST">
-            <label for="causa">causa</label>
-            <textarea name="causa" id="causa" required></textarea>
-
-            <label for="data">data</label>
-            <input type="date" name="data" id="data" required>
-
-            <label for="importo">importo</label>
-            <input type="number" name="importo" id="importo" min="0" required>
-
-            <label for="entrata">entrata</label>
-            <input type="radio" name="tipoSpesa" id="entrata" value="entrata" checked>
-            <label for="uscita">uscita</label>
-            <input type="radio" name="tipoSpesa" id="uscita" value="uscita">
+        <form id="cassaForm" action="/updateCassa" method="POST">
+            <div class="field">
+                <label for="causa">causa</label>
+                <textarea name="causa" id="causa" required></textarea>
+            </div>
+            <div class="field">
+                <label for="data">data</label>
+                <input type="date" name="data" id="data" required>
+            </div>
+            <div class="field">
+                <label for="importo">importo</label>
+                <input type="number" name="importo" id="importo" min="0" required>
+            </div>
+            <div class="field">
+                <label for="entrata">entrata</label>
+                <input type="radio" name="tipoSpesa" id="entrata" value="entrata" checked>
+                <label for="uscita">uscita</label>
+                <input type="radio" name="tipoSpesa" id="uscita" value="uscita">
+            </div>
             <button type="submit">Invia</button>
         </form>
-    </main>
 
-    <table>
-        <thead>
-            <th>causa</th>
-            <th>data</th>
-            <th>importo</th>
-            <th>tipo</th>
-        </thead>
-        <tbody>
-            <% for(const transazione of cassa){ %>
-                <tr>
-                    <td><%= transazione.causa %></td>
-                    <td><%= transazione.data %></td>
-                    <td><%= Math.abs(transazione.importo) %></td>
-                    <td><%= transazione.importo < 0 ? 'Uscita' : 'Entrata' %></td>
-                </tr>
-            <% } %>
-        </tbody>
-    </table>
+        <table>
+            <thead>
+                <th>causa</th>
+                <th>data</th>
+                <th>importo</th>
+                <th>tipo</th>
+            </thead>
+            <tbody>
+                <% for(const transazione of cassa){ %>
+                    <tr>
+                        <td><%= transazione.causa %></td>
+                        <td><%= transazione.data %></td>
+                        <td><%= Math.abs(transazione.importo) %>€</td>
+                        <td><%= transazione.importo < 0 ? 'Uscita' : 'Entrata' %></td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </main>
 </body>
 </html>
