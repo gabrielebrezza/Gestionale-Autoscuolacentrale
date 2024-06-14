@@ -14,6 +14,7 @@ const admins = require('../DB/Admin');
 const utenti = require('../DB/User');
 const prezzi = require('../DB/Prezzi');
 const codes = require('../DB/Codes');
+const cassa = require('../DB/Cassa');
 const numeroFattura = require('../DB/NumeroFattura');
 const storicoFatture = require('../DB/StoricoFatture');
 //functions
@@ -524,5 +525,25 @@ router.post('/downloadFatture', authenticateJWT, async (req, res) => {
     res.render('errorPage', {error: 'Si è verificato un errore durante il download delle fatture'});
   }
 })
+
+router.get('/admin/cassa', authenticateJWT, async (req, res) => {
+    const datiCassa = await cassa.find();
+
+    res.render('admin/payments/cassa')
+});
+
+router.post('/updateCassa', authenticateJWT, async (req, res) => {
+  const causa = req.body.causa.trim();
+  const data = req.body.data.split('-').reverse().join('/');
+  const tipo = req.body.tipoSpesa;
+  let {importo} = Number(req.body);
+  if(tipo == 'uscita'){
+    importo = -importo
+  }
+  console.log(importo)
+  const datiCassa = await cassa.find();
+  
+  res.render('admin/payments/cassa', {cassa: datiCassa});
+});
 
 module.exports = router;

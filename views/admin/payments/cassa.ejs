@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cassa</title>
+    <style>
+        main{
+            margin-top: 175px;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../components/header.ejs') %>
+
+    <main>
+        <form action="/updateCassa" method="POST">
+            <label for="causa">causa</label>
+            <textarea name="causa" id="causa" required></textarea>
+
+            <label for="data">data</label>
+            <input type="date" name="data" id="data" required>
+
+            <label for="importo">importo</label>
+            <input type="number" name="importo" id="importo" min="0" required>
+
+            <label for="entrata">entrata</label>
+            <input type="radio" name="tipoSpesa" id="entrata" value="entrata" checked>
+            <label for="uscita">uscita</label>
+            <input type="radio" name="tipoSpesa" id="uscita" value="uscita">
+            <button type="submit">Invia</button>
+        </form>
+    </main>
+
+    <table>
+
+    </table>
+</body>
+</html>
