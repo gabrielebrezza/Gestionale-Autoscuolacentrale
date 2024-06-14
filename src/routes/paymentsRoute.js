@@ -22,11 +22,12 @@ router.post('/stripeHooks', express.raw({type: 'application/json'}), async (req,
         return res.status(400).json({success: false});
     }
   
-    if(event.type == 'payment_intent.succeeded') {
+    if(event.type == 'checkout.session.completed') {
         console.log('proprio io')
-        const paymentIntentSucceeded = event.data.object;
-        const price = paymentIntentSucceeded.amount_total/100;
-        const {cFiscale, patente, email} = paymentIntentSucceeded.metadata;
+        const session = event.data.object;
+        const price = session.amount_total/100;
+        const {cFiscale, patente, email} = session.metadata;
+        console.log(session)
         await setPayment(cFiscale, patente, price, email);
     }
     res.json({success: true});
