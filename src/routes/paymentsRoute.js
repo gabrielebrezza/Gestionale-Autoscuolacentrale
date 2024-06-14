@@ -8,16 +8,13 @@ const setPayment = require('../utils/paymentsUtils.js');
 const router = express.Router();
 
 router.post('/stripeHooks', express.raw({type: 'application/json'}), async (req, res) =>{
-    console.log('sono stato chiamato');
     const payload = req.body;
     const sig = req.headers['stripe-signature'];
   
     let event;
     try {
         event = stripe.webhooks.constructEvent(payload, sig, process.env.STRIPE_SIGNING_SECRET);
-        console.log('trovato');
       } catch (error) {
-        console.log('errore cazzo');
         console.log(error.message);
         return res.status(400).json({success: false});
     }
@@ -27,7 +24,6 @@ router.post('/stripeHooks', express.raw({type: 'application/json'}), async (req,
         const session = event.data.object;
         const price = session.amount_total/100;
         const {cFiscale, patente, email} = session.metadata;
-        console.log(session)
         await setPayment(cFiscale, patente, price, email);
     }
     res.json({success: true});
