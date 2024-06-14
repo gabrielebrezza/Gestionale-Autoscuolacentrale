@@ -98,20 +98,25 @@
 
         <table>
             <thead>
+                <th>elimina</th>
                 <th>causa</th>
                 <th>data</th>
                 <th>importo</th>
                 <th>tipo</th>
             </thead>
             <tbody>
-                <% for(const transazione of cassa){ %>
-                    <tr>
-                        <td><%= transazione.causa %></td>
-                        <td><%= transazione.data %></td>
-                        <td><%= Math.abs(transazione.importo) %>€</td>
-                        <td><%= transazione.importo < 0 ? 'Uscita' : 'Entrata' %></td>
-                    </tr>
-                <% } %>
+                <form action="/deleteCassaItem" method="POST">
+                    <% for(const transazione of cassa){ %>
+                        <tr>
+                            <td><input type="checkbox" name="id_<%= transazione._id %>" value="<%= transazione._id %>"></td>
+                            <td><%= transazione.causa %></td>
+                            <td><%= transazione.data %></td>
+                            <td><%= Math.abs(transazione.importo) %>€</td>
+                            <td><%= transazione.importo < 0 ? 'Uscita' : 'Entrata' %></td>
+                        </tr>
+                    <% } %>
+                    <button type="submit">elimina</button>
+                </form>
             </tbody>
         </table>
     </main>

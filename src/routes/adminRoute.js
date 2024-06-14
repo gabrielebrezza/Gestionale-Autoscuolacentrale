@@ -545,5 +545,12 @@ router.post('/updateCassa', authenticateJWT, async (req, res) => {
 
   res.redirect('admin/cassa');
 });
-
+router.post('/deleteCassaItem', authenticateJWT, async (req, res) => {
+  const transazioni = req.body;
+  for (const id of Object.values(transazioni)) {
+      await cassa.deleteOne({"_id": id});
+      console.log(`transazione ${id} eliminata definitivamente`);
+  }
+  res.redirect('/admin/cassa');
+});
 module.exports = router;
