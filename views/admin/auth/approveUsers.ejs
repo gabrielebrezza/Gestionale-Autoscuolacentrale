@@ -1,42 +1,42 @@
 <!DOCTYPE html>
 <html lang="it">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/styles/admin/approveUsers.css">
-        <title>Approva Amministratori</title>
-    </head>
-    <body>
-        <%- include('../components/header.ejs') %>
-        <main>
-            <div id="adminsList" class="approval-list">
-                <%if(needApprovalAdmins != '') { %>
-                    <div id="cards">
-                        <% needApprovalAdmins.forEach(function(item) { %>
-                            <div class="user-card">
-                                <div class="user-card-header">
-                                    <h3>istruttore: <%= item.nome %> <%= item.cognome %></h3>
-                                </div>
-                                <ul class="user-info">
-                                    <li><strong>Email:</strong> <%= item.email %></li> 
-                                </ul>
-                                <div class="buttons">
-                                    <form action="/approveAdmin" method="POST">
-                                        <input type="hidden" name="email" value="<%= item.email %>">
-                                        <button type="submit" class="approve-button">Approva</button>
-                                    </form>
-                                    <form action="/disapproveAdmin" method="POST">
-                                        <input type="hidden" name="email" value="<%= item.email %>">
-                                        <button type="submit" class="disapprove-button">Disapprova</button>
-                                    </form>
-                                </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/admin/auth/approveUsers.css">
+    <title>Admin - Approva Amministratori</title>
+</head>
+<body>
+    <%- include('../components/header.ejs') %>
+    <main>
+        <div id="adminsList" class="approval-list">
+            <%if(needApprovalAdmins != '') { %>
+                <div id="cards">
+                    <% needApprovalAdmins.forEach(function(item) { %>
+                        <div class="user-card">
+                            <div class="user-card-header">
+                                <h3>istruttore: <%= item.nome %> <%= item.cognome %></h3>
                             </div>
-                        <% }); %>
-                    </div>
-                <% } else{ %>
-                    <h1>Non ci sono admin in attesa di approvazione</h1>
-                <% } %>
-            </div>
-        </main>
-    </body>
+                            <ul class="user-info">
+                                <li><strong>Email:</strong> <%= item.email %></li> 
+                            </ul>
+                            <div class="buttons">
+                                <form action="/approveAdmin" method="POST">
+                                    <input type="hidden" name="email" value="<%= item.email %>">
+                                    <button type="submit" class="approve-button">Approva</button>
+                                </form>
+                                <form action="/disapproveAdmin" method="POST">
+                                    <input type="hidden" name="email" value="<%= item.email %>">
+                                    <button type="submit" class="disapprove-button">Disapprova</button>
+                                </form>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else{ %>
+                <h1>Non ci sono admin in attesa di approvazione</h1>
+            <% } %>
+        </div>
+    </main>
+</body>
 </html>

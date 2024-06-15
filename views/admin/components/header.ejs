@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="/styles/admin/components/header.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<script src="/scripts/admin/components/header.js"></script>
 <header class="header">
     <div class="openMenu">
         <span id="toggleMenuBtn" class="material-symbols-outlined">
@@ -28,19 +29,4 @@
         </li>
     </ul>
 </nav>
-<script>
-    const toggleMenuBtn = document.getElementById('toggleMenuBtn');
-    const navBar = document.getElementById('navBar');
-    const navBarItems = document.querySelector('#navBar ul')
-    toggleMenuBtn.addEventListener('click', () => {
-        toggleMenuBtn.style.rotate = toggleMenuBtn.style.rotate == '90deg' ? '0deg' : '90deg';
-        navBar.style.width = navBar.style.width == '300px' ? 0 : '300px';
-        navBarItems.style.display = navBarItems.style.display == 'block' ? 'none' : 'block';
-        setTimeout(() =>{     
-            navBarItems.style.opacity = navBarItems.style.opacity == 1 ? 0 : 1;
-
-        }, 350);
-        
-    });
-</script>
 <%- include('codesGenerator.ejs') %>

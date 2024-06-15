@@ -3,116 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cassa</title>
-    <style>
-        body{
-            background: #71a1cb;
-        }
-        main{
-            margin-top: 175px;
-            display: flex;
-            align-items: center;
-            flex-direction: column;
-        }
-        table{
-            margin-top: 75px;
-            border-collapse: collapse;
-            border-spacing: 0;
-            max-width: 600px;
-            width: 100%;
-        }
-        td, th{
-            text-align: left;
-            border-bottom: 2px solid #ccc;
-            padding: 5px;
-            background: #f1f1f1;
-        }
-        th{
-            background: #588dbc;
-            color: #f1f1f1;
-            text-transform: uppercase;
-        }
-        tfoot td{
-            padding: 0;
-            border: none;
-            background: #0000;
-        }
-        tfoot td button{
-            border: none;
-            outline: none;
-            cursor: pointer;
-            padding: 5px 10px;
-            text-transform: uppercase;
-            font-size: 1.1rem;
-            color: #f1f1f1;
-            background: red;
-            width: 100%;
-            border-radius: 0 0 10px 10px;
-        }
-        #cassaForm{
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            background: #588dbc;
-            padding: 15px;
-            border-radius: 5px;
-            color: #f1f1f1;
-        }
-        .field{
-            display: flex;
-            align-items: center;
-            margin-inline: 10px;
-        }
-        .field input, .field textarea{
-            padding: 10px;
-            border: none;
-            outline: none;
-        }
-        .field input[type="radio"]{
-            margin-inline: 10px;
-            cursor: pointer;
-        }
-        #cassaForm button{
-            border: none;
-            outline: none;
-            cursor: pointer;
-            padding: 10px 15px;
-            background: #71a1cb;
-            color: #f1f1f1;
-            transition: .5s;
-            border-radius: 5px;
-        }
-        #cassaForm button:hover{
-            opacity: .5;
-        }
-        .filters input[type="date"]{
-            cursor: pointer;
-            padding: 10px;
-            outline: none;
-            border: none;
-            border-radius: 5px;
-        }
-        .filters th{
-            text-align: center;
-            border: none;
-        }
-    </style>
+    <title>Admin - Cassa</title>
+    <link rel="stylesheet" href="/styles/admin/payments/cassa.css">
 </head>
 <body>
     <%- include('../components/header.ejs') %>
-
+    <%- include('../components/cassaFilters.ejs') %>
     <main>
         <form id="cassaForm" action="/updateCassa" method="POST">
             <div class="field">
-                <label for="causa">causa</label>
+                <label for="causa">oggetto: </label>
                 <textarea name="causa" id="causa" required></textarea>
             </div>
             <div class="field">
-                <label for="data">data</label>
+                <label for="data">data: </label>
                 <input type="date" name="data" id="data" required>
             </div>
             <div class="field">
-                <label for="importo">importo</label>
+                <label for="importo">importo: </label>
                 <input type="number" name="importo" id="importo" min="0" required>
             </div>
             <div class="field">
@@ -125,34 +33,23 @@
         </form>
 
         <table>
-            <thead>
-                <tr class="filters">
-                        <th colspan="2">
-                            <label for="fromDate">Da</label>
-                            <input type="date" name="fromDate" id="fromDate">
-                        </th>
-                        <th colspan="2">
-                            <label for="toDate">A</label>
-                            <input type="date" name="toDate" id="toDate">
-                        </th>
-                        <th>
-                            <label for="tipoSpesaFilter">Uscita</label>
-                            <input type="checkbox" name="tipoSpesaFilter" id="uscitaFilter" checked>
-                            <label for="tipo">Entrata</label>
-                            <input type="checkbox" name="tipoSpesaFilter" id="entrataFilter" checked>
-                        </th>
-                </tr>
-                <tr>
-                    <th>elimina</th>
-                    <th>causa</th>
-                    <th>data</th>
-                    <th>importo</th>
-                    <th>tipo</th>
-                </tr>
-            </thead>
             <form action="/deleteCassaItem" method="POST">
-            <tbody>
-                
+                <thead>
+                    <tr>
+                        <th>
+                            <button id="deleteTransazioneBtn" type="submit">
+                                <span class="material-symbols-outlined">
+                                    delete_forever
+                                </span>
+                            </button>
+                        </th>
+                        <th>oggetto</th>
+                        <th>data</th>
+                        <th>importo</th>
+                        <th>tipo</th>
+                    </tr>
+                </thead>
+                <tbody>
                     <% for(const transazione of cassa){ %>
                         <tr class="row">
                             <td><input type="checkbox" name="id_<%= transazione._id %>" value="<%= transazione._id %>"></td>
@@ -162,46 +59,9 @@
                             <td><%= transazione.importo < 0 ? 'Uscita' : 'Entrata' %></td>
                         </tr>
                     <% } %>
-            </tbody>
-            <tfoot>
-                <td colspan="5"><button type="submit">elimina</button></td>
-            </tfoot>
+                </tbody>
             </form>
         </table>
     </main>
-
-    <script>
-        const fromDateFilter = document.getElementById('fromDate');
-        const toDateFilter = document.getElementById('toDate');
-        const entrataFilter = document.getElementById('entrataFilter');
-        const uscitaFilter = document.getElementById('uscitaFilter');
-        const rows = document.querySelectorAll('.row');
-
-        const filterTransazioni = () => {
-            const fromDate = new Date(fromDateFilter.value);
-            
-            const toDate = new Date(toDateFilter.value); 
-            for(const row of rows){
-                const dataTransazione = new Date(row.getElementsByTagName('td')[2].textContent.split('/').reverse().join('-'));
-                const tipoSpesa = row.getElementsByTagName('td')[4].textContent.toLocaleLowerCase();
-                console.log(tipoSpesa == 'entrata' && entrataFilter.checked)
-                console.log(tipoSpesa == 'uscita' && uscitaFilter.checked)
-                const spesaFiltrata = tipoSpesa == 'entrata' && entrataFilter.checked ? true : tipoSpesa == 'uscita' && uscitaFilter.checked ? true : false;
-                if(
-                    ((fromDate <= dataTransazione && dataTransazione <= toDate) || 
-                     (!fromDateFilter.value || !toDateFilter.value)) &&
-                    (spesaFiltrata)
-                ){
-                    row.style.display = 'table-row'
-                }else{
-                    row.style.display = 'none'
-                }
-            }
-        }
-        fromDateFilter.addEventListener('change', filterTransazioni)
-        toDateFilter.addEventListener('change', filterTransazioni)
-        entrataFilter.addEventListener('change', filterTransazioni)
-        uscitaFilter.addEventListener('change', filterTransazioni)
-    </script>
 </body>
 </html>

@@ -138,16 +138,11 @@ router.post('/uploadUserFirma', async (req, res) => {
   });
 });
 
-
-
 router.get('/admin/pagamenti', async (req, res) => {
     const pagamenti = await utenti.findOne({"cFiscale": req.query.cf}, {"fatture": 1}); 
     if(pagamenti.fatture == '') return res.render('errorPage', {error: "Questo utente non ha effetuato ancora un pagamento"});
-    
     res.render('admin/payments/storicoPagamenti',{pagamenti: pagamenti.fatture})
 });
-
-
 
 
 router.use(express.json());
@@ -296,7 +291,7 @@ router.post('/deleteUsers', authenticateJWT, async (req, res) => {
 
 router.get('/admin/price', authenticateJWT, async (req, res) => {
   const prices = await prezzi.find();
-  res.render('admin/pricePage', {prices});
+  res.render('admin/payments/pricePage', {prices});
 });
 router.post('/updatePrice', authenticateJWT, async (req, res) => {
   const {tipo, iscrizione, price} = req.body;
@@ -382,7 +377,7 @@ router.get('/admin/fattureDaEmettere', authenticateJWT, async (req, res)=> {
       {"cFiscale": cf},
       {"fatture": 1}
     );
-    res.render('admin/fatture/fattureDaEmettere', {dati, cf});
+    res.render('admin/payments/fatture/fattureDaEmettere', {dati, cf});
   }catch(error){
     res.render('errorPage', {error: 'Utente non trovato'})
   }
@@ -398,7 +393,7 @@ router.get('/admin/emettiFattura', authenticateJWT, async (req, res)=> {
       { "cFiscale": cf },
       { nome: 1, cognome: 1, cFiscale: 1, residenza: 1 }
     );
-    res.render('admin/fatture/emettiFattura', {numeroFattura: nFattura.numero, dati: datiUtente, cf, data, importo});
+    res.render('admin/payments/fatture/emettiFattura', {numeroFattura: nFattura.numero, dati: datiUtente, cf, data, importo});
   }catch(error){
     res.render('errorPage', {error: 'Utente non trovato'})
   }
@@ -477,7 +472,7 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
 router.get('/admin/storicoFatture', authenticateJWT, async (req, res)=> {
   try {
     const fatture = await storicoFatture.find();
-    res.render('admin/fatture/storicoFatture', { fatture });
+    res.render('admin/payments/fatture/storicoFatture', { fatture });
   } catch (error) {
     console.error('Si è verificato un errore durante il recupero delle fatture:', error);
     res.render('errorPage', {error: 'Si è verificato un errore durante il recupero delle fatture'});

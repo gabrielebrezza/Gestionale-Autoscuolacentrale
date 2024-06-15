@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inserire Codice Di Verifica</title>
-    <link rel="stylesheet" href="/styles/admin/otp.css">
+    <title>Admin - Codice Di Verifica</title>
+    <link rel="stylesheet" href="/styles/admin/auth/otp.css">
 </head>
 <body>
     <h1>Inserisci il codice OTP che ti abbiamo inviato via Email</h1>
@@ -19,22 +19,7 @@
         <button id="submitBtn" type="submit">Verifica Codice OTP</button>
     </form>
 
-    <script>
-        document.querySelectorAll('input[type="number"]').forEach(function(input, index, inputs) {
-            input.addEventListener('input', function() {
-                if (this.value.length > 0 && index < inputs.length - 1) {
-                    inputs[index + 1].focus();
-                }
-            });
-        });
-
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.addEventListener('click', () => {
-            setTimeout(()=> {
-                submitBtn.disabled = true;
-            }, 5);
-        });
-    </script>
-
+    <script src="/scripts/admin/auth/otp.js"></script>
+    <script src="/scripts/utils/delayBtn.js"></script>
 </body>
 </html>

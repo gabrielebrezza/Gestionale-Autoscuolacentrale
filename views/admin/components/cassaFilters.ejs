@@ -1,0 +1,35 @@
+<link rel="stylesheet" href="/styles/admin/components/filters.css">
+<script src="/scripts/admin/components/cassaFilters.js"></script>
+<div class="filterBox">
+    <details id="filterMenu">
+        <summary>
+            <span class="material-symbols-outlined openFilters">
+            filter_alt
+            </span>
+            <span class="material-symbols-outlined closeFilters">
+                filter_alt_off
+            </span>
+        </summary>
+
+        <div class="filters">
+            <div class="filterField">
+                <label for="fromDate">Da: </label>
+                <input type="date" name="fromDate" id="fromDate">
+            </div>
+            <div class="filterField">
+                <label for="toDate">A: </label>
+                <input type="date" name="toDate" id="toDate">
+            </div>
+            <div class="filterField">
+                <div class="checkboxGroup">
+                    <label for="tipoSpesaFilter">Uscita</label>
+                    <input type="checkbox" name="tipoSpesaFilter" id="uscitaFilter" checked>
+                </div>
+                <div class="checkboxGroup">
+                    <label for="tipo">Entrata</label>
+                    <input type="checkbox" name="tipoSpesaFilter" id="entrataFilter" checked>
+                </div>
+            </div>
+        </div>
+    </details>
+</div>

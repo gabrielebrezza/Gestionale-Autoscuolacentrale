@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Storico Fatture</title>
+    <link rel="stylesheet" href="\styles\admin\payments\fatture\storicoFatture.css">
+    <script src="/scripts/admin/payments/fatture/storicoFatture.js"></script>
+</head>
+<body>
+    <%- include('../../components/header.ejs') %>
+    <main>
+        <table>
+            <thead>
+                <tr class="filters">
+                    <form id="fattureFilters" action="/downloadFatture" method="POST">
+                        <th colspan="2">
+                            <label for="fromDate">Da</label>
+                            <input type="date" name="fromDate" id="fromDate">
+                        </th>
+                        <th>
+                            <label for="toDate">A</label>
+                            <input type="date" name="toDate" id="toDate">
+                        </th>
+                        <th>
+                            <button type="submit">
+                                <span class="material-symbols-outlined">
+                                    download
+                                </span>
+                            </button>
+                        </th>
+                    </form>
+                </tr>
+                <tr>
+                    <th>numero</th>
+                    <th>data</th>
+                    <th>importo</th>
+                    <th>File</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                <% for(const fattura of fatture){ %>
+                    <tr class="row">
+                        <td><%= fattura.numero %></td>
+                        <td><%= fattura.data %></td>
+                        <td><%= fattura.importo %></td>
+                        <td><%= fattura.nomeFile %></td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

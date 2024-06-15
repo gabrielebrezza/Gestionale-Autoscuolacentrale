@@ -7,7 +7,9 @@
     font-family: "Reddit Mono", monospace;
     font-optical-sizing: auto;
 }
-
+body{
+    background: #71a1cb;
+}
 .header {
     top: 0;
     position: fixed;

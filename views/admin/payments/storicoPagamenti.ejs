@@ -3,36 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        body{
-            background: #71a1cb;
-        }
-        main{
-            margin-top: 175px;
-            display: flex;
-            align-items: center;
-            flex-direction: column;
-        }
-        table{
-            margin-top: 75px;
-            border-collapse: collapse;
-            border-spacing: 0;
-            max-width: 600px;
-            width: 100%;
-        }
-        td, th{
-            text-align: left;
-            border-bottom: 2px solid #ccc;
-            padding: 5px;
-            background: #f1f1f1;
-        }
-        th{
-            background: #588dbc;
-            color: #f1f1f1;
-            text-transform: uppercase;
-        }
-    </style>
+    <title>Storico Pagamenti</title>
+    <link rel="stylesheet" href="/styles/admin/payments/storicoPagamenti.css">
 </head>
 <body>
     <%- include('../components/header.ejs') %>
@@ -54,6 +26,5 @@
             </tbody>
         </table>
     </main>
-
 </body>
 </html>
