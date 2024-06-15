@@ -20,7 +20,6 @@ router.post('/stripeHooks', express.raw({type: 'application/json'}), async (req,
     }
   
     if(event.type == 'checkout.session.completed') {
-        console.log('proprio io')
         const session = event.data.object;
         const price = session.amount_total/100;
         const {cFiscale, patente, email} = session.metadata;
