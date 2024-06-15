@@ -133,10 +133,13 @@ async function creaFatturaElettronica(dati) {
 
 
 
-
+const utenti = require('../DB/User');
 async function creaFatturaCortesia(dati) {
     return new Promise(async (resolve, reject) => {
         try {
+            const utente = await utenti.findOne({ "cFiscale": dati.codiceFiscaleCliente });
+            const patente = utente.patente.find(item => item.pagato === true && item.bocciato === null);
+            dati.patente = patente.tipo;
             const doc = new PDFDocument();
             doc.fontSize(16).text('Autoscuola Centrale', { align: 'left' });
             doc.text('Corso Marconi 33 - 10125 Torino (TO)', { align: 'left' });
@@ -161,22 +164,26 @@ async function creaFatturaCortesia(dati) {
             // Box per dettagli della fattura
             doc.text('Dettagli Fattura', { underline: true });
             doc.moveDown();
-            doc.text('Data             Descrizione                            QTA     EURO');
-            doc.text(`${dati.data}     ${dati.descrizione1}                           ${dati.imponibileImporto1}€`);
+            doc.text('Data             Descrizione');
+            doc.fontSize(9);
+            doc.text(`${dati.data}`, { continued: true });
+            doc.text(`                   iscrizione patente ${dati.patente}`)
             doc.moveDown();
-            doc.fillColor("#FF0000").text(`Fattura di cortesia  non valida ai fini fiscali.`);
-            doc.text(`La fattura è stata emessa in formato elettronico ed è consultabile nel cassetto fiscale`);
-            doc.fillColor("#000000");
-            doc.moveDown();
-            doc.text('Modalità di pagamento', { underline: true });
             doc.moveDown();
             doc.text('TOTALE IMPONIBILE: ', { continued: true });
             doc.text(`${dati.imponibileImporto1} €`);
             doc.text('IVA 22%: ', { continued: true });
             doc.text(`${(Number(dati.imponibileImporto1) * 0.22).toFixed(2)} €`);
+            doc.moveDown();
+            doc.text(`anticipazioni conto cliente`);
+            doc.text(`esclusiva iva art.15 dpr 633/72 diritti della Motorizzazione e imposte di bollo €`);
+            doc.moveDown();
             doc.text('TOTALE FATTURA: ', { continued: true });
             doc.text(`${dati.ImportoTotaleDocumento} €`);
             doc.moveDown();
+            doc.moveDown();
+            doc.fillColor("#FF0000").text(`Fattura di cortesia  non valida ai fini fiscali.`);
+            doc.text(`La fattura è stata emessa in formato elettronico ed è consultabile nel cassetto fiscale`);
             const buffers = [];
             const pdfBufferPromise = new Promise((resolve, reject) => {
                 doc.on('data', buffers.push.bind(buffers));

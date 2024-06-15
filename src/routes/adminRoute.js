@@ -231,11 +231,8 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
               emailSent: true
             };
             userData.patente.forEach((patente, index) => {
-              console.log(patente)
-              console.log(dati.patente)
               if (patente.bocciato === null && patente.tipo == dati.patente) {
                 userData.patente[index].bocciato = false;
-                console.log('fatto')
               }
             });
             userData.archiviato = true;
@@ -553,4 +550,5 @@ router.post('/deleteCassaItem', authenticateJWT, async (req, res) => {
   }
   res.redirect('/admin/cassa');
 });
+
 module.exports = router;

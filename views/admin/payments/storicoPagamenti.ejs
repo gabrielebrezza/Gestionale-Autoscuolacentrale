@@ -4,15 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        body{
+            background: #71a1cb;
+        }
+        main{
+            margin-top: 175px;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+        table{
+            margin-top: 75px;
+            border-collapse: collapse;
+            border-spacing: 0;
+            max-width: 600px;
+            width: 100%;
+        }
+        td, th{
+            text-align: left;
+            border-bottom: 2px solid #ccc;
+            padding: 5px;
+            background: #f1f1f1;
+        }
+        th{
+            background: #588dbc;
+            color: #f1f1f1;
+            text-transform: uppercase;
+        }
+    </style>
 </head>
 <body>
-    <section class="cards">
-        <% pagamenti.forEach(pagamento => { %>
-            <div class="card">
-                <h2>Data: <%= pagamento.data %></h2>
-                <h2>Importo: <%= pagamento.importo %></h2>
-            </div>
-        <% }); %>
-    </section>
+    <%- include('../components/header.ejs') %>
+    <main>
+        <table>
+            <thead>
+                <th>data</th>
+                <th>importo</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <% pagamenti.forEach(pagamento => { %>
+                        <tr>
+                            <td><%= pagamento.data %></td>
+                            <td><%= pagamento.importo %>€</td>
+                        </tr>
+                    <% }); %>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+
 </body>
 </html>
