@@ -20,17 +20,34 @@
             border-spacing: 0;
             max-width: 600px;
             width: 100%;
-            background: #f1f1f1;
         }
         td, th{
             text-align: left;
             border-bottom: 2px solid #ccc;
             padding: 5px;
+            background: #f1f1f1;
         }
         th{
             background: #588dbc;
             color: #f1f1f1;
             text-transform: uppercase;
+        }
+        tfoot td{
+            padding: 0;
+            border: none;
+            background: #0000;
+        }
+        tfoot td button{
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            text-transform: uppercase;
+            font-size: 1.1rem;
+            color: #f1f1f1;
+            background: red;
+            width: 100%;
+            border-radius: 0 0 10px 10px;
         }
         #cassaForm{
             display: flex;
@@ -68,6 +85,17 @@
         #cassaForm button:hover{
             opacity: .5;
         }
+        .filters input[type="date"]{
+            cursor: pointer;
+            padding: 10px;
+            outline: none;
+            border: none;
+            border-radius: 5px;
+        }
+        .filters th{
+            text-align: center;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -98,16 +126,35 @@
 
         <table>
             <thead>
-                <th>elimina</th>
-                <th>causa</th>
-                <th>data</th>
-                <th>importo</th>
-                <th>tipo</th>
+                <tr class="filters">
+                        <th colspan="2">
+                            <label for="fromDate">Da</label>
+                            <input type="date" name="fromDate" id="fromDate">
+                        </th>
+                        <th colspan="2">
+                            <label for="toDate">A</label>
+                            <input type="date" name="toDate" id="toDate">
+                        </th>
+                        <th>
+                            <label for="tipoSpesaFilter">Uscita</label>
+                            <input type="checkbox" name="tipoSpesaFilter" id="uscitaFilter" checked>
+                            <label for="tipo">Entrata</label>
+                            <input type="checkbox" name="tipoSpesaFilter" id="entrataFilter" checked>
+                        </th>
+                </tr>
+                <tr>
+                    <th>elimina</th>
+                    <th>causa</th>
+                    <th>data</th>
+                    <th>importo</th>
+                    <th>tipo</th>
+                </tr>
             </thead>
+            <form action="/deleteCassaItem" method="POST">
             <tbody>
-                <form action="/deleteCassaItem" method="POST">
+                
                     <% for(const transazione of cassa){ %>
-                        <tr>
+                        <tr class="row">
                             <td><input type="checkbox" name="id_<%= transazione._id %>" value="<%= transazione._id %>"></td>
                             <td><%= transazione.causa %></td>
                             <td><%= transazione.data %></td>
@@ -115,10 +162,46 @@
                             <td><%= transazione.importo < 0 ? 'Uscita' : 'Entrata' %></td>
                         </tr>
                     <% } %>
-                    <button type="submit">elimina</button>
-                </form>
             </tbody>
+            <tfoot>
+                <td colspan="5"><button type="submit">elimina</button></td>
+            </tfoot>
+            </form>
         </table>
     </main>
+
+    <script>
+        const fromDateFilter = document.getElementById('fromDate');
+        const toDateFilter = document.getElementById('toDate');
+        const entrataFilter = document.getElementById('entrataFilter');
+        const uscitaFilter = document.getElementById('uscitaFilter');
+        const rows = document.querySelectorAll('.row');
+
+        const filterTransazioni = () => {
+            const fromDate = new Date(fromDateFilter.value);
+            
+            const toDate = new Date(toDateFilter.value); 
+            for(const row of rows){
+                const dataTransazione = new Date(row.getElementsByTagName('td')[2].textContent.split('/').reverse().join('-'));
+                const tipoSpesa = row.getElementsByTagName('td')[4].textContent.toLocaleLowerCase();
+                console.log(tipoSpesa == 'entrata' && entrataFilter.checked)
+                console.log(tipoSpesa == 'uscita' && uscitaFilter.checked)
+                const spesaFiltrata = tipoSpesa == 'entrata' && entrataFilter.checked ? true : tipoSpesa == 'uscita' && uscitaFilter.checked ? true : false;
+                if(
+                    ((fromDate <= dataTransazione && dataTransazione <= toDate) || 
+                     (!fromDateFilter.value || !toDateFilter.value)) &&
+                    (spesaFiltrata)
+                ){
+                    row.style.display = 'table-row'
+                }else{
+                    row.style.display = 'none'
+                }
+            }
+        }
+        fromDateFilter.addEventListener('change', filterTransazioni)
+        toDateFilter.addEventListener('change', filterTransazioni)
+        entrataFilter.addEventListener('change', filterTransazioni)
+        uscitaFilter.addEventListener('change', filterTransazioni)
+    </script>
 </body>
 </html>
