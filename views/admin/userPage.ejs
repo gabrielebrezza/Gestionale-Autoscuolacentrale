@@ -40,12 +40,13 @@
             width: 50%;
             border-collapse: collapse;
             border-spacing: 0;
-            background: #f1f1f1;
+            margin: 50px;
         }
         th, td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
+            background: #f1f1f1;
         }
 
         th {
@@ -53,9 +54,20 @@
             background: #5681a9;
             text-transform: uppercase;
         }
+        th:first-child{
+            border-radius: 5px 0 0  0;
+        }
+        th:last-child{
+            border-radius:  0 5px 0  0;
+        }
+        tfoot td{
+            padding: 0;
+            background: #0000;
+            border: none;
+        }
         #submitFormBtn{
-            width: 50%;
-            margin-top: 5px;
+            width: 100%;
+            /* margin-top: 5px; */
             cursor: pointer;
             padding: 10px 20px;
             background: green;
@@ -63,10 +75,10 @@
             transition: .5s;
             outline: none;
             border: none;
-            border-radius: 5px;
+            border-radius: 0 0 5px 5px;
         }
         #submitFormBtn:hover{
-            opacity: .8;
+            opacity: .7;
         }
         .imageForms{
             width: 50%;
@@ -504,8 +516,11 @@
                     <td><textarea name="note" id="note"><%= user.note %></textarea></td>
                 </tr>
             </tbody>
+            <tfoot>
+                <td colspan="2"><button id="submitFormBtn" type="submit">Salva</button></td>
+            </tfoot>
         </table>
-        <button id="submitFormBtn" type="submit">Salva</button>
+        
     </form>
 
     <script>
