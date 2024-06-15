@@ -231,10 +231,10 @@
                 <input type="text" id="descrizione" name="descrizione2" value="Costo Servizio"><br><br>
 
                 <label for="prezzoUnitario">Prezzo Unitario:</label><br>
-                <input type="text" id="prezzoUnitario" name="prezzoUnitario2" value="<%= (importo*36.4259259/100).toFixed(2) %>"><br><br>
+                <input type="text" id="prezzoUnitario" name="prezzoUnitario2" value="<%= (importo-42.20).toFixed(2) %>"><br><br>
 
                 <label for="prezzoTotale">Prezzo Totale:</label><br>
-                <input type="text" id="prezzoTotale" name="prezzoTotale2" value="<%= (importo*36.4259259/100).toFixed(2) %>"><br><br>
+                <input type="text" id="prezzoTotale" name="prezzoTotale2" value="<%= (importo-42.20).toFixed(2) %>"><br><br>
 
                 <label for="aliquotaIVA">Aliquota IVA:</label><br>
                 <input type="text" id="aliquotaIVA" name="aliquotaIVA2" value="22.00"><br><br>
@@ -246,10 +246,10 @@
                 <input type="text" id="aliquotaIVARiepilogo1" name="aliquotaIVARiepilogo1" value="22.00"><br><br>
 
                 <label for="imponibileImporto1">Imponibile Importo:</label><br>
-                <input type="text" id="imponibileImporto1" name="imponibileImporto1" value="<%= (importo*36.4259259/100).toFixed(2) %>"><br><br>
+                <input type="text" id="imponibileImporto1" name="imponibileImporto1" value="<%= (importo-42.20).toFixed(2) %>"><br><br>
 
                 <label for="imposta1">Imposta:</label><br>
-                <input type="text" id="imposta1" name="imposta1" value="<%= (42.20 - importo*36.4259259/100).toFixed(2) %>"><br><br>
+                <input type="text" id="imposta1" name="imposta1" value="<%= (importo-42.20*0.22).toFixed(2) %>"><br><br>
 
                 <label for="esigibilitaIVA1">Esigibilita IVA:</label><br>
                 <input type="text" id="esigibilitaIVA1" name="esigibilitaIVA1" value="I"><br><br>
