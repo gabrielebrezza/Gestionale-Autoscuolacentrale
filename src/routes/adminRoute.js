@@ -385,17 +385,20 @@ router.get('/admin/fattureDaEmettere', authenticateJWT, async (req, res)=> {
 
 router.get('/admin/emettiFattura', authenticateJWT, async (req, res)=> {
   try{
-    const cf = req.query.cf; 
-    const data = req.query.data.split('/').reverse().join('-'); 
-    const importo = req.query.importo; 
     const nFattura = await numeroFattura.findOne();
-    const datiUtente = await utenti.findOne(
-      { "cFiscale": cf },
-      { nome: 1, cognome: 1, cFiscale: 1, residenza: 1 }
-    );
-    res.render('admin/payments/fatture/emettiFattura', {numeroFattura: nFattura.numero, dati: datiUtente, cf, data, importo});
+    if( req.query.cf && req.query.data && req.query.importo){
+      const cf = req.query.cf; 
+      const data = req.query.data.split('/').reverse().join('-'); 
+      const importo = req.query.importo; 
+      const datiUtente = await utenti.findOne(
+        { "cFiscale": cf },
+        { nome: 1, cognome: 1, cFiscale: 1, residenza: 1 }
+      );
+      return res.render('admin/payments/fatture/emettiFattura', {numeroFattura: nFattura.numero, dati: datiUtente, cf, data, importo, guide: true});
+    }
+    res.render('admin/payments/fatture/emettiFattura', {numeroFattura: nFattura.numero, guide: false});
   }catch(error){
-    res.render('errorPage', {error: 'Utente non trovato'})
+      res.render('errorPage', {error: 'Utente non trovato'})
   }
 });
 
