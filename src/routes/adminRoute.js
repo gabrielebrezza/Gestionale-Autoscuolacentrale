@@ -15,6 +15,7 @@ const utenti = require('../DB/User');
 const prezzi = require('../DB/Prezzi');
 const codes = require('../DB/Codes');
 const cassa = require('../DB/Cassa');
+const ClientiGenerici = require('../DB/ClientiGenerici');
 const numeroFattura = require('../DB/NumeroFattura');
 const storicoFatture = require('../DB/StoricoFatture');
 //functions
@@ -394,9 +395,10 @@ router.get('/admin/emettiFattura', authenticateJWT, async (req, res)=> {
         { "cFiscale": cf },
         { nome: 1, cognome: 1, cFiscale: 1, residenza: 1 }
       );
-      return res.render('admin/payments/fatture/emettiFattura', {numeroFattura: nFattura.numero, dati: datiUtente, cf, data, importo, guide: true});
+      return res.render('admin/payments/fatture/emettiFattura', {numeroFattura: nFattura.numero, dati: datiUtente, cf, data, importo, iscrizione: true});
     }
-    res.render('admin/payments/fatture/emettiFattura', {numeroFattura: nFattura.numero, guide: false});
+    const clienti = await ClientiGenerici.find();
+    res.render('admin/payments/fatture/emettiFattura', {numeroFattura: nFattura.numero, clienti, iscrizione: false});
   }catch(error){
       res.render('errorPage', {error: 'Utente non trovato'})
   }
@@ -405,10 +407,16 @@ router.get('/admin/emettiFattura', authenticateJWT, async (req, res)=> {
 
 router.post('/createFattura', authenticateJWT, async (req, res) =>{
   let dati = req.body;
-  const {numero} = await numeroFattura.findOne();
-  dati.progressivoInvio = `i00${numero}`;
-  dati.numeroDocumento = `i00${numero}`;
-  
+  const iscrizione = req.body.iscrizione == 'true';
+  if(iscrizione){
+    const {numeroIscrizioni} = await numeroFattura.findOne();
+    dati.progressivoInvio = `i00${numeroIscrizioni}`;
+    dati.numeroDocumento = `i00${numeroIscrizioni}`;
+  }else{
+    const {numeroGeneriche} = await numeroFattura.findOne();
+    dati.progressivoInvio = `g00${numeroGeneriche}`;
+    dati.numeroDocumento = `g00${numeroGeneriche}`;
+  }
   try {
     const result = await creaFatturaElettronica(dati);
     console.log(result);
@@ -417,30 +425,36 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
     return res.render('errorPage', { error: 'errore nell\'emissione della fattura elettronica' });
   }
   try {
-    const result = await creaFatturaCortesia(dati);
+    const result = await creaFatturaCortesia(dati, iscrizione);
     console.log(result);
   } catch (error) {
     console.error(error);
     return res.render('errorPage', { error: 'errore nell\'emissione della fattura di cortesia' });
   }
-
-  await utenti.findOneAndUpdate(
-    {
-      "cFiscale": dati.codiceFiscaleCliente,
-      "fatture": {
-        $elemMatch: {
-            "data": dati.data.split('-').reverse().join('/'),
-            "importo": dati.importoPagamento,
-            "emessa": false
+  
+  if(iscrizione){
+    await utenti.findOneAndUpdate(
+      {
+        "cFiscale": dati.codiceFiscaleCliente,
+        "fatture": {
+          $elemMatch: {
+              "data": dati.data.split('-').reverse().join('/'),
+              "importo": dati.importoPagamento,
+              "emessa": false
+          }
         }
-      }
-    },
-    {
-      $set: {
-        "fatture.$.emessa": true
-      }
-  });
-  await numeroFattura.updateOne({$inc: {"numero": 1}});
+      },
+      {
+        $set: {
+          "fatture.$.emessa": true
+        }
+    });
+  }
+  if(iscrizione){
+    await numeroFattura.updateOne({$inc: {"numeroIscrizioni": 1}});
+  }else{
+    await numeroFattura.updateOne({$inc: {"numeroGeneriche": 1}});
+  }
   const today = new Date();
   const DD = String(today.getDate()).padStart(2, '0'); 
   const MM = String(today.getMonth() + 1).padStart(2, '0'); 
@@ -448,6 +462,7 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
   const dataFatturazione = `${DD}/${MM}/${YYYY}`;
   try{
     const nuovaFattura = new storicoFatture({
+      tipo: iscrizione ? 'iscrizione' : 'generica',
       numero: parseInt(dati.progressivoInvio.replace(/\D/g, ''), 10),
       importo: dati.importoPagamento,
       data: dataFatturazione,
@@ -458,16 +473,47 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
     console.error('Si è verificato un errore durante l\'aggiunta della fattura allo storico:', error);
     return res.render('errorPage', {error: 'errore nell\'aggiunta della fattura allo storico'});
   }
-  
-  const email = await utenti.findOne({"cFiscale": dati.codiceFiscaleCliente}, {"contatti.email": 1});
+
+  let email
+  if(iscrizione){
+    const utente = await utenti.findOne({"cFiscale": dati.codiceFiscaleCliente}, {"contatti.email": 1});
+    email = utente.contatti.email
+  }else{
+    email = dati.emailCliente;
+  }
   const subject = 'Fattura di cortesia';
   const text = `Gentile ${dati.cognomeCliente} ${dati.nomeCliente} ti inviamo la fattura di cortesia per il pagamento che hai effettuato.`;
   const filename = `./fatture/cortesia/fattura_${dati.nomeCliente}_${dati.cognomeCliente}.pdf`;
   try{
-    const result = await sendEmail(email.contatti.email, subject, text, filename);
+    const result = await sendEmail(email, subject, text, filename);
     console.log(result);
   }catch(error){
     console.log('errore: ', error);
+  }
+
+  if(!iscrizione){
+    if(req.body.saveCustomerData == 'save'){
+      try{
+        const nuovoCliente = new ClientiGenerici({
+          cDestinatario: dati.codiceDestinatario,
+          nome: dati.nomeCliente,
+          cognome: dati.cognomeCliente,
+          cFiscale: dati.codiceFiscaleCliente,
+          email: dati.emailCliente,
+          residenza : {
+            indirizzo: dati.indirizzoSedeCliente,
+            cap: dati.capSedeCliente,
+            comune: dati.comuneSedeCliente,
+            provincia: dati.provinciaSedeCliente,
+            nazione: dati.nazioneSedeCliente,
+          }
+        });
+        await  nuovoCliente.save()                
+      }catch(error){
+        console.error('Si è verificato un errore durante l\'aggiunta del nuovo utente:', error);
+        return res.render('errorPage', {error: 'errore nell\'aggiunta del nuovo utente'});
+      }
+    }
   }
   res.redirect(`/admin`);
 });

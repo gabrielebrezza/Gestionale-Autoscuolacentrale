@@ -8,19 +8,40 @@
 </head>
 <body>
     <%- include('../../components/header.ejs') %>
+    <% if (!iscrizione) { %>
+        <div class="clienti">
+            <details>
+                <summary> Clienti </summary>
+                
+                <% for(const cliente of clienti){ %>
+                    <details>
+                        
+                        <summary> <%= cliente.cognome + ' ' + cliente.nome %> </summary>
+                        <p>codice destinatario: <% cliente.cDestinatario %></p>
+                        <p>codice fiscale: <%= cliente.cFiscale %></p>
+                        <p>email: <%= cliente.email %></p>
+                        <h3>Residenza</h3>
+                            <p>indirizzo: <%= cliente.residenza.indirizzo %></p>
+                            <p>cap: <%= cliente.residenza.cap %></p>
+                            <p>comune: <%= cliente.residenza.comune %></p>
+                            <p>provincia: <%= cliente.residenza.provincia %></p>
+                            <p>nazione: <%= cliente.residenza.nazione %></p>
+                    </details>
+                <% } %>
+            </details>
+        </div>
+    <% } %>
     <main>
+        
         <form id="fatturaForm" method="POST" action="/createFattura">
             <fieldset>
                 <legend>Dati Trasmissione</legend>
                 <input type="hidden" name="IdPaese" id="IdPaese" value="IT">
                 <input type="hidden" name="IdCodice" id="IdCodice" value="06498290011">
-                <label for="progressivoInvio">Progressivo Invio:</label><br>
-                <input type="text" id="progressivoInvio" name="progressivoInvio" value="i00<%= numeroFattura %>"><br><br>
-
                 <input type="hidden" id="formatoTrasmissione" name="formatoTrasmissione" value="FPR12">
 
                 <label for="codiceDestinatario">Codice Destinatario:</label><br>
-                <input type="text" id="codiceDestinatario" name="codiceDestinatario" value="<%= guide ? '0000000' : '' %> "><br><br>
+                <input type="text" id="codiceDestinatario" name="codiceDestinatario" value="<%= iscrizione ? '0000000' : '' %> "><br><br>
 
                 <input type="hidden" id="telefonoTrasmittente" name="telefonoTrasmittente" value="0116507136">
                 <input type="hidden" id="emailTrasmittente" name="emailTrasmittente" value="autoscuola.centrale@libero.it">
@@ -38,26 +59,30 @@
                 <legend>Dati Cessionario/Committente</legend>
 
                 <label for="nomeCliente">Nome Cliente:</label><br>
-                <input type="text" id="nomeCliente" name="nomeCliente" value="<%= guide ? (dati.nome).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
+                <input type="text" id="nomeCliente" name="nomeCliente" value="<%= iscrizione ? (dati.nome).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
 
                 <label for="cognomeCliente">Cognome Cliente:</label><br>
-                <input type="text" id="cognomeCliente" name="cognomeCliente" value="<%= guide ? (dati.cognome).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
+                <input type="text" id="cognomeCliente" name="cognomeCliente" value="<%= iscrizione ? (dati.cognome).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
 
                 <label for="codiceFiscaleCliente">Codice Fiscale Cliente:</label><br>
-                <input type="text" id="codiceFiscaleCliente" name="codiceFiscaleCliente" value="<%= guide ? (dati.cFiscale).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
+                <input type="text" id="codiceFiscaleCliente" name="codiceFiscaleCliente" value="<%= iscrizione ? (dati.cFiscale).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
+                <% if (!iscrizione) { %>
+                    <label for="emailCliente">Email Cliente:</label><br>
+                    <input type="email" id="emailCliente" name="emailCliente"><br><br>
+                <% } %>
                 <fieldset>
                     <legend>Sede Cessionario/Committente</legend>
                     <label for="indirizzoSedeCliente">Indirizzo:</label><br>
-                    <input type="text" id="indirizzoSedeCliente" name="indirizzoSedeCliente" value="<%= guide ? (dati.residenza.via).replace(/\s+/g, ' ').trim() + ' ' + (dati.residenza.nCivico).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
+                    <input type="text" id="indirizzoSedeCliente" name="indirizzoSedeCliente" value="<%= iscrizione ? (dati.residenza.via).replace(/\s+/g, ' ').trim() + ' ' + (dati.residenza.nCivico).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
 
                     <label for="capSedeCliente">CAP:</label><br>
-                    <input type="text" id="capSedeCliente" name="capSedeCliente" value="<%= guide ? (dati.residenza.cap).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
+                    <input type="text" id="capSedeCliente" name="capSedeCliente" value="<%= iscrizione ? (dati.residenza.cap).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
 
                     <label for="comuneSedeCliente">Comune:</label><br>
-                    <input type="text" id="comuneSedeCliente" name="comuneSedeCliente" value="<%= guide ? (dati.residenza.comune).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
+                    <input type="text" id="comuneSedeCliente" name="comuneSedeCliente" value="<%= iscrizione ? (dati.residenza.comune).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
 
                     <label for="provinciaSedeCliente">Provincia:</label><br>
-                    <input type="text" id="provinciaSedeCliente" name="provinciaSedeCliente" value="<%= guide ? (dati.residenza.provincia).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
+                    <input type="text" id="provinciaSedeCliente" name="provinciaSedeCliente" value="<%= iscrizione ? (dati.residenza.provincia).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
 
                     <label for="nazioneSedeCliente">Nazione:</label><br>
                     <input type="text" id="nazioneSedeCliente" name="nazioneSedeCliente" value="IT"><br><br>
@@ -70,12 +95,10 @@
                 <input type="hidden" id="divisa" name="divisa" value="EUR">
 
                 <label for="data">Data:</label><br>
-                <input type="text" id="data" name="data" value="<%= guide ? data : '' %>"><br><br>
+                <input type="text" id="data" name="data" value="<%= iscrizione ? data : '' %>"><br><br>
 
-                <label for="numeroDocumento">Numero Documento:</label><br>
-                <input type="text" id="numeroDocumento" name="numeroDocumento" value="i00<%= numeroFattura %>"><br><br>
                 <label for="ImportoTotaleDocumento">ImportoTotaleDocumento</label>
-                <input type="text" id="ImportoTotaleDocumento" name="ImportoTotaleDocumento" value="<%= guide ? Number(importo).toFixed(2) : '' %>">
+                <input type="text" id="ImportoTotaleDocumento" name="ImportoTotaleDocumento" value="<%= iscrizione ? Number(importo).toFixed(2) : '' %>">
             </fieldset>
 
             <fieldset>
@@ -110,10 +133,10 @@
                     <input type="text" id="descrizione" name="descrizione2" value="Costo Servizio"><br><br>
 
                     <label for="prezzoUnitario">Prezzo Unitario:</label><br>
-                    <input type="text" id="prezzoUnitario" name="prezzoUnitario2" value="<%= guide ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
+                    <input type="text" id="prezzoUnitario" name="prezzoUnitario2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
 
                     <label for="prezzoTotale">Prezzo Totale:</label><br>
-                    <input type="text" id="prezzoTotale" name="prezzoTotale2" value="<%= guide ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
+                    <input type="text" id="prezzoTotale" name="prezzoTotale2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
 
                     <label for="aliquotaIVA">Aliquota IVA:</label><br>
                     <input type="text" id="aliquotaIVA" name="aliquotaIVA2" value="22.00"><br><br>
@@ -125,10 +148,10 @@
                     <input type="text" id="aliquotaIVARiepilogo1" name="aliquotaIVARiepilogo1" value="22.00"><br><br>
 
                     <label for="imponibileImporto1">Imponibile Importo:</label><br>
-                    <input type="text" id="imponibileImporto1" name="imponibileImporto1" value="<%= guide ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
+                    <input type="text" id="imponibileImporto1" name="imponibileImporto1" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
 
                     <label for="imposta1">Imposta:</label><br>
-                    <input type="text" id="imposta1" name="imposta1" value="<%= guide ? ((((importo-42.20)/1.22)*22)/100).toFixed(2) : '' %>"><br><br>
+                    <input type="text" id="imposta1" name="imposta1" value="<%= iscrizione ? ((((importo-42.20)/1.22)*22)/100).toFixed(2) : '' %>"><br><br>
 
                     <label for="esigibilitaIVA1">Esigibilita IVA:</label><br>
                     <input type="text" id="esigibilitaIVA1" name="esigibilitaIVA1" value="I"><br><br>
@@ -143,7 +166,7 @@
                     <input type="text" id="natura2" name="natura2" value="N1"><br><br>
 
                     <label for="imponibileImporto2">Imponibile Importo:</label><br>
-                    <input type="text" id="imponibileImporto2" name="imponibileImporto2" value="<%= guide ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
+                    <input type="text" id="imponibileImporto2" name="imponibileImporto2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
 
                     <label for="imposta2">Imposta:</label><br>
                     <input type="text" id="imposta2" name="imposta2" value="0.00"><br><br>
@@ -165,10 +188,16 @@
                     <input type="text" id="modalitaPagamento" name="modalitaPagamento" value="MP08"><br><br>
 
                     <label for="importoPagamento">Importo Pagamento:</label><br>
-                    <input type="text" id="importoPagamento" name="importoPagamento" value="<%= guide ? Number(importo).toFixed(2) : '' %>"><br><br>
+                    <input type="text" id="importoPagamento" name="importoPagamento" value="<%= iscrizione ? Number(importo).toFixed(2) : '' %>"><br><br>
                 </fieldset>
             </fieldset>
-
+            <% if (!iscrizione) { %>
+                <div class="field" style="display: flex;">
+                    <label for="saveCustomerData">Salva dati cliente:</label><br>
+                    <input type="checkbox" id="saveCustomerData" name="saveCustomerData" value="save">
+                </div>
+            <% } %>
+            <input type="hidden" id="iscrizione" name="iscrizione" value="<%= iscrizione %>">
             <input type="submit" id="submitBtn" value="Genera Fattura">
         </form>
     </main>

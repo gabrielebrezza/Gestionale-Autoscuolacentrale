@@ -134,12 +134,16 @@ async function creaFatturaElettronica(dati) {
 
 
 const utenti = require('../DB/User');
-async function creaFatturaCortesia(dati) {
+async function creaFatturaCortesia(dati, iscrizione) {
     return new Promise(async (resolve, reject) => {
         try {
-            const utente = await utenti.findOne({ "cFiscale": dati.codiceFiscaleCliente });
-            const patente = utente.patente.find(item => item.pagato === true && item.bocciato === null);
-            dati.patente = patente.tipo;
+            
+            if(iscrizione){
+                const utente = await utenti.findOne({ "cFiscale": dati.codiceFiscaleCliente });
+                const patente = utente.patente.find(item => item.pagato === true && item.bocciato === null);
+                dati.patente =`iscrizione patente ${patente.tipo}` ;
+            }
+
             const doc = new PDFDocument();
             doc.fontSize(16).text('Autoscuola Centrale', { align: 'left' });
             doc.text('Corso Marconi 33 - 10125 Torino (TO)', { align: 'left' });
@@ -167,7 +171,7 @@ async function creaFatturaCortesia(dati) {
             doc.text('Data             Descrizione');
             doc.fontSize(9);
             doc.text(`${dati.data}`, { continued: true });
-            doc.text(`                   iscrizione patente ${dati.patente}`)
+            doc.text(`                                      ${dati.patente}`)
             doc.moveDown();
             doc.moveDown();
             doc.text('TOTALE IMPONIBILE: ', { continued: true });

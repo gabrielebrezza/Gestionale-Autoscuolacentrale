@@ -9,6 +9,10 @@ connect.then(() =>{
 });
 
 const StoricoFattureSchema = new mongoose.Schema({
+    tipo: {
+        type: String,
+        required: true
+    },
     numero: {
         type: Number,
         required: true

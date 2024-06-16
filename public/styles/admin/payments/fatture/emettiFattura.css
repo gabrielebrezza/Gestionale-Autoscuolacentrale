@@ -3,9 +3,18 @@ main{
     align-items: center;
     flex-direction: column;
 }
+.clienti{
+    width: fit-content;
+    margin-top: 175px;
+    background: #5681a9;
+    color: #f1f1f1;
+    padding: 10px;
+}
+.clienti details > *:not(summary) {
+    margin-left: 50px;
+}
 #fatturaForm {
     max-width: 600px;
-    margin-top: 200px;
     padding: 20px;
     background-color: #fff;
     border-radius: 10px;

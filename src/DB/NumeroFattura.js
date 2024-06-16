@@ -9,7 +9,11 @@ connect.then(() =>{
 });
 
 const NumeroFatturaSchema = new mongoose.Schema({
-    numero: {
+    numeroIscrizioni: {
+        type: Number,
+        required: true
+    },
+    numeroGeneriche: {
         type: Number,
         required: true
     }
