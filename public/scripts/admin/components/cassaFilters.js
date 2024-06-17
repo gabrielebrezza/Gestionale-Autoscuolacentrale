@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(
                 ((fromDate <= dataTransazione && dataTransazione <= toDate) || 
                  (!fromDateFilter.value || !toDateFilter.value)) &&
-                (spesaFiltrata) && causaTdValue.includes(causa)
+                (spesaFiltrata) && (causa === '' || causaTdValue.includes(causa))
             ){
                 row.style.display = 'table-row'
             }else{
