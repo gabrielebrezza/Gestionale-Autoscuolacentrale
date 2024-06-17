@@ -8,12 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const filterTransazioni = () => {
         const causa = causaFilter.value;
-   alert('filtro:' + causa)
         const fromDate = new Date(fromDateFilter.value);
         
         const toDate = new Date(toDateFilter.value); 
         for(const row of rows){
-            const causaTdValue = row.getElementsByTagName('td')[2].textContent;
+            const causaTdValue = row.getElementsByTagName('td')[1].textContent;
             alert('td' + causaTdValue)
             const dataTransazione = new Date(row.getElementsByTagName('td')[2].textContent.split('/').reverse().join('-'));
             const tipoSpesa = row.getElementsByTagName('td')[4].textContent.toLocaleLowerCase();
