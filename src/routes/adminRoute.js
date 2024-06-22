@@ -418,7 +418,7 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
     dati.numeroDocumento = `g00${numeroGeneriche}`;
   }
   try {
-    const result = await creaFatturaElettronica(dati);
+    const result = await creaFatturaElettronica(dati, iscrizione);
     console.log(result);
   } catch (error) {
     console.error('Errore nell\'emissione della fattura elettronica: ', error);

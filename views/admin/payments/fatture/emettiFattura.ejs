@@ -139,48 +139,45 @@
             <fieldset>
                 <legend>Dati Beni e Servizi</legend>
                 <fieldset>
-                    <legend>Numero Linea 1</legend>
-                    <label for="numeroLinea1">Numero Linea:</label><br>
-                    <input type="text" id="numeroLinea1" name="numeroLinea1" value="1"><br><br>
+                    <legend><%= iscrizione ? 'Pagamento bollettini': 'Costo servizi soggetto ad iva' %></legend>
+                    <input type="hidden" id="numeroLinea1" name="numeroLinea1" value="1">
 
                     <label for="descrizione">Descrizione:</label><br>
-                    <input type="text" id="descrizione" name="descrizione1" value="Pagamento bollettini c/c 9001 (diritti Motorizzazione) e c/c 4028 (imposta di bollo)"><br><br>
+                    <input type="text" id="descrizione" name="descrizione1" value="<%= iscrizione ? 'Pagamento bollettini c/c 9001 (diritti Motorizzazione) e c/c 4028 (imposta di bollo)': '' %>"><br><br>
 
                     <label for="prezzoUnitario1">Prezzo Unitario:</label><br>
-                    <input type="number" id="prezzoUnitario1" name="prezzoUnitario1" value="42.20"><br><br>
+                    <input type="number" id="prezzoUnitario1" name="prezzoUnitario1" value="<%= iscrizione ? '42.20' : '' %>"><br><br>
 
-                    <label for="prezzoTotale1">Prezzo Totale:</label><br>
-                    <input type="number" id="prezzoTotale1" name="prezzoTotale1" value="42.20"><br><br>
+                    <input type="hidden" id="prezzoTotale1" name="prezzoTotale1" value="<%= iscrizione ? '42.20' : '' %>">
 
-                    <label for="aliquotaIVA">Aliquota IVA:</label><br>
-                    <input type="text" id="aliquotaIVA" name="aliquotaIVA1" value="0.00"><br><br>
-
-                    <label for="natura">Natura:</label><br>
-                    <input type="text" id="natura" name="natura1" value="N1"><br><br>
-
+                    <% if (iscrizione) { %>
+                        <input type="hidden" id="aliquotaIVA" name="aliquotaIVA1" value="0.00">
+                        <input type="hidden" id="natura" name="natura1" value="N1">
+                    <% }else{ %>
+                        <input type="hidden" id="aliquotaIVA" name="aliquotaIVA1" value="22.00">
+                    <% } %>
                 </fieldset>
                 <fieldset>
-                    <legend>Numero Linea 2</legend>
-                    <label for="numeroLinea2">Numero Linea:</label><br>
-                    <input type="text" id="numeroLinea2" name="numeroLinea2" value="2"><br><br>
-
-                    <label for="descrizione">Descrizione:</label><br>
-                    <input type="text" id="descrizione" name="descrizione2" value="Costo Servizio"><br><br>
+                    <legend>anticipazioni conto cliente</legend>
+                    <input type="hidden" id="numeroLinea2" name="numeroLinea2" value="2">
+                    <input type="hidden" id="descrizione" name="descrizione2" value="<%= iscrizione ? 'Costo Servizio' : 'anticipazioni conto cliente iva esclusa art.15 dpr 633/72' %>">
 
                     <label for="prezzoUnitario2">Prezzo Unitario:</label><br>
                     <input type="number" id="prezzoUnitario2" name="prezzoUnitario2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
 
-                    <label for="prezzoTotale2">Prezzo Totale:</label><br>
-                    <input type="number" id="prezzoTotale2" name="prezzoTotale2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
+                    <input type="hidden" id="prezzoTotale2" name="prezzoTotale2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
 
-                    <label for="aliquotaIVA">Aliquota IVA:</label><br>
-                    <input type="text" id="aliquotaIVA" name="aliquotaIVA2" value="22.00"><br><br>
-
+                    <% if (iscrizione) { %>
+                        <input type="hidden" id="aliquotaIVA" name="aliquotaIVA2" value="22.00">
+                    <% }else{ %>
+                        <input type="hidden" id="aliquotaIVA" name="aliquotaIVA2" value="0.00">
+                        <input type="hidden" id="natura" name="natura2" value="N1">
+                    <% } %>
                 </fieldset>
                 <fieldset>
                     <legend>Dati Riepilogo</legend>
-                    <label for="aliquotaIVARiepilogo1">Aliquota IVA:</label><br>
-                    <input type="text" id="aliquotaIVARiepilogo1" name="aliquotaIVARiepilogo1" value="22.00"><br><br>
+
+                    <input type="hidden" id="aliquotaIVARiepilogo1" name="aliquotaIVARiepilogo1" value="22.00">
 
                     <label for="imponibileImporto1">Imponibile Importo:</label><br>
                     <input type="number" id="imponibileImporto1" name="imponibileImporto1" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
@@ -220,7 +217,7 @@
                 <fieldset>
                     <legend>Dettaglio Pagamento</legend>
                     <label for="modalitaPagamento">Modalita Pagamento:</label><br>
-                    <input type="text" id="modalitaPagamento" name="modalitaPagamento" value="MP08"><br><br>
+                    <input type="text" id="modalitaPagamento" name="modalitaPagamento" value=" <%= iscrizione ? 'MP08' : 'MP05' %> "><br><br>
 
                     <label for="importoPagamento">Importo Pagamento:</label><br>
                     <input type="number" id="importoPagamento" name="importoPagamento" value="<%= iscrizione ? Number(importo).toFixed(2) : '' %>"><br><br>
@@ -240,27 +237,34 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const ImportoTotaleDocumento = document.getElementById('ImportoTotaleDocumento');
-            const prezzoTotale1Input = document.getElementById('prezzoTotale1');
+            const prezzoUnitario2Input = document.getElementById('prezzoUnitario2');
             function autocompleteImports(){
-                const prezzoTotale1 = document.getElementById('prezzoTotale1').value;
-                const prezzoUnitario2 = document.getElementById('prezzoUnitario2');
-                const prezzoTotale2 = document.getElementById('prezzoTotale2');
-                const imponibileImporto1 = document.getElementById('imponibileImporto1');
-                const imposta1 = document.getElementById('imposta1');
-                const imponibileImporto2 = document.getElementById('imponibileImporto2');
-                const importoPagamento = document.getElementById('importoPagamento');
-                const importo = Number(ImportoTotaleDocumento.value);
-                prezzoUnitario2.value = ((importo-prezzoTotale1)/1.22).toFixed(2);
-                prezzoTotale2.value = ((importo-prezzoTotale1)/1.22).toFixed(2);
-                imponibileImporto1.value = ((importo-42.20)/1.22).toFixed(2);
-                imposta1.value = ((((importo-42.20)/1.22)*22)/100).toFixed(2);
-                imponibileImporto2.value = ((importo-42.20)/1.22).toFixed(2);
-                importoPagamento.value = (importo).toFixed(2);
+                const importo = Number(ImportoTotaleDocumento.value).toFixed(2);
+                const prezzoUnitario2 = Number(prezzoUnitario2Input.value).toFixed(2);
+                if(importo != 0 && prezzoUnitario2 != 0){
+                    const prezzoUnitario1 = document.getElementById('prezzoUnitario1');
+                    const prezzoTotale1 = document.getElementById('prezzoTotale1');
+                    const prezzoTotale2 = document.getElementById('prezzoTotale2');
+                    const imponibileImporto1 = document.getElementById('imponibileImporto1');
+                    const imposta1 = document.getElementById('imposta1');
+                    const imponibileImporto2 = document.getElementById('imponibileImporto2');
+                    const importoPagamento = document.getElementById('importoPagamento');
+                    prezzoUnitario1.value = ((importo-prezzoUnitario2)/1.22).toFixed(2)
+                    prezzoTotale1.value = prezzoUnitario1.value;
+                    imponibileImporto1.value = prezzoUnitario1.value;
+                    imponibileImporto2.value = prezzoUnitario2;
+                    prezzoTotale2.value = prezzoUnitario2;
+                    prezzoUnitario2Input.value = prezzoUnitario2;
+                    ImportoTotaleDocumento.value = importo;
+                    importoPagamento.value = importo;
+                    imposta1.value = (((prezzoUnitario1.value)*22)/100).toFixed(2);
+                }
             }
 
-            ImportoTotaleDocumento.addEventListener('input', autocompleteImports);
-            prezzoTotale1Input.addEventListener('input', autocompleteImports);
+            prezzoUnitario2Input.addEventListener('change', autocompleteImports);
+            ImportoTotaleDocumento.addEventListener('change', autocompleteImports);
         });
     </script>
+    
 </body>
 </html>

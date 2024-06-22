@@ -3,7 +3,7 @@ const path = require('path');
 const PDFDocument = require('pdfkit');
 const { create } = require('xmlbuilder2');
 
-async function creaFatturaElettronica(dati) {
+async function creaFatturaElettronica(dati, iscrizione) {
     return new Promise(async (resolve, reject) => {
         try{
         const xml = create({ version: '1.0', encoding: 'UTF-8' })
@@ -79,16 +79,21 @@ async function creaFatturaElettronica(dati) {
                     .ele('Descrizione').txt(dati.descrizione1).up()
                     .ele('PrezzoUnitario').txt(dati.prezzoUnitario1).up()
                     .ele('PrezzoTotale').txt(dati.prezzoTotale1).up()
-                    .ele('AliquotaIVA').txt(dati.aliquotaIVA1).up()
-                    .ele('Natura').txt(dati.natura1).up()
-                .up()
-                  .ele('DettaglioLinee')
+                    .ele('AliquotaIVA').txt(dati.aliquotaIVA1).up();
+                    if (iscrizione) {
+                        xml.ele('Natura').txt(dati.natura1).up();
+                    }  
+                xml.up()
+                .ele('DettaglioLinee')
                   .ele('NumeroLinea').txt(dati.numeroLinea2).up()
                   .ele('Descrizione').txt(dati.descrizione2).up()
                   .ele('PrezzoUnitario').txt(dati.prezzoUnitario2).up()
                   .ele('PrezzoTotale').txt(dati.prezzoTotale2).up()
-                  .ele('AliquotaIVA').txt(dati.aliquotaIVA2).up()
-                .up()
+                  .ele('AliquotaIVA').txt(dati.aliquotaIVA2).up();
+                  if (!iscrizione) {
+                    xml.ele('Natura').txt(dati.natura2).up();
+                  }
+                xml.up()
                 .ele('DatiRiepilogo')
                     .ele('AliquotaIVA').txt(dati.aliquotaIVARiepilogo1).up()
                     .ele('ImponibileImporto').txt(dati.imponibileImporto1).up()
