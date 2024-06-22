@@ -3,12 +3,26 @@ main{
     align-items: center;
     flex-direction: column;
 }
-.clienti{
-    width: fit-content;
-    margin-top: 175px;
-    background: #5681a9;
+.clienti {
+    z-index: 654;
+    position: fixed;
+    right: 0;
+    top: 0;
+    background-color: #5681a9;
     color: #f1f1f1;
-    padding: 10px;
+    padding: 20px;
+    transition: 0.5s;
+}
+.clienti[open] {
+    max-width: 300px;
+    width: 100%;
+    height: 100vh;
+    overflow: auto;
+}
+#filterMenu > summary {
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
 }
 .clienti details > *:not(summary) {
     margin-left: 50px;
@@ -54,6 +68,7 @@ h1 {
 
 #fatturaForm input[type="text"],
 #fatturaForm input[type="email"],
+#fatturaForm input[type="number"],
 #fatturaForm input[type="date"] {
     width: calc(100% - 10px);
     padding: 10px;

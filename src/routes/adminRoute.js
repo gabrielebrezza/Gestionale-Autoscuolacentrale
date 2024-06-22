@@ -495,17 +495,17 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
     if(req.body.saveCustomerData == 'save'){
       try{
         const nuovoCliente = new ClientiGenerici({
-          cDestinatario: dati.codiceDestinatario,
-          nome: dati.nomeCliente,
-          cognome: dati.cognomeCliente,
-          cFiscale: dati.codiceFiscaleCliente,
-          email: dati.emailCliente,
+          cDestinatario: dati.codiceDestinatario.trim(),
+          nome: dati.nomeCliente.trim(),
+          cognome: dati.cognomeCliente.trim(),
+          cFiscale: dati.codiceFiscaleCliente.trim(),
+          email: dati.emailCliente.trim(),
           residenza : {
-            indirizzo: dati.indirizzoSedeCliente,
-            cap: dati.capSedeCliente,
-            comune: dati.comuneSedeCliente,
-            provincia: dati.provinciaSedeCliente,
-            nazione: dati.nazioneSedeCliente,
+            indirizzo: dati.indirizzoSedeCliente.trim(),
+            cap: dati.capSedeCliente.trim(),
+            comune: dati.comuneSedeCliente.trim(),
+            provincia: dati.provinciaSedeCliente.trim(),
+            nazione: dati.nazioneSedeCliente.trim(),
           }
         });
         await  nuovoCliente.save()                
