@@ -89,6 +89,7 @@ async function creaFatturaElettronica(dati, iscrizione) {
                     if (iscrizione === true) {
                         xml.ele('Natura').txt(dati.natura1).up();
                         console.log('sono un iscrizione')
+                        console.log(dati.natura1)
                     }  
                 xml.up()
                 .ele('DettaglioLinee')
