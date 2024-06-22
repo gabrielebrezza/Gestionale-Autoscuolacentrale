@@ -86,8 +86,9 @@ async function creaFatturaElettronica(dati, iscrizione) {
                     .ele('PrezzoUnitario').txt(dati.prezzoUnitario1).up()
                     .ele('PrezzoTotale').txt(dati.prezzoTotale1).up()
                     .ele('AliquotaIVA').txt(dati.aliquotaIVA1).up();
-                    if (iscrizione) {
+                    if (iscrizione === true) {
                         xml.ele('Natura').txt(dati.natura1).up();
+                        console.log('sono un iscrizione')
                     }  
                 xml.up()
                 .ele('DettaglioLinee')
