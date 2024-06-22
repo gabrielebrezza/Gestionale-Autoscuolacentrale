@@ -76,7 +76,7 @@
                 <input type="hidden" id="formatoTrasmissione" name="formatoTrasmissione" value="FPR12">
 
                 <label for="codiceDestinatario">Codice Destinatario:</label><br>
-                <input type="text" id="codiceDestinatario" name="codiceDestinatario" value="<%= iscrizione ? '0000000' : '' %> "><br><br>
+                <input type="text" id="codiceDestinatario" name="codiceDestinatario" value="<%= iscrizione ? '0000000' : '' %>"><br><br>
 
                 <input type="hidden" id="telefonoTrasmittente" name="telefonoTrasmittente" value="0116507136">
                 <input type="hidden" id="emailTrasmittente" name="emailTrasmittente" value="autoscuola.centrale@libero.it">
@@ -133,7 +133,7 @@
                 <input type="date" id="data" name="data" value="<%= iscrizione ? data : '' %>"><br><br>
 
                 <label for="ImportoTotaleDocumento">ImportoTotaleDocumento</label>
-                <input type="number" id="ImportoTotaleDocumento" name="ImportoTotaleDocumento" value="<%= iscrizione ? Number(importo).toFixed(2) : '' %>">
+                <input type="text" id="ImportoTotaleDocumento" name="ImportoTotaleDocumento" value="<%= iscrizione ? Number(importo).toFixed(2) : '' %>">
             </fieldset>
 
             <fieldset>
@@ -146,7 +146,7 @@
                     <input type="text" id="descrizione" name="descrizione1" value="<%= iscrizione ? 'Pagamento bollettini c/c 9001 (diritti Motorizzazione) e c/c 4028 (imposta di bollo)': '' %>"><br><br>
 
                     <label for="prezzoUnitario1">Prezzo Unitario:</label><br>
-                    <input type="number" id="prezzoUnitario1" name="prezzoUnitario1" value="<%= iscrizione ? '42.20' : '' %>"><br><br>
+                    <input type="text" id="prezzoUnitario1" name="prezzoUnitario1" value="<%= iscrizione ? '42.20' : '' %>"><br><br>
 
                     <input type="hidden" id="prezzoTotale1" name="prezzoTotale1" value="<%= iscrizione ? '42.20' : '' %>">
 
@@ -163,7 +163,7 @@
                     <input type="hidden" id="descrizione" name="descrizione2" value="<%= iscrizione ? 'Costo Servizio' : 'anticipazioni conto cliente iva esclusa art.15 dpr 633/72' %>">
 
                     <label for="prezzoUnitario2">Prezzo Unitario:</label><br>
-                    <input type="number" id="prezzoUnitario2" name="prezzoUnitario2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
+                    <input type="text" id="prezzoUnitario2" name="prezzoUnitario2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
 
                     <input type="hidden" id="prezzoTotale2" name="prezzoTotale2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
 
@@ -180,10 +180,10 @@
                     <input type="hidden" id="aliquotaIVARiepilogo1" name="aliquotaIVARiepilogo1" value="22.00">
 
                     <label for="imponibileImporto1">Imponibile Importo:</label><br>
-                    <input type="number" id="imponibileImporto1" name="imponibileImporto1" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
+                    <input type="text" id="imponibileImporto1" name="imponibileImporto1" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
 
                     <label for="imposta1">Imposta:</label><br>
-                    <input type="number" id="imposta1" name="imposta1" value="<%= iscrizione ? ((((importo-42.20)/1.22)*22)/100).toFixed(2) : '' %>"><br><br>
+                    <input type="text" id="imposta1" name="imposta1" value="<%= iscrizione ? ((((importo-42.20)/1.22)*22)/100).toFixed(2) : '' %>"><br><br>
 
                     <label for="esigibilitaIVA1">Esigibilita IVA:</label><br>
                     <input type="text" id="esigibilitaIVA1" name="esigibilitaIVA1" value="I"><br><br>
@@ -198,7 +198,7 @@
                     <input type="text" id="natura2" name="natura2" value="N1"><br><br>
 
                     <label for="imponibileImporto2">Imponibile Importo:</label><br>
-                    <input type="number" id="imponibileImporto2" name="imponibileImporto2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
+                    <input type="text" id="imponibileImporto2" name="imponibileImporto2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
 
                     <label for="imposta2">Imposta:</label><br>
                     <input type="text" id="imposta2" name="imposta2" value="0.00"><br><br>
@@ -217,10 +217,10 @@
                 <fieldset>
                     <legend>Dettaglio Pagamento</legend>
                     <label for="modalitaPagamento">Modalita Pagamento:</label><br>
-                    <input type="text" id="modalitaPagamento" name="modalitaPagamento" value=" <%= iscrizione ? 'MP08' : 'MP05' %> "><br><br>
+                    <input type="text" id="modalitaPagamento" name="modalitaPagamento" value="<%= iscrizione ? 'MP08' : 'MP05' %>"><br><br>
 
                     <label for="importoPagamento">Importo Pagamento:</label><br>
-                    <input type="number" id="importoPagamento" name="importoPagamento" value="<%= iscrizione ? Number(importo).toFixed(2) : '' %>"><br><br>
+                    <input type="text" id="importoPagamento" name="importoPagamento" value="<%= iscrizione ? Number(importo).toFixed(2) : '' %>"><br><br>
                 </fieldset>
             </fieldset>
             <% if (!iscrizione) { %>
