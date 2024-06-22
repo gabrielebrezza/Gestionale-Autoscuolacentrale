@@ -101,7 +101,15 @@
 
                 <label for="codiceFiscaleCliente">Codice Fiscale Cliente:</label><br>
                 <input type="text" id="codiceFiscaleCliente" name="codiceFiscaleCliente" value="<%= iscrizione ? (dati.cFiscale).replace(/\s+/g, ' ').trim() : '' %>"><br><br>
+                
+
                 <% if (!iscrizione) { %>
+                    <label for="IdPaeseCliente">Id paese Cliente:</label><br>
+                    <input type="text" id="IdPaeseCliente" name="IdPaeseCliente"><br><br>
+
+                    <label for="partitaIvaCliente">Partita Iva Cliente:</label><br>
+                    <input type="text" id="partitaIvaCliente" name="partitaIvaCliente"><br><br>
+
                     <label for="emailCliente">Email Cliente:</label><br>
                     <input type="email" id="emailCliente" name="emailCliente"><br><br>
                 <% } %>

@@ -500,6 +500,8 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
           cognome: dati.cognomeCliente.trim(),
           cFiscale: dati.codiceFiscaleCliente.trim(),
           email: dati.emailCliente.trim(),
+          pIva: dati.partitaIvaCliente,
+          idPaese: dati.IdPaeseCliente,
           residenza : {
             indirizzo: dati.indirizzoSedeCliente.trim(),
             cap: dati.capSedeCliente.trim(),

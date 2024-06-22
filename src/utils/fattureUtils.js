@@ -47,8 +47,14 @@ async function creaFatturaElettronica(dati, iscrizione) {
                     .up()
                 .up()
                 .ele('CessionarioCommittente')
-                    .ele('DatiAnagrafici')
-                        .ele('CodiceFiscale').txt(dati.codiceFiscaleCliente).up()
+                    .ele('DatiAnagrafici');
+                        if (!iscrizione) {
+                            xml.ele('IdFiscaleIVA')
+                                .ele('IdPaese').txt(dati.IdPaeseCliente).up()
+                                .ele('IdCodice').txt(dati.partitaIvaCliente).up()
+                            .up();
+                        }
+                        xml.ele('CodiceFiscale').txt(dati.codiceFiscaleCliente).up()
                         .ele('Anagrafica')
                             .ele('Nome').txt(dati.nomeCliente).up()
                             .ele('Cognome').txt(dati.cognomeCliente).up()

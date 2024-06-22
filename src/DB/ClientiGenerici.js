@@ -25,6 +25,14 @@ const ClientiSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    pIva: {
+        type: String,
+        required: true
+    },
+    idPaese: {
+        type: String,
+        required: true
+    },
     email: {
         type: String,
         required: true
@@ -49,7 +57,7 @@ const ClientiSchema = new mongoose.Schema({
         nazione: {
             type: String,
             required: true
-        },
+        }
     }
 });
 const ClientiGenerici = new mongoose.model('Clienti', ClientiSchema);
