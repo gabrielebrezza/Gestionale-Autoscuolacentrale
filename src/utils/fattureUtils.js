@@ -47,14 +47,8 @@ async function creaFatturaElettronica(dati, iscrizione) {
                     .up()
                 .up()
                 .ele('CessionarioCommittente')
-                    .ele('DatiAnagrafici');
-                        if (!iscrizione) {
-                            xml.ele('IdFiscaleIVA')
-                                .ele('IdPaese').txt(dati.IdPaeseCliente).up()
-                                .ele('IdCodice').txt(dati.partitaIvaCliente).up()
-                            .up();
-                        }
-                        xml.ele('CodiceFiscale').txt(dati.codiceFiscaleCliente).up()
+                    .ele('DatiAnagrafici')
+                        .ele('CodiceFiscale').txt(dati.codiceFiscaleCliente).up()
                         .ele('Anagrafica')
                             .ele('Nome').txt(dati.nomeCliente).up()
                             .ele('Cognome').txt(dati.cognomeCliente).up()
@@ -85,23 +79,16 @@ async function creaFatturaElettronica(dati, iscrizione) {
                     .ele('Descrizione').txt(dati.descrizione1).up()
                     .ele('PrezzoUnitario').txt(dati.prezzoUnitario1).up()
                     .ele('PrezzoTotale').txt(dati.prezzoTotale1).up()
-                    .ele('AliquotaIVA').txt(dati.aliquotaIVA1).up();
-                    if (iscrizione === true) {
-                        xml.ele('Natura').txt(dati.natura1).up();
-                        console.log('sono un iscrizione')
-                        console.log(dati.natura1)
-                    }  
-                xml.up()
-                .ele('DettaglioLinee')
+                    .ele('AliquotaIVA').txt(dati.aliquotaIVA1).up()
+                    .ele('Natura').txt(dati.natura1).up()
+                .up()
+                  .ele('DettaglioLinee')
                   .ele('NumeroLinea').txt(dati.numeroLinea2).up()
                   .ele('Descrizione').txt(dati.descrizione2).up()
                   .ele('PrezzoUnitario').txt(dati.prezzoUnitario2).up()
                   .ele('PrezzoTotale').txt(dati.prezzoTotale2).up()
-                  .ele('AliquotaIVA').txt(dati.aliquotaIVA2).up();
-                  if (!iscrizione) {
-                    xml.ele('Natura').txt(dati.natura2).up();
-                  }
-                xml.up()
+                  .ele('AliquotaIVA').txt(dati.aliquotaIVA2).up()
+                .up()
                 .ele('DatiRiepilogo')
                     .ele('AliquotaIVA').txt(dati.aliquotaIVARiepilogo1).up()
                     .ele('ImponibileImporto').txt(dati.imponibileImporto1).up()
