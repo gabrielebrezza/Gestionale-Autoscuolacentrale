@@ -257,7 +257,9 @@ async function creaFatturaCortesia(dati, iscrizione) {
             if(iscrizione){
                 const utente = await utenti.findOne({ "cFiscale": dati.codiceFiscaleCliente });
                 const patente = utente.patente.find(item => item.pagato === true && item.bocciato === null);
-                dati.patente =`iscrizione patente ${patente.tipo}` ;
+                dati.descrizionePdf =`iscrizione patente ${patente.tipo}` ;
+            }else{
+                dati.descrizionePdf = dati.descrizione1;
             }
 
             const doc = new PDFDocument();
@@ -287,7 +289,7 @@ async function creaFatturaCortesia(dati, iscrizione) {
             doc.text('Data             Descrizione');
             doc.fontSize(9);
             doc.text(`${dati.data}`, { continued: true });
-            doc.text(`                                      ${dati.patente}`)
+            doc.text(`                                      ${dati.descrizionePdf}`)
             doc.moveDown();
             doc.moveDown();
             doc.text('TOTALE IMPONIBILE: ', { continued: true });
@@ -296,7 +298,7 @@ async function creaFatturaCortesia(dati, iscrizione) {
             doc.text(`${(Number(dati.imponibileImporto1) * 0.22).toFixed(2)} €`);
             doc.moveDown();
             doc.text(`anticipazioni conto cliente`);
-            doc.text(`esclusiva iva art.15 dpr 633/72 diritti della Motorizzazione e imposte di bollo €`);
+            doc.text(`esclusiva iva art.15 dpr 633/72 diritti della Motorizzazione e imposte di bollo € ${dati.prezzoUnitario1}`);
             doc.moveDown();
             doc.text('TOTALE FATTURA: ', { continued: true });
             doc.text(`${dati.ImportoTotaleDocumento} €`);

@@ -137,18 +137,11 @@
                 <input type="text" id="ImportoTotaleDocumento" name="ImportoTotaleDocumento" value="<%= iscrizione ? Number(importo).toFixed(2) : '' %>">
             </fieldset>
 
-            <fieldset>
-                <legend>Dati Beni e Servizi</legend>
-                <fieldset>
                     <!-- linea 1 -->
-                    <legend><%= iscrizione ? 'Pagamento bollettini': 'Costo servizi soggetto ad iva' %></legend>
-
-                    <label for="descrizione">Descrizione:</label><br>
-                    <input type="text" id="descrizione" name="descrizione1" value="<%= iscrizione ? 'Pagamento bollettini c/c 9001 (diritti Motorizzazione) e c/c 4028 (imposta di bollo)': '' %>"><br><br>
+                    <input type="hidden" id="descrizione" name="descrizione1" value="<%= iscrizione ? 'Pagamento bollettini c/c 9001 (diritti Motorizzazione) e c/c 4028 (imposta di bollo)': 'Servizio generazione IUV' %>">
                     <input type="hidden" id="prezzoUnitario1" name="prezzoUnitario1" value="<%= iscrizione ? '42.20' : '' %>">
                     <input type="hidden" id="prezzoTotale1" name="prezzoTotale1" value="<%= iscrizione ? '42.20' : '' %>">
                     <input type="hidden" id="aliquotaIVA" name="aliquotaIVA1" value="<%= iscrizione ? '0.00' : '22.00' %>">
-                </fieldset>
                 <fieldset>
                     <!-- linea 2 -->
                     <legend>Anticipazioni Conto Cliente</legend>
@@ -160,7 +153,6 @@
                     <input type="hidden" id="prezzoTotale2" name="prezzoTotale2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
 
                     <input type="hidden" id="aliquotaIVA" name="aliquotaIVA2" value="<%= iscrizione ? '22.00' : '0.00' %>">
-                </fieldset>
                     <!-- dati riepilogo riga 1 -->
                     <input type="hidden" id="aliquotaIVARiepilogo1" name="aliquotaIVARiepilogo1" value="22.00">
                     <input type="hidden" id="imponibileImporto1" name="imponibileImporto1" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
