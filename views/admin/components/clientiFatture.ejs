@@ -1,0 +1,36 @@
+<link rel="stylesheet" href="\styles\admin\components\clientiFatture.css">
+<script src="/scripts/admin/components/clientiFatture.js"></script>
+<section>
+    <details class="clienti">
+        <summary>
+            <span class="material-symbols-outlined">
+                group
+            </span>
+        </summary>
+        <details id="nuovoCliente">
+            <summary>
+                <input type="radio" class="clientRadioBtn" data-dati="" name="cliente" checked>
+                Nuovo Cliente
+            </summary>
+        </details>
+                <% clienti.forEach((cliente, index) => { %>
+            <details class="cliente">
+                <summary>
+                    <input type="radio" class="clientRadioBtn" data-dati="<%= JSON.stringify(cliente) %>" name="cliente" id="cliente<%= index %>">
+                    <%= cliente.cognome + ' ' + cliente.nome %> 
+                </summary>
+                <p>codice destinatario: <%= cliente.cDestinatario %></p>
+                <p>codice fiscale: <%= cliente.cFiscale %></p>
+                <p>Partita Iva: <%= cliente.pIva %></p>
+                <p>Id Paese: <%= cliente.idPaese %></p>
+                <p>email: <%= cliente.email %></p>
+                <h3>Residenza</h3>
+                    <p>indirizzo: <%= cliente.residenza.indirizzo %></p>
+                    <p>cap: <%= cliente.residenza.cap %></p>
+                    <p>comune: <%= cliente.residenza.comune %></p>
+                    <p>provincia: <%= cliente.residenza.provincia %></p>
+                    <p>nazione: <%= cliente.residenza.nazione %></p>
+            </details>
+        <% }); %>
+    </details>
+</section>

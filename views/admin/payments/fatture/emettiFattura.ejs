@@ -5,80 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Generatore Fattura Elettronica</title>
     <link rel="stylesheet" href="\styles\admin\payments\fatture\emettiFattura.css">
-    <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" rel="stylesheet">
 </head>
 <body>
     <%- include('../../components/header.ejs') %>
     <% if (!iscrizione) { %>
-        <div>
-            <details class="clienti">
-                <summary>
-                    <span class="material-symbols-outlined">
-                        group
-                    </span>
-                </summary>
-                <% clienti.forEach((cliente, index) => { %>
-                    <details>
-                        <summary>
-                            <input type="radio" class="clientRadioBtn" data-dati="<%= JSON.stringify(cliente) %>" name="cliente" id="cliente<%= index %>">
-                            <%= cliente.cognome + ' ' + cliente.nome %> 
-                        </summary>
-                        <p>codice destinatario: <%= cliente.cDestinatario %></p>
-                        <p>codice fiscale: <%= cliente.cFiscale %></p>
-                        <p>Partita Iva: <%= cliente.pIva %></p>
-                        <p>Id Paese: <%= cliente.idPaese %></p>
-                        <p>email: <%= cliente.email %></p>
-                        <h3>Residenza</h3>
-                            <p>indirizzo: <%= cliente.residenza.indirizzo %></p>
-                            <p>cap: <%= cliente.residenza.cap %></p>
-                            <p>comune: <%= cliente.residenza.comune %></p>
-                            <p>provincia: <%= cliente.residenza.provincia %></p>
-                            <p>nazione: <%= cliente.residenza.nazione %></p>
-                    </details>
-                <% }); %>
-            </details>
-        </div>
+        <script src="/scripts/admin/payments/fatture/autocompileFatture.js"></script>
+        <%- include('../../components/clientiFatture.ejs') %>
     <% } %>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const codiceDestinatarioInput = document.getElementById('codiceDestinatario');
-        const nomeClienteInput = document.getElementById('nomeCliente');
-        const cognomeClienteInput = document.getElementById('cognomeCliente');
-        const codiceFiscaleClienteInput = document.getElementById('codiceFiscaleCliente');
-        const emailClienteInput = document.getElementById('emailCliente');
-        const indirizzoSedeClienteInput = document.getElementById('indirizzoSedeCliente');
-        const capSedeClienteInput = document.getElementById('capSedeCliente');
-        const comuneSedeClienteInput = document.getElementById('comuneSedeCliente');
-        const provinciaSedeClienteInput = document.getElementById('provinciaSedeCliente');
-        const nazioneSedeClienteInput = document.getElementById('nazioneSedeCliente');
-        const IdPaeseClienteInput = document.getElementById('IdPaeseCliente');
-        const partitaIvaClienteInput = document.getElementById('partitaIvaCliente');
-        const clientRadioBtn = document.querySelectorAll('.clientRadioBtn');
-        for (const btn of clientRadioBtn) {
-            btn.addEventListener('change', () => {
-                if (btn.checked) {
-                    const data = JSON.parse(btn.dataset.dati);
-                    codiceDestinatarioInput.value = data.cDestinatario;
-                    nomeClienteInput.value = data.nome;
-                    cognomeClienteInput.value = data.cognome;
-                    codiceFiscaleClienteInput.value = data.cFiscale;
-                    emailClienteInput.value = data.email;
-                    indirizzoSedeClienteInput.value = data.residenza.indirizzo;
-                    capSedeClienteInput.value = data.residenza.cap;
-                    comuneSedeClienteInput.value = data.residenza.comune;
-                    provinciaSedeClienteInput.value = data.residenza.provincia;
-                    nazioneSedeClienteInput.value = data.residenza.nazione;
-                    IdPaeseClienteInput.value = data.idPaese;
-                    partitaIvaClienteInput.value = data.pIva;
-                }
-            });
-        }
-    });
-    </script>
-
     <main>
-        
         <form id="fatturaForm" method="POST" action="/createFattura">
             <fieldset>
                 <legend>Dati Trasmissione</legend>
@@ -137,79 +71,49 @@
                 <input type="text" id="ImportoTotaleDocumento" name="ImportoTotaleDocumento" value="<%= iscrizione ? Number(importo).toFixed(2) : '' %>">
             </fieldset>
 
-                    <!-- linea 1 -->
-                    <input type="hidden" id="descrizione" name="descrizione1" value="<%= iscrizione ? 'Pagamento bollettini c/c 9001 (diritti Motorizzazione) e c/c 4028 (imposta di bollo)': 'Servizio generazione IUV' %>">
-                    <input type="hidden" id="prezzoUnitario1" name="prezzoUnitario1" value="<%= iscrizione ? '42.20' : '' %>">
-                    <input type="hidden" id="prezzoTotale1" name="prezzoTotale1" value="<%= iscrizione ? '42.20' : '' %>">
-                    <input type="hidden" id="aliquotaIVA" name="aliquotaIVA1" value="<%= iscrizione ? '0.00' : '22.00' %>">
-                <fieldset>
-                    <!-- linea 2 -->
-                    <legend>Anticipazioni Conto Cliente</legend>
-                    <input type="hidden" id="descrizione" name="descrizione2" value="<%= iscrizione ? 'Costo Servizio' : 'anticipazioni conto cliente iva esclusa art.15 dpr 633/72' %>">
-
-                    <label for="prezzoUnitario2">Prezzo Unitario:</label><br>
-                    <input type="text" id="prezzoUnitario2" name="prezzoUnitario2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
-
-                    <input type="hidden" id="prezzoTotale2" name="prezzoTotale2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
-
-                    <input type="hidden" id="aliquotaIVA" name="aliquotaIVA2" value="<%= iscrizione ? '22.00' : '0.00' %>">
-                    <!-- dati riepilogo riga 1 -->
-                    <input type="hidden" id="aliquotaIVARiepilogo1" name="aliquotaIVARiepilogo1" value="22.00">
-                    <input type="hidden" id="imponibileImporto1" name="imponibileImporto1" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
-                    <input type="hidden" id="imposta1" name="imposta1" value="<%= iscrizione ? ((((importo-42.20)/1.22)*22)/100).toFixed(2) : '' %>">
-                    <input type="hidden" id="esigibilitaIVA1" name="esigibilitaIVA1" value="I">
-                    <!-- dati riepilogo riga 2 -->
-                    <input type="hidden" id="aliquotaIVARiepilogo2" name="aliquotaIVARiepilogo2" value="0.00">
-                    <input type="hidden" id="imponibileImporto2" name="imponibileImporto2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
-                    <input type="hidden" id="imposta2" name="imposta2" value="0.00">
-                    <input type="hidden" id="RiferimentoNormativo2" name="RiferimentoNormativo2" value="Anticipazioni conto cliente art. 15 DPR 633/72">
+                <!-- linea 1 -->
+                <input type="hidden" id="descrizione" name="descrizione1" value="<%= iscrizione ? 'Pagamento bollettini c/c 9001 (diritti Motorizzazione) e c/c 4028 (imposta di bollo)': 'Servizio generazione IUV' %>">
+                <input type="hidden" id="prezzoUnitario1" name="prezzoUnitario1" value="<%= iscrizione ? '42.20' : '' %>">
+                <input type="hidden" id="prezzoTotale1" name="prezzoTotale1" value="<%= iscrizione ? '42.20' : '' %>">
+                <input type="hidden" id="aliquotaIVA" name="aliquotaIVA1" value="<%= iscrizione ? '0.00' : '22.00' %>">
+            
+            <fieldset>
+                <!-- linea 2 -->
+                <legend>Anticipazioni Conto Cliente</legend>
+                <input type="hidden" id="descrizione" name="descrizione2" value="<%= iscrizione ? 'Costo Servizio' : 'anticipazioni conto cliente iva esclusa art.15 dpr 633/72' %>">
+                <label for="prezzoUnitario2">Prezzo Unitario:</label><br>
+                <input type="text" id="prezzoUnitario2" name="prezzoUnitario2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
+                <input type="hidden" id="prezzoTotale2" name="prezzoTotale2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
+                <input type="hidden" id="aliquotaIVA" name="aliquotaIVA2" value="<%= iscrizione ? '22.00' : '0.00' %>">
             </fieldset>
+
+            <!-- dati riepilogo riga 1 -->
+            <input type="hidden" id="aliquotaIVARiepilogo1" name="aliquotaIVARiepilogo1" value="22.00">
+            <input type="hidden" id="imponibileImporto1" name="imponibileImporto1" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
+            <input type="hidden" id="imposta1" name="imposta1" value="<%= iscrizione ? ((((importo-42.20)/1.22)*22)/100).toFixed(2) : '' %>">
+            <input type="hidden" id="esigibilitaIVA1" name="esigibilitaIVA1" value="I">
+            
+            <!-- dati riepilogo riga 2 -->
+            <input type="hidden" id="aliquotaIVARiepilogo2" name="aliquotaIVARiepilogo2" value="0.00">
+            <input type="hidden" id="imponibileImporto2" name="imponibileImporto2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
+            <input type="hidden" id="imposta2" name="imposta2" value="0.00">
+            <input type="hidden" id="RiferimentoNormativo2" name="RiferimentoNormativo2" value="Anticipazioni conto cliente art. 15 DPR 633/72">
 
             <input type="hidden" id="condizioniPagamento" name="condizioniPagamento" value="TP02">
             <input type="hidden" id="modalitaPagamento" name="modalitaPagamento" value="<%= iscrizione ? 'MP08' : 'MP05' %>">
             <input type="hidden" id="importoPagamento" name="importoPagamento" value="<%= iscrizione ? Number(importo).toFixed(2) : '' %>">
+            
             <% if (!iscrizione) { %>
                 <div class="field" style="display: flex;">
                     <label for="saveCustomerData">Salva dati cliente:</label><br>
                     <input type="checkbox" id="saveCustomerData" name="saveCustomerData" value="save">
                 </div>
             <% } %>
+
             <input type="hidden" id="iscrizione" name="iscrizione" value="<%= iscrizione %>">
             <input type="submit" id="submitBtn" value="Genera Fattura">
         </form>
     </main>
     <script src="/scripts/utils/delayBtn.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const ImportoTotaleDocumento = document.getElementById('ImportoTotaleDocumento');
-            const prezzoUnitario2Input = document.getElementById('prezzoUnitario2');
-            function autocompleteImports(){
-                const importo = Number(ImportoTotaleDocumento.value).toFixed(2);
-                const prezzoUnitario2 = Number(prezzoUnitario2Input.value).toFixed(2);
-                if(importo != 0 && prezzoUnitario2 != 0){
-                    const prezzoUnitario1 = document.getElementById('prezzoUnitario1');
-                    const prezzoTotale1 = document.getElementById('prezzoTotale1');
-                    const prezzoTotale2 = document.getElementById('prezzoTotale2');
-                    const imponibileImporto1 = document.getElementById('imponibileImporto1');
-                    const imposta1 = document.getElementById('imposta1');
-                    const imponibileImporto2 = document.getElementById('imponibileImporto2');
-                    const importoPagamento = document.getElementById('importoPagamento');
-                    prezzoUnitario1.value = ((importo-prezzoUnitario2)/1.22).toFixed(2)
-                    prezzoTotale1.value = prezzoUnitario1.value;
-                    imponibileImporto1.value = prezzoUnitario1.value;
-                    imponibileImporto2.value = prezzoUnitario2;
-                    prezzoTotale2.value = prezzoUnitario2;
-                    prezzoUnitario2Input.value = prezzoUnitario2;
-                    ImportoTotaleDocumento.value = importo;
-                    importoPagamento.value = importo;
-                    imposta1.value = (((prezzoUnitario1.value)*22)/100).toFixed(2);
-                }
-            }
-
-            prezzoUnitario2Input.addEventListener('change', autocompleteImports);
-            ImportoTotaleDocumento.addEventListener('change', autocompleteImports);
-        });
-    </script>
-    
 </body>
 </html>
