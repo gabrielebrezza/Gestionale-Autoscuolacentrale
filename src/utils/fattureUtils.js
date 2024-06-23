@@ -298,7 +298,7 @@ async function creaFatturaCortesia(dati, iscrizione) {
             doc.text(`${(Number(dati.imponibileImporto1) * 0.22).toFixed(2)} €`);
             doc.moveDown();
             doc.text(`anticipazioni conto cliente`);
-            doc.text(`esclusiva iva art.15 dpr 633/72 diritti della Motorizzazione e imposte di bollo € ${dati.prezzoUnitario1}`);
+            doc.text(`esclusiva iva art.15 dpr 633/72 diritti della Motorizzazione e imposte di bollo € ${dati.prezzoUnitario2}`);
             doc.moveDown();
             doc.text('TOTALE FATTURA: ', { continued: true });
             doc.text(`${dati.ImportoTotaleDocumento} €`);
