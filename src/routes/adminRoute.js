@@ -550,7 +550,7 @@ router.post('/downloadFatture', authenticateJWT, async (req, res) => {
     }
 
     res.set('Content-Type', 'application/zip');
-    res.set('Content-Disposition', 'attachment; filename="fatture_iscrizioni.zip"');
+    res.set('Content-Disposition', 'attachment; filename="fatture_gestionale.zip"');
 
     const zip = archiver('zip');
     zip.pipe(res);

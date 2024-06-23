@@ -5,19 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Generatore Fattura Elettronica</title>
     <link rel="stylesheet" href="\styles\admin\payments\fatture\emettiFattura.css">
+    <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" rel="stylesheet">
 </head>
 <body>
     <%- include('../../components/header.ejs') %>
     <% if (!iscrizione) { %>
-        <div class="clienti">
-            <details>
-                <summary> Clienti </summary>
+        <div>
+            <details class="clienti">
+                <summary>
+                    <span class="material-symbols-outlined">
+                        group
+                    </span>
+                </summary>
                 <% clienti.forEach((cliente, index) => { %>
                     <details>
-                        
                         <summary>
                             <input type="radio" class="clientRadioBtn" data-dati="<%= JSON.stringify(cliente) %>" name="cliente" id="cliente<%= index %>">
-                             <%= cliente.cognome + ' ' + cliente.nome %> </summary>
+                            <%= cliente.cognome + ' ' + cliente.nome %> 
+                        </summary>
                         <p>codice destinatario: <%= cliente.cDestinatario %></p>
                         <p>codice fiscale: <%= cliente.cFiscale %></p>
                         <p>Partita Iva: <%= cliente.pIva %></p>
@@ -135,20 +140,18 @@
             <fieldset>
                 <legend>Dati Beni e Servizi</legend>
                 <fieldset>
+                    <!-- linea 1 -->
                     <legend><%= iscrizione ? 'Pagamento bollettini': 'Costo servizi soggetto ad iva' %></legend>
 
                     <label for="descrizione">Descrizione:</label><br>
                     <input type="text" id="descrizione" name="descrizione1" value="<%= iscrizione ? 'Pagamento bollettini c/c 9001 (diritti Motorizzazione) e c/c 4028 (imposta di bollo)': '' %>"><br><br>
-
-                    <label for="prezzoUnitario1">Prezzo Unitario:</label><br>
-                    <input type="text" id="prezzoUnitario1" name="prezzoUnitario1" value="<%= iscrizione ? '42.20' : '' %>"><br><br>
-
+                    <input type="hidden" id="prezzoUnitario1" name="prezzoUnitario1" value="<%= iscrizione ? '42.20' : '' %>">
                     <input type="hidden" id="prezzoTotale1" name="prezzoTotale1" value="<%= iscrizione ? '42.20' : '' %>">
-
                     <input type="hidden" id="aliquotaIVA" name="aliquotaIVA1" value="<%= iscrizione ? '0.00' : '22.00' %>">
                 </fieldset>
                 <fieldset>
-                    <legend>anticipazioni conto cliente</legend>
+                    <!-- linea 2 -->
+                    <legend>Anticipazioni Conto Cliente</legend>
                     <input type="hidden" id="descrizione" name="descrizione2" value="<%= iscrizione ? 'Costo Servizio' : 'anticipazioni conto cliente iva esclusa art.15 dpr 633/72' %>">
 
                     <label for="prezzoUnitario2">Prezzo Unitario:</label><br>
@@ -158,51 +161,21 @@
 
                     <input type="hidden" id="aliquotaIVA" name="aliquotaIVA2" value="<%= iscrizione ? '22.00' : '0.00' %>">
                 </fieldset>
-                <fieldset>
-                    <legend>Dati Riepilogo</legend>
-
+                    <!-- dati riepilogo riga 1 -->
                     <input type="hidden" id="aliquotaIVARiepilogo1" name="aliquotaIVARiepilogo1" value="22.00">
-
-                    <label for="imponibileImporto1">Imponibile Importo:</label><br>
-                    <input type="text" id="imponibileImporto1" name="imponibileImporto1" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
-
-                    <label for="imposta1">Imposta:</label><br>
-                    <input type="text" id="imposta1" name="imposta1" value="<%= iscrizione ? ((((importo-42.20)/1.22)*22)/100).toFixed(2) : '' %>"><br><br>
-
-                    <label for="esigibilitaIVA1">Esigibilita IVA:</label><br>
-                    <input type="text" id="esigibilitaIVA1" name="esigibilitaIVA1" value="I"><br><br>
-
-                </fieldset>
-                <fieldset>
-                    <legend>Dati Riepilogo</legend>
+                    <input type="hidden" id="imponibileImporto1" name="imponibileImporto1" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
+                    <input type="hidden" id="imposta1" name="imposta1" value="<%= iscrizione ? ((((importo-42.20)/1.22)*22)/100).toFixed(2) : '' %>">
+                    <input type="hidden" id="esigibilitaIVA1" name="esigibilitaIVA1" value="I">
+                    <!-- dati riepilogo riga 2 -->
                     <input type="hidden" id="aliquotaIVARiepilogo2" name="aliquotaIVARiepilogo2" value="0.00">
-
-                    <label for="imponibileImporto2">Imponibile Importo:</label><br>
-                    <input type="text" id="imponibileImporto2" name="imponibileImporto2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
-
-                    <label for="imposta2">Imposta:</label><br>
-                    <input type="text" id="imposta2" name="imposta2" value="0.00"><br><br>
-
-                    <label for="RiferimentoNormativo2">Riferimento Normativo:</label><br>
-                    <input type="text" id="RiferimentoNormativo2" name="RiferimentoNormativo2" value="Anticipazioni conto cliente art. 15 DPR 633/72"><br><br>
-
-                </fieldset>
+                    <input type="hidden" id="imponibileImporto2" name="imponibileImporto2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
+                    <input type="hidden" id="imposta2" name="imposta2" value="0.00">
+                    <input type="hidden" id="RiferimentoNormativo2" name="RiferimentoNormativo2" value="Anticipazioni conto cliente art. 15 DPR 633/72">
             </fieldset>
 
-            <fieldset>
-                <legend>Dati Pagamento</legend>
-                <label for="condizioniPagamento">Condizioni Pagamento:</label><br>
-                <input type="text" id="condizioniPagamento" name="condizioniPagamento" value="TP02"><br><br>
-
-                <fieldset>
-                    <legend>Dettaglio Pagamento</legend>
-                    <label for="modalitaPagamento">Modalita Pagamento:</label><br>
-                    <input type="text" id="modalitaPagamento" name="modalitaPagamento" value="<%= iscrizione ? 'MP08' : 'MP05' %>"><br><br>
-
-                    <label for="importoPagamento">Importo Pagamento:</label><br>
-                    <input type="text" id="importoPagamento" name="importoPagamento" value="<%= iscrizione ? Number(importo).toFixed(2) : '' %>"><br><br>
-                </fieldset>
-            </fieldset>
+            <input type="hidden" id="condizioniPagamento" name="condizioniPagamento" value="TP02">
+            <input type="hidden" id="modalitaPagamento" name="modalitaPagamento" value="<%= iscrizione ? 'MP08' : 'MP05' %>">
+            <input type="hidden" id="importoPagamento" name="importoPagamento" value="<%= iscrizione ? Number(importo).toFixed(2) : '' %>">
             <% if (!iscrizione) { %>
                 <div class="field" style="display: flex;">
                     <label for="saveCustomerData">Salva dati cliente:</label><br>

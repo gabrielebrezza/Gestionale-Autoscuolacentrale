@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for(const row of rows){
             const dataFattura = new Date(row.getElementsByTagName('td')[1].textContent.split('/').reverse().join('-'));
             if(fromDate <= dataFattura && dataFattura <= toDate){
-                row.style.display = 'flex'
+                row.style.display = 'table-row'
             }else{
                 row.style.display = 'none'
             }
