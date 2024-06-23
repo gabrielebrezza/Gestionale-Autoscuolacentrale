@@ -20,6 +20,8 @@
                              <%= cliente.cognome + ' ' + cliente.nome %> </summary>
                         <p>codice destinatario: <%= cliente.cDestinatario %></p>
                         <p>codice fiscale: <%= cliente.cFiscale %></p>
+                        <p>Partita Iva: <%= cliente.pIva %></p>
+                        <p>Id Paese: <%= cliente.idPaese %></p>
                         <p>email: <%= cliente.email %></p>
                         <h3>Residenza</h3>
                             <p>indirizzo: <%= cliente.residenza.indirizzo %></p>
@@ -45,6 +47,8 @@
         const comuneSedeClienteInput = document.getElementById('comuneSedeCliente');
         const provinciaSedeClienteInput = document.getElementById('provinciaSedeCliente');
         const nazioneSedeClienteInput = document.getElementById('nazioneSedeCliente');
+        const IdPaeseClienteInput = document.getElementById('IdPaeseCliente');
+        const partitaIvaClienteInput = document.getElementById('partitaIvaCliente');
         const clientRadioBtn = document.querySelectorAll('.clientRadioBtn');
         for (const btn of clientRadioBtn) {
             btn.addEventListener('change', () => {
@@ -60,6 +64,8 @@
                     comuneSedeClienteInput.value = data.residenza.comune;
                     provinciaSedeClienteInput.value = data.residenza.provincia;
                     nazioneSedeClienteInput.value = data.residenza.nazione;
+                    IdPaeseClienteInput.value = data.idPaese;
+                    partitaIvaClienteInput.value = data.pIva;
                 }
             });
         }
@@ -71,25 +77,9 @@
         <form id="fatturaForm" method="POST" action="/createFattura">
             <fieldset>
                 <legend>Dati Trasmissione</legend>
-                <input type="hidden" name="IdPaese" id="IdPaese" value="IT">
-                <input type="hidden" name="IdCodice" id="IdCodice" value="06498290011">
-                <input type="hidden" id="formatoTrasmissione" name="formatoTrasmissione" value="FPR12">
-
                 <label for="codiceDestinatario">Codice Destinatario:</label><br>
                 <input type="text" id="codiceDestinatario" name="codiceDestinatario" value="<%= iscrizione ? '0000000' : '' %>"><br><br>
-
-                <input type="hidden" id="telefonoTrasmittente" name="telefonoTrasmittente" value="0116507136">
-                <input type="hidden" id="emailTrasmittente" name="emailTrasmittente" value="autoscuola.centrale@libero.it">
-                <input type="hidden" id="codiceFiscaleCedente" name="codiceFiscaleCedente" value="DMLNTN67S12L738X">    
-                <input type="hidden" id="denominazioneCedente" name="denominazioneCedente" value="D'Amelio Antonio">    
-                <input type="hidden" id="regimeFiscaleCedente" name="regimeFiscaleCedente" value="RF01">
-                <input type="hidden" id="indirizzoSedeCedente" name="indirizzoSedeCedente" value="Corso Guglielmo Marconi, 33">
-                <input type="hidden" id="capSedeCedente" name="capSedeCedente" value="10125">
-                <input type="hidden" id="comuneSedeCedente" name="comuneSedeCedente" value="TORINO">
-                <input type="hidden" id="provinciaSedeCedente" name="provinciaSedeCedente" value="TO">
-                <input type="hidden" id="nazioneSedeCedente" name="nazioneSedeCedente" value="IT">
             </fieldset>
-                
             <fieldset>
                 <legend>Dati Cessionario/Committente</legend>
 
@@ -134,9 +124,7 @@
 
             <fieldset>
                 <legend>Dati Generici Documento</legend>
-                <input type="hidden" id="tipoDocumento" name="tipoDocumento" value="TD01">
-                <input type="hidden" id="divisa" name="divisa" value="EUR">
-
+                
                 <label for="data">Data:</label><br>
                 <input type="date" id="data" name="data" value="<%= iscrizione ? data : '' %>"><br><br>
 
@@ -148,7 +136,6 @@
                 <legend>Dati Beni e Servizi</legend>
                 <fieldset>
                     <legend><%= iscrizione ? 'Pagamento bollettini': 'Costo servizi soggetto ad iva' %></legend>
-                    <input type="hidden" id="numeroLinea1" name="numeroLinea1" value="1">
 
                     <label for="descrizione">Descrizione:</label><br>
                     <input type="text" id="descrizione" name="descrizione1" value="<%= iscrizione ? 'Pagamento bollettini c/c 9001 (diritti Motorizzazione) e c/c 4028 (imposta di bollo)': '' %>"><br><br>
@@ -158,16 +145,10 @@
 
                     <input type="text" id="prezzoTotale1" name="prezzoTotale1" value="<%= iscrizione ? '42.20' : '' %>">
 
-                    <% if (iscrizione) { %>
-                        <input type="hidden" id="aliquotaIVA" name="aliquotaIVA1" value="0.00">
-                        <input type="hidden" id="natura" name="natura1" value="N1">
-                    <% }else{ %>
-                        <input type="hidden" id="aliquotaIVA" name="aliquotaIVA1" value="22.00">
-                    <% } %>
+                    <input type="hidden" id="aliquotaIVA" name="aliquotaIVA1" value="<%= iscrizione ? '0.00' : '22.00' %>">
                 </fieldset>
                 <fieldset>
                     <legend>anticipazioni conto cliente</legend>
-                    <input type="hidden" id="numeroLinea2" name="numeroLinea2" value="2">
                     <input type="hidden" id="descrizione" name="descrizione2" value="<%= iscrizione ? 'Costo Servizio' : 'anticipazioni conto cliente iva esclusa art.15 dpr 633/72' %>">
 
                     <label for="prezzoUnitario2">Prezzo Unitario:</label><br>
@@ -175,12 +156,7 @@
 
                     <input type="hidden" id="prezzoTotale2" name="prezzoTotale2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
 
-                    <% if (iscrizione) { %>
-                        <input type="hidden" id="aliquotaIVA" name="aliquotaIVA2" value="22.00">
-                    <% }else{ %>
-                        <input type="hidden" id="aliquotaIVA" name="aliquotaIVA2" value="0.00">
-                        <input type="hidden" id="natura" name="natura2" value="N1">
-                    <% } %>
+                    <input type="hidden" id="aliquotaIVA" name="aliquotaIVA2" value="<%= iscrizione ? '22.00' : '0.00' %>">
                 </fieldset>
                 <fieldset>
                     <legend>Dati Riepilogo</legend>
@@ -199,11 +175,7 @@
                 </fieldset>
                 <fieldset>
                     <legend>Dati Riepilogo</legend>
-                    <label for="aliquotaIVARiepilogo2">Aliquota IVA:</label><br>
-                    <input type="text" id="aliquotaIVARiepilogo2" name="aliquotaIVARiepilogo2" value="0.00"><br><br>
-
-                    <label for="natura2">Imponibile Importo:</label><br>
-                    <input type="text" id="natura2" name="natura2" value="N1"><br><br>
+                    <input type="hidden" id="aliquotaIVARiepilogo2" name="aliquotaIVARiepilogo2" value="0.00">
 
                     <label for="imponibileImporto2">Imponibile Importo:</label><br>
                     <input type="text" id="imponibileImporto2" name="imponibileImporto2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
