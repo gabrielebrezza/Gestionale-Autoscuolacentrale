@@ -466,7 +466,7 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
       numero: parseInt(dati.progressivoInvio.replace(/\D/g, ''), 10),
       importo: dati.importoPagamento,
       data: dataFatturazione,
-      nomeFile: `${dati.IdPaese}${dati.IdCodice}_${dati.progressivoInvio}.xml`,
+      nomeFile: `IT06498290011_${dati.progressivoInvio}.xml`,
     });
     await  nuovaFattura.save()                
   }catch(error){
