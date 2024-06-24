@@ -1,5 +1,24 @@
+.clienti::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.clienti::-webkit-scrollbar-track {
+    background: #5681a9;
+    border-radius: 10px;
+}
+
+.clienti::-webkit-scrollbar-thumb {
+    background: #71a1cb;
+    border-radius: 10px;
+}
+
+.clienti::-webkit-scrollbar-thumb:hover {
+    background: #2c98f6;
+}
+
 .clienti {
-    z-index: 654;
+    z-index: 2;
     position: fixed;
     right: 0;
     top: 0;
@@ -36,46 +55,38 @@
     transition: .5s;
 }
 .clienti[open] summary span{
-    transform: rotateY(50deg);
+    transform: rotateY(35deg);
     color: #ffffff68;
 }
 .clienti[open] > summary {
-    margin-left: 78%;
+    margin-left: 75%;
 }
 
-.clienti > summary {
-    list-style: none;
+.cliente{
+    margin-block: 25px;
+}
+.cliente label{
+    font-size: 1.3rem;
     cursor: pointer;
     user-select: none;
-}
-.clienti  h3{
-    color: #ffffff9e;
-}
-.clienti  h3 ~ *{
-    padding-left: 15px;
-}
-.clienti > details > *:not(summary) {
-    margin-left: 50px;
-}
-.clienti > details{
-    transition: .15s;
-    border: 2px solid #0000;
     transition: .5s;
 }
-.clienti > details > summary{
-    font-size: 1.3rem;
-}
-.clienti > details[open]:not(#nuovoCliente){
-    border-block: 2px solid #fff;
-}
-.clienti > details > summary{
-    transition: margin 0.15s ease-out;
-}
-.clienti > details[open]:not(#nuovoCliente) summary {
-    margin-bottom: 10px;
+
+.cliente label:hover{
+    font-size: 1.5rem;
+    
 }
 
 input[type="radio"]{
     cursor: pointer;
     accent-color: green;
+}
+
+@media (max-height: 870px) {
+    .clienti:not([open]) {
+        padding: 25px;
+    }
+    .clienti summary span{
+        font-size: 2rem;
+    }
 }

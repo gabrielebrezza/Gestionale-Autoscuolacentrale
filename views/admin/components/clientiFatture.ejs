@@ -7,30 +7,15 @@
                 group
             </span>
         </summary>
-        <details id="nuovoCliente">
-            <summary>
-                <input type="radio" class="clientRadioBtn" data-dati="" name="cliente" checked>
-                Nuovo Cliente
-            </summary>
-        </details>
-                <% clienti.forEach((cliente, index) => { %>
-            <details class="cliente">
-                <summary>
-                    <input type="radio" class="clientRadioBtn" data-dati="<%= JSON.stringify(cliente) %>" name="cliente" id="cliente<%= index %>">
-                    <%= cliente.cognome + ' ' + cliente.nome %> 
-                </summary>
-                <p>codice destinatario: <%= cliente.cDestinatario %></p>
-                <p>codice fiscale: <%= cliente.cFiscale %></p>
-                <p>Partita Iva: <%= cliente.pIva %></p>
-                <p>Id Paese: <%= cliente.idPaese %></p>
-                <p>email: <%= cliente.email %></p>
-                <h3>Residenza</h3>
-                    <p>indirizzo: <%= cliente.residenza.indirizzo %></p>
-                    <p>cap: <%= cliente.residenza.cap %></p>
-                    <p>comune: <%= cliente.residenza.comune %></p>
-                    <p>provincia: <%= cliente.residenza.provincia %></p>
-                    <p>nazione: <%= cliente.residenza.nazione %></p>
-            </details>
+        <div class="cliente" id="nuovoCliente">
+            <label for="clienteNuovo">Nuovo Cliente</label>
+            <input type="radio" class="clientRadioBtn" data-dati="" name="cliente" id="clienteNuovo" checked>
+        </div>
+        <% clienti.forEach((cliente, index) => { %>
+            <div class="cliente">
+                <label for="cliente<%= index %>"><%= cliente.cognome + ' ' + cliente.nome %></label>
+                <input type="radio" class="clientRadioBtn" data-dati="<%= JSON.stringify(cliente) %>" name="cliente" id="cliente<%= index %>">
+            </div>
         <% }); %>
     </details>
 </section>
