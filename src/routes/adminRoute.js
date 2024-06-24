@@ -414,8 +414,8 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
     dati.numeroDocumento = `i00${numeroIscrizioni}`;
   }else{
     const {numeroGeneriche} = await numeroFattura.findOne();
-    dati.progressivoInvio = `g00${numeroGeneriche}`;
-    dati.numeroDocumento = `g00${numeroGeneriche}`;
+    dati.progressivoInvio = `m00${numeroGeneriche}`;
+    dati.numeroDocumento = `m00${numeroGeneriche}`;
   }
   try {
     const result = await creaFatturaElettronica(dati, iscrizione);
