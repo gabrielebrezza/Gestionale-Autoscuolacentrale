@@ -1,0 +1,111 @@
+#searchUsersBtn{
+    z-index: 2;
+    position: fixed;
+    top: 50px;
+    right: 25px;
+    cursor: pointer;
+}
+#searchUsersBtn span{
+    font-size: 3rem;
+    color: #f1f1f1;
+}
+#blurredBg{
+    display: none;
+    z-index: 2;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #f1f1f1;
+    opacity: 0;
+    transition: opacity .5s;
+}
+#searchDataContainer{
+    z-index: 2;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity .5s;
+}
+
+#searchDataForm{
+    z-index: 3;
+    max-width: 400px;
+    width: 100%;
+    background: #5681a9;
+    border-radius: 10px;
+    padding: 35px;
+}
+#searchDataForm .field:has(:not(#closeSearchFormBtn)){
+    width: 100%;
+    margin-block: 50px;
+}
+#searchDataForm .field:has(:not(#closeSearchFormBtn, h3, button)){
+    display: flex;
+    flex-direction: column;
+    height: 30px;
+}
+#searchDataForm .field:has(#closeSearchFormBtn){
+    cursor: pointer;
+    display: flex;
+    justify-content: end;
+    color: #f1f1f1;
+}
+#searchDataForm .field h3{
+    text-align: center;
+    font-size: 1.4rem;
+    color: #f1f1f1;
+}
+#searchDataForm .field label{
+    cursor: text;
+    font-size: 1.2rem;
+    margin-bottom: -1.9rem;
+    margin-left: 10px;
+    z-index: 3;
+    transition: .5s;
+}
+#searchDataForm .field input{
+    padding: 8px;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+}
+
+#searchDataForm .field:has(input:focus, input:not(:placeholder-shown)) label {
+    margin-bottom: 0;
+    color: #f1f1f1;
+}
+
+#searchDataForm .field:has(button){
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#searchDataForm .field button{
+    margin-top: 25px;
+    cursor: pointer;
+    background: #0000;
+    border: none;
+    outline: none;
+}
+#searchDataForm .field button span{
+    color: #5681a9;
+    font-size: 2.5rem;
+    background: #f1f1f1;
+    border-radius: 50%;
+    padding: 20px;
+    border: none;
+    outline: none;
+    transition: .5s;
+}
+#searchDataForm .field:has(button:hover) span{
+    scale: 1.4;
+    color: green;
+}

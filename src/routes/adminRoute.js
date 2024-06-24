@@ -10,7 +10,6 @@ const cookieParser = require('cookie-parser');
 const router = express.Router();
 
 //databases
-const admins = require('../DB/Admin');
 const utenti = require('../DB/User');
 const prezzi = require('../DB/Prezzi');
 const codes = require('../DB/Codes');

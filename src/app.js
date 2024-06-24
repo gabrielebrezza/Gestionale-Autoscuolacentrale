@@ -19,9 +19,10 @@ const setPayment = require('./utils/paymentsUtils.js');
 //routes
 const paymentsRoute = require('./routes/paymentsRoute');
 const adminRoute = require('./routes/adminRoute');
+const rinnoviRoute = require('./routes/rinnoviRoute');
 const authRoute = require('./routes/authRoute');
 
-app.use(paymentsRoute, adminRoute, authRoute);
+app.use(paymentsRoute, adminRoute, rinnoviRoute, authRoute);
 
 
 

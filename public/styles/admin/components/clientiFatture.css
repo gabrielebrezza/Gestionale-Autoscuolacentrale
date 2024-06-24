@@ -64,8 +64,12 @@
 
 .cliente{
     margin-block: 25px;
+    display: flex;
+    justify-content: start;
+    flex-direction: row-reverse;
 }
 .cliente label{
+    margin-left: 10px;
     font-size: 1.3rem;
     cursor: pointer;
     user-select: none;
