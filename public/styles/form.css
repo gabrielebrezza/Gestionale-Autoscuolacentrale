@@ -89,6 +89,12 @@ header img{
     justify-content: center;
     margin-block: 0;
 }
+.container form strong{
+    text-align: center;
+}
+.container form strong a{
+    color: rgb(71, 178, 89);
+}
 .container form input[type="checkbox"]{
     height: 20px;
 }
@@ -116,10 +122,6 @@ header img{
     background: #fff;
     transform: scale(1.2);
 }
-/* #stripe{
-    display: flex;
-    justify-content: space-between;
-} */
 .submitBtn{
     display: flex;
     justify-content: center;
