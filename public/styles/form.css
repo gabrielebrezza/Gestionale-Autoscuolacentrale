@@ -14,7 +14,11 @@ header{
     width: 100%;
     background-color: #f1f1f1;
 }
+header a{
+    -webkit-user-drag: none;
+}
 header img{
+    -webkit-user-drag: none;
     max-width: 350px;
     width: 100%;
     mix-blend-mode: multiply;
