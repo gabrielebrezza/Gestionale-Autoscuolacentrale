@@ -55,13 +55,19 @@
             outline: none;
         }
     </style>
+        <style>
+            #signatureCanvas {
+                border: 1px solid black;
+                touch-action: none;
+            }
+        </style>
 </head>
 <body>
     <%- include('../components/header.ejs') %>
     <gmpx-api-loader key="AIzaSyA4iu52UT4JEx3Reh5fk0VI6WCafwqZwtM" solution-channel="GMP_QB_addressselection_v3_cA">
     </gmpx-api-loader>
     <main>
-        <form id="addUserForm" action="/rinnovi/addUser" method="POST" >
+        <form id="addUserForm">
             <h2>Salva un Nuovo Utente</h2>
             <div class="field">
                 <label for="nome">Nome:</label>
@@ -107,6 +113,63 @@
                 <button type="submit">Salva</button>
             </div>
         </form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addUserForm = document.getElementById('addUserForm');
+        addUserForm.addEventListener('submit', event => {
+            event.preventDefault();
+            const nome = document.getElementById('nome').value;
+            const cognome = document.getElementById('cognome').value;
+            const cfRinnovo = document.getElementById('cfRinnovo').value;
+            const spedizione = document.getElementById('locality-input').value;
+            const emailRinnovo = document.getElementById('emailRinnovo').value;
+            const tel = document.getElementById('tel').value;
+            const note = document.getElementById('note').value;
+            const visita = document.getElementById('visita').value;
+            const nPatente = document.getElementById('nPatente').value;
+            const protocollo = document.getElementById('protocollo').value;
+            const formData = {
+                nome: nome,
+                cognome: cognome,
+                cf: cfRinnovo,
+                email: emailRinnovo,
+                tel: tel,
+                note: note,
+                nPatente: nPatente,
+                protocollo: protocollo,
+                indirizzo: spedizione,
+                visita: visita
+            }
+            fetch('/rinnovi/addUser', {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.id)
+                document.getElementById('signatureContainer').style.display = 'block';
+                document.getElementById('saveSignatureBtn').addEventListener('click', () => {
+                    saveSignature(data.id); 
+                });
+            })
+            .catch(error => {
+                console.error('Errore:', error);
+            });
+        });
+    });
+</script>
+        
+        <div id="signatureContainer" style="display: none;">
+            <canvas id="signatureCanvas" width="500" height="200"></canvas>
+            <br>
+            <button onclick="clearCanvas()">Cancella</button>
+            <button id="saveSignatureBtn">Salva Firma</button>
+        </div>
+        <script src="/scripts/utils/firmaElettronica.js"></script>
     </main>
 </body>
 </html>

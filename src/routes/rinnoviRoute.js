@@ -1,9 +1,10 @@
 const express = require('express');
-const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
-const paypal = require('paypal-rest-sdk');
 const bodyParser = require('body-parser');
+const fs = require('fs');
+const path = require('path');
 
 const router = express.Router();
+router.use(bodyParser.json({ limit: '10mb' }));
 
 //databases
 const rinnovi = require('../DB/Rinnovi');
@@ -53,7 +54,7 @@ router.post('/rinnovi/addUser', authenticateJWT, async (req, res) => {
         saveUser.save()
         .then(() => {
             console.log(`Nuovo utente rinnovi salvato: ${nome} ${cognome}`);
-            return res.redirect('/admin/rinnovi/addUser');
+            return res.json({ message: 'Dati salvati con successo!', id: saveUser._id });
         })
         .catch((errore) => {
             console.error(`Errore durante il salvataggio del nuovo utente rinnovi: ${errore}`);
@@ -72,6 +73,22 @@ router.post('/rinnovi/deleteUsers', authenticateJWT, async (req, res)=> {
         console.error(`errore durante l'eliminazione degli utenti rinnovi: ${error}`);
         return res.render('errorPage', {error: `errore durante l'eliminazione degli alievi`});
     }
-    
 });
+
+router.post('/rinnovi/saveSignature', authenticateJWT, async (req, res) => {
+    const data = req.body.image;
+    const id = req.body.id;
+    console.log(id);
+    const base64Data = data.replace(/^data:image\/png;base64,/, "");
+    const filePath = path.join('privateImages', 'firmeRinnovi' , `${id}.png`);
+
+    fs.writeFile(filePath, base64Data, 'base64', (err) => {
+        if (err) {
+            console.error('Errore nel salvataggio della firma:', err);
+            return res.status(500).json({ message: 'Errore nel salvataggio della firma' });
+        }
+        res.status(200).json({ message: 'Firma salvata con successo' });
+    });
+});
+
 module.exports = router;
