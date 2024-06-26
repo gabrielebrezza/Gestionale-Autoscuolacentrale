@@ -1,3 +1,6 @@
+span{
+    user-select: none;
+}
 #searchUsersBtn{
     z-index: 2;
     position: fixed;

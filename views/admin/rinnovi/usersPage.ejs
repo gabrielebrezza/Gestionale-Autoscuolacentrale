@@ -71,7 +71,7 @@
         });
     </script>
     <table>
-        <form action="/deleteUsers" id="deleteUsersForm" method="POST">
+        <form action="/rinnovi/deleteUsers" id="deleteUsersForm" method="POST">
             <thead>
                 <tr>
                     <th>
@@ -89,20 +89,17 @@
                     <th>Email</th>
                     <th>Telefono</th>
                     <th>Visita Medica</th>
-                    <th>Registrazione</th>
-                    <th>Fatture</th>
+                    <!-- <th>Fatture</th> -->
                 </tr>
             </thead>
             <tbody id="usersTableBody">
                 <% let enumArchiviati = 1 %>
                 <% let enumUtenti = 1 %>
                 <% users.forEach(function(user, index) { %>
-                    <% const pagato = user.patente.some(patenti => patenti.pagato);%>
-                    <% if(pagato){ %>
                         <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %>" data-archiviato="<%= user.archiviato %>">
                             <td>
                                 <div class="cellContent">
-                                    <input class="elimina" type="checkbox" name="codiceFiscale<%= index %>" value="<%= user.cFiscale %>">
+                                    <input class="elimina" type="checkbox" name="id<%= index %>" value="<%= user._id %>">
                                     <div class="numero">
                                         <%= user.archiviato ? enumArchiviati++ : enumUtenti++ %>
                                     </div>
@@ -112,32 +109,8 @@
                             <td><%= user.cognome %></td>
                             <td><%= user.contatti.email %></td>
                             <td><%= user.contatti.tel %></td>
-                            <td><%= user.visita ? user.visita : 'Mancante' %></td>
-                            <td><%= user.dataRegistrazione %></td>
-                            <%  
-                                const fatturaEmessa = user.fatture.find(function(fattura) {
-                                    return fattura.emessa === false;
-                                });
-                                const daEmettere = !!fatturaEmessa;
-                            %>
-                            <td class="buttonCell">
-                                <% if (daEmettere) { %>
-                                        <a class="fatturaDaEmettere" href="<%= `/admin/fattureDaEmettere?cf=${encodeURIComponent(user.cFiscale)}` %>">
-                                            <span class="material-symbols-outlined">
-                                                receipt_long
-                                            </span>
-                                        </a>
-                                <% }else{ %>
-
-                                        <a class="pagamenti" href="<%= `/admin/pagamenti?cf=${encodeURIComponent(user.cFiscale)}` %>">
-                                            <span class="material-symbols-outlined">
-                                               payments
-                                            </span>
-                                        </a>
-                                <% } %>
-                            </td>
+                            <td><%= user.visita ? `${user.visita.data.split('-').reverse().join('/')} ${user.visita.ora}`  : 'Mancante' %></td>
                         </tr>
-                    <% } %>
                 <% }); %>
             </tbody>
         </form>

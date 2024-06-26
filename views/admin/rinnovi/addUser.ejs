@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Allievi</title>
+    <link rel="stylesheet" href="/styles/admin/users.css">
+    <link rel="stylesheet" href="/styles/admin/rinnovi/users.css">
+    <script type="module" src="/scripts/utils/places.js"></script>
+    <style>
+        main{
+            margin-top: 175px;
+            height: 100%;
+            display: grid;
+            place-items: center;
+        }
+        #addUserForm{
+            padding: 25px;
+            background: #5681a9;
+            border-radius: 25px;
+            color: #eee;
+        }
+        #addUserForm h2{
+            text-align: center;
+        }
+        #addUserForm .field{
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #addUserForm .field input::placeholder{
+            color: #eee;
+            opacity: .5;
+        } 
+        #addUserForm .field input{
+            padding: 10px;
+            border: none;
+            outline: none;
+            background: none;
+            color: #eee;
+            border-bottom: 2px solid #eee;
+        }
+        #addUserForm .field:has(button){
+            justify-content: center;
+        }
+        #addUserForm .field button{
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 5px;
+            background: #71a1cb;
+            color: #eee;
+            font-size: 1.1rem;
+            border: none;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../components/header.ejs') %>
+    <gmpx-api-loader key="AIzaSyA4iu52UT4JEx3Reh5fk0VI6WCafwqZwtM" solution-channel="GMP_QB_addressselection_v3_cA">
+    </gmpx-api-loader>
+    <main>
+        <form id="addUserForm" action="/rinnovi/addUser" method="POST" >
+            <h2>Salva un Nuovo Utente</h2>
+            <div class="field">
+                <label for="nome">Nome:</label>
+                <input type="text" name="nome" id="nome">
+            </div>
+            <div class="field">
+                <label for="cognome">Cognome:</label>
+                <input type="text" name="cognome" id="cognome">
+            </div>
+            <div class="field">
+                <label for="cfRinnovo">Codice Fiscale:</label>
+                <input type="text" name="cf" id="cfRinnovo">
+            </div>
+            <div class="field">
+                <label for="locality-input">Comune di Spedizione:</label>
+                <input type="text" name="indirizzo" id="locality-input" class="autocomplete">
+            </div>
+            <div class="field">
+                <label for="emailRinnovo">Email:</label>
+                <input type="email" name="email" id="emailRinnovo">
+            </div>
+            <div class="field">
+                <label for="tel">Telefono:</label>
+                <input type="tel" name="tel" id="tel">
+            </div>
+            <div class="field">
+                <label for="note">Note:</label>
+                <input type="text" name="note" id="note">
+            </div>
+            <div class="field">
+                <label for="visita">Data e Ora Visita:</label>
+                <input type="datetime-local" name="visita" id="visita">
+            </div>
+            <div class="field">
+                <label for="nPatente">Numero Patente:</label>
+                <input type="text" name="nPatente" id="nPatente">
+            </div>
+            <div class="field">
+                <label for="protocollo">Protocollo MCTC:</label>
+                <input type="text" name="protocollo" id="protocollo">
+            </div>
+            <div class="field">
+                <button type="submit">Salva</button>
+            </div>
+        </form>
+    </main>
+</body>
+</html>
