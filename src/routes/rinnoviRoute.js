@@ -63,11 +63,21 @@ router.post('/rinnovi/addUser', authenticateJWT, async (req, res) => {
         });
 });
 router.post('/rinnovi/deleteUsers', authenticateJWT, async (req, res)=> {
-    const ids = req.body;
+    const {action} = req.body;
+    const ids = (Object.keys(req.body)
+        .filter(key => key.startsWith('user')))
+        .map(key => req.body[key]);
     try {
-        for (const id of Object.values(ids)) {
-            await rinnovi.deleteOne({"_id": id});
-            console.log(`utente rinnovi ${id} eliminato definitivamente`);
+        if(action == 'archivia'){
+            for (const id of ids) {
+                await rinnovi.findOneAndUpdate({"_id": id}, {"archiviato": true});
+                console.log(`utente rinnovi ${id} archiviato`);
+            }
+        }else{
+            for (const id of ids) {
+                await rinnovi.deleteOne({"_id": id});
+                console.log(`utente rinnovi ${id} eliminato definitivamente`);
+            }
         }
         return res.redirect('/admin/rinnovi');
     } catch (error) {

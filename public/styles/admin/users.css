@@ -65,15 +65,20 @@ a {
     display: none;
 }
 
-.elimina {
+.theadBtn, .action{
     margin-left: 10px;
     cursor: pointer;
     user-select: none;
     display: none;
-    color: red;
     outline: none;
     border: none;
     background: #0000;
+}
+.elimina{
+    color: red;
+}
+.archivia{
+    color: orange;
 }
 #selectUsers {
     cursor: pointer;
