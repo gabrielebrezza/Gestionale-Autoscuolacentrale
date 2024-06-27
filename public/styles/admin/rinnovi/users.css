@@ -129,6 +129,7 @@ span{
     transition: opacity .5s;
 }
 #searchDataContainer{
+    pointer-events: none;
     z-index: 2;
     position: fixed;
     top: 0;
@@ -143,6 +144,7 @@ span{
 }
 
 #searchDataForm{
+    pointer-events: all;
     z-index: 3;
     max-width: 400px;
     width: 100%;

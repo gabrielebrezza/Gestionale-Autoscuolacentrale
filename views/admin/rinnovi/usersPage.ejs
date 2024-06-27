@@ -128,6 +128,7 @@
         const searchUsersBtn = document.getElementById('searchUsersBtn');
         const blurredBg = document.getElementById('blurredBg');
         const searchDataContainer = document.getElementById('searchDataContainer');
+        const searchDataForm = document.getElementById('searchDataForm');
         const closeSearchFormBtn = document.getElementById('closeSearchFormBtn');
         searchUsersBtn.addEventListener('click', () => {
             blurredBg.style.display = 'block';
@@ -137,14 +138,22 @@
                 searchDataContainer.style.opacity = 1;
             }, 100);
         });
+
         closeSearchFormBtn.addEventListener('click', () => {
+            closeSearchForm()
+        });
+        blurredBg.addEventListener('click', () => {
+            closeSearchForm()
+        });
+        
+        const closeSearchForm = () => {
             blurredBg.style.opacity = 0;
             searchDataContainer.style.opacity = 0;
             setTimeout(() => {
                 blurredBg.style.display = 'none';
                 searchDataContainer.style.display = 'none';
             }, 500);
-        });
+        }
     </script>
     <table>
         <form action="/rinnovi/deleteUsers" id="actionUsersForm" method="POST">
