@@ -1,16 +1,120 @@
 span{
     user-select: none;
 }
-#searchUsersBtn{
+
+
+
+#filterRinnovi{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    background: #5681a9;
+    transition: .75s;
+    
+}
+#closeFilterBtn{
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 25px;
+    color: #eee;
+    font-size: 2.5rem;
+    cursor: pointer;
+}
+
+#filterRinnovi .field{
+    display: flex;
+    gap: 10px;
+    color: #eee;
+    display: flex;
+    align-items: center;
+}
+#filterRinnovi .field label{
+    color: #eee;
+}
+#filterRinnovi .field label{
+    color: #eee;
+}
+#filterRinnovi .field input{
+    border: none;
+    outline: none;
+    padding: 10px;
+}
+#filterRinnovi .field:has(input[type="date"]){
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+
+
+
+
+
+
+
+#rinnoviMenu{
     z-index: 2;
     position: fixed;
     top: 50px;
     right: 25px;
     cursor: pointer;
 }
-#searchUsersBtn span{
+#rinnoviMenu summary{
+    list-style: none;
+}
+#rinnoviMenu span{
     font-size: 3rem;
     color: #f1f1f1;
+}
+#rinnoviMenu ul{
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    background: #eee;
+    list-style: none;
+    border-radius: 10px;
+}
+#rinnoviMenu ul li{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #71a1cb;
+    transition: .5s;
+    padding: 10px;
+    
+}
+#rinnoviMenu ul li:first-child{
+    border-radius: 8px 8px 0 0;
+}
+#rinnoviMenu ul li:last-child{
+    border-radius: 0 0 8px 8px;
+}
+#rinnoviMenu ul li:first-child:after{
+    content: 'Filtri';
+}
+#rinnoviMenu ul li:last-child:after{
+    content: 'Cerca';
+}
+#rinnoviMenu ul span{
+    color: #71a1cb;
+    transition: .5s;
+}
+#rinnoviMenu ul li:hover{
+    background: #71a1cb;
+    color: #eee;
+}
+#rinnoviMenu ul li:hover span{
+    color: #eee;
 }
 #blurredBg{
     display: none;

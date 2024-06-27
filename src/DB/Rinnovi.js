@@ -56,11 +56,11 @@ const RinnoviSchema = new mongoose.Schema({
     visita: {
         data: {
             type: String,
-            required: true
+            required: false
         },
         ora: {
             type: String,
-            required: true
+            required: false
         }
     },
     nPatente: {
@@ -69,7 +69,7 @@ const RinnoviSchema = new mongoose.Schema({
     },
     protocollo: {
         type: String,
-        required: true
+        required: false
     },
     fatture: {
         data:{

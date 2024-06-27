@@ -9,13 +9,89 @@
 </head>
 <body>
     <%- include('../components/header.ejs') %>
-    
-    <div id="searchUsersBtn">
-        <span class="material-symbols-outlined">
-            data_loss_prevention
-        </span>
-    </div>
-    
+        <details id="rinnoviMenu">
+            <summary>
+                <span class="material-symbols-outlined">
+                    more_vert
+                </span>
+            </summary>
+            <ul>
+                <li id="filterRinnoviBtn">
+                    <span  class="material-symbols-outlined">
+                        filter_alt
+                    </span>
+                </li>
+                <li id="searchUsersBtn">
+                    <span  class="material-symbols-outlined">
+                        data_loss_prevention
+                    </span>
+                </li>
+            </ul>
+        </details>
+
+
+        <section id="filterRinnovi" style="height: 0;">
+            <div class="closeFilterField">
+                <span id="closeFilterBtn" class="material-symbols-outlined">
+                    close
+                </span>
+            </div>
+            <div class="field">
+                <label for="filterName">Nome:</label>
+                <input type="text" name="filterName" id="filterName">
+            </div>
+            <div class="field">
+                <label for="filterSurname">Cognome:</label>
+                <input type="text" name="filterSurname" id="filterSurname">
+            </div>
+            <div class="field">
+                <label for="filterEmail">Email:</label>
+                <input type="email" name="filterEmail" id="filterEmail">
+            </div>
+            <div class="field">
+                <label for="filterPhone">Telefono:</label>
+                <input type="tel" name="filterPhone" id="filterPhone">
+            </div>
+            <div class="field">
+                <h3>Visita Medica</h3><br>
+                <div>
+                    <label for="filterVisitaFromDate">Da Data:</label>
+                    <input type="date" id="filterVisitaFromDate" name="filterVisitaFromDate">
+                    <label for="filterVisitaToDate">A Data:</label>
+                    <input type="date" id="filterVisitaToDate" name="filterVisitaToDate">
+                    <label for="filterVisitaFromHour">Da Ora:</label>
+                    <input type="time" id="filterVisitaFromHour" name="filterVisitaFromHour">
+                    <label for="filterVisitaToHour">A Ora:</label>
+                    <input type="time" id="filterVisitaToHour" name="filterVisitaToHour">
+                </div>
+            </div>
+        </section>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const filterRinnoviBtn = document.getElementById('filterRinnoviBtn');
+                const filterRinnovi = document.getElementById('filterRinnovi');
+                const closeFilterBtn = document.getElementById('closeFilterBtn');
+                filterRinnoviBtn.addEventListener('click', () => {
+                    toggleFilterMenu()
+                });
+                closeFilterBtn.addEventListener('click', () => {
+                    toggleFilterMenu()
+                });
+
+                const toggleFilterMenu = () => {
+                    const isClosed = filterRinnovi.style.height == '0px';
+                    filterRinnovi.style.height = isClosed ? '100%' : '0px';
+                    setTimeout(() => {
+                        filterRinnovi.style.opacity = isClosed ? 1 : 0;
+                    },200);
+                    
+                }
+            });
+            
+        </script>
+
+
     <div id="blurredBg"></div>
     <section id="searchDataContainer">
             <form id="searchDataForm" action="/rinnovi/findUsers" method="POST">
@@ -96,7 +172,7 @@
                 <% let enumArchiviati = 1 %>
                 <% let enumUtenti = 1 %>
                 <% users.forEach(function(user, index) { %>
-                        <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %>" data-archiviato="<%= user.archiviato %>">
+                        <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %> row" data-archiviato="<%= user.archiviato %>">
                             <td>
                                 <div class="cellContent">
                                     <input class="elimina" type="checkbox" name="id<%= index %>" value="<%= user._id %>">
@@ -131,5 +207,72 @@
             }
         });
     </script>
+
+
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const filterName = document.getElementById('filterName');
+        const filterSurname = document.getElementById('filterSurname');
+        const filterEmail = document.getElementById('filterEmail');
+        const filterPhone = document.getElementById('filterPhone');    
+        const filterVisitaFromDate = document.getElementById('filterVisitaFromDate');
+        const filterVisitaToDate = document.getElementById('filterVisitaToDate');
+        const filterVisitaFromHour = document.getElementById('filterVisitaFromHour');
+        const filterVisitaToHour = document.getElementById('filterVisitaToHour');
+        const rows = document.querySelectorAll('.row');
+    
+
+
+
+
+    const filterRinnovi = () => {
+        const nome = filterName.value.toLowerCase();
+        const cognome = filterSurname.value.toLowerCase();
+        const email = filterEmail.value.toLowerCase();
+        const tel = filterPhone.value;
+        const fromDate = new Date(filterVisitaFromDate.value);
+        const toDate = new Date(filterVisitaToDate.value); 
+        const fromHour = filterVisitaFromHour.value.split(':')[0]*60 + filterVisitaFromHour.value.split(':')[1];
+        const toHour = filterVisitaToHour.value.split(':')[0]*60 + filterVisitaToHour.value.split(':')[1];
+        for(const row of rows){
+            const nomeTd = row.getElementsByTagName('td')[1].textContent.toLocaleLowerCase();
+            const cognomeTd = row.getElementsByTagName('td')[2].textContent.toLocaleLowerCase();
+            const emailTd = row.getElementsByTagName('td')[3].textContent.toLocaleLowerCase();
+            const telTd = row.getElementsByTagName('td')[4].textContent.toLocaleLowerCase();
+            const [dataTd, oraTd] = row.getElementsByTagName('td')[5].textContent.split(' ');
+            const ora = oraTd.split(':')[0]*60 + oraTd.split(':')[1];
+            const oraCompresa = fromHour <= ora && ora <= toHour;
+            const dataCompresa = fromDate <= new Date(dataTd) && new Date(dataTd) <= toDate;
+            
+            if(
+                (nome === '' || nomeTd.includes(nome)) &&
+                (cognome === '' || cognomeTd.includes(cognome)) &&
+                (email === '' || emailTd.includes(email)) &&
+                (tel === '' || telTd.includes(tel)) &&
+                ((oraCompresa) || !filterVisitaFromHour.value || !filterVisitaToHour.value) &&
+                 ((dataCompresa) || !filterVisitaFromDate.value || !filterVisitaToDate.value)
+            ){
+                row.style.display = 'table-row'
+            }else{
+                row.style.display = 'none'
+            }
+        }
+    }
+
+    filterName.addEventListener('input', filterRinnovi);
+    filterSurname.addEventListener('input', filterRinnovi);
+    filterEmail.addEventListener('input', filterRinnovi);
+    filterPhone.addEventListener('input', filterRinnovi);
+    filterVisitaFromDate.addEventListener('input', filterRinnovi);
+    filterVisitaToDate.addEventListener('input', filterRinnovi);
+    filterVisitaFromHour.addEventListener('input', filterRinnovi);
+    filterVisitaToHour.addEventListener('input', filterRinnovi);
+});
+
+</script>
 </body>
 </html>
