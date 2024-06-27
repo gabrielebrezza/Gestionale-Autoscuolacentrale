@@ -1,10 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 
 const router = express.Router();
-router.use(bodyParser.json({ limit: '10mb' }));
+router.use(bodyParser.json({ limit: '50mb' }));
 
 //databases
 const rinnovi = require('../DB/Rinnovi');
@@ -75,10 +76,9 @@ router.post('/rinnovi/deleteUsers', authenticateJWT, async (req, res)=> {
     }
 });
 
-router.post('/rinnovi/saveSignature', authenticateJWT, async (req, res) => {
+router.post('/rinnovi/upload/signature', authenticateJWT, async (req, res) => {
     const data = req.body.image;
     const id = req.body.id;
-    console.log(id);
     const base64Data = data.replace(/^data:image\/png;base64,/, "");
     const filePath = path.join('privateImages', 'firmeRinnovi' , `${id}.png`);
 
@@ -88,6 +88,22 @@ router.post('/rinnovi/saveSignature', authenticateJWT, async (req, res) => {
             return res.status(500).json({ message: 'Errore nel salvataggio della firma' });
         }
         res.status(200).json({ message: 'Firma salvata con successo' });
+    });
+});
+
+
+router.post('/rinnovi/upload/profile', authenticateJWT, (req, res) => {
+    const data = req.body.image;
+    const id = req.body.id;
+    const base64Data = data.replace(/^data:image\/jpeg;base64,/, "").replace(/\s/g, '');
+    const filePath = path.join('privateImages', 'immaginiRinnovi' , `${id}.png`);
+
+    fs.writeFile(filePath, base64Data, 'base64', (err) => {
+        if (err) {
+            console.error('Errore nel salvataggio della firma:', err);
+            return res.status(500).json({ message: `Errore nel salvataggio dell'immagine rinnovi` });
+        }
+        res.status(200).json({ message: 'immagine rinnovi salvata con successo' });
     });
 });
 

@@ -14,13 +14,13 @@
             display: grid;
             place-items: center;
         }
-        #addUserForm{
+        #addUserCard{
             padding: 25px;
             background: #5681a9;
             border-radius: 25px;
             color: #eee;
         }
-        #addUserForm h2{
+        #addUserCard{
             text-align: center;
         }
         #addUserForm .field{
@@ -44,21 +44,77 @@
         #addUserForm .field:has(button){
             justify-content: center;
         }
-        #addUserForm .field button{
-            cursor: pointer;
-            padding: 10px 15px;
-            border-radius: 5px;
-            background: #71a1cb;
-            color: #eee;
-            font-size: 1.1rem;
-            border: none;
-            outline: none;
+
+        #addUserForm .field button:hover{
+            background: rgb(27, 110, 27);
         }
     </style>
         <style>
+
+            #signatureContainer{
+                display: none;
+                place-items: center;
+            }
             #signatureCanvas {
-                border: 1px solid black;
                 touch-action: none;
+                background: #eee;
+            }
+            #signatureContainer .field button{
+                display: grid;
+                place-items: center;
+            }
+            #signatureContainer .field{
+                display: flex;
+                justify-content: space-around;
+            }
+            .field button{
+                cursor: pointer;
+                padding: 5px 10px;
+                margin: 10px;
+                border-radius: 5px;
+                background: #71a1cb;
+                color: #eee;
+                font-size: 1rem;
+                border: none;
+                outline: none;
+                transition: .5s;
+                & .delete{
+                    color: rgb(211, 34, 34);
+                    transition: .5s;
+                }
+                & .continue{
+                    color: rgb(27, 110, 27);
+                    transition: .5s;
+                }
+            }
+            .field button:has(.delete):hover{
+                background: rgb(211, 34, 34);
+                & span{
+                    color: #eee;
+                }
+            }
+            .field button:has(.continue):hover{
+                background: rgb(27, 110, 27);
+                & span{
+                    color: #eee;
+                }
+            }
+            #profileImageContainer{
+                display: none;
+            }
+            label[for="imageInput"]{
+                cursor: pointer;
+                text-decoration: underline;
+            }
+            #imageInput{
+                display: none;
+            }
+            #imagePreview{
+                max-width: 300px;
+                max-height: 300px;
+            }
+            #imagePreview:not([src]){
+                display: none;
             }
         </style>
 </head>
@@ -67,53 +123,93 @@
     <gmpx-api-loader key="AIzaSyA4iu52UT4JEx3Reh5fk0VI6WCafwqZwtM" solution-channel="GMP_QB_addressselection_v3_cA">
     </gmpx-api-loader>
     <main>
-        <form id="addUserForm">
-            <h2>Salva un Nuovo Utente</h2>
-            <div class="field">
-                <label for="nome">Nome:</label>
-                <input type="text" name="nome" id="nome">
+        <article id="addUserCard">
+            <form id="addUserForm">
+                <h2>Salva un Nuovo Utente</h2>
+                <div class="field">
+                    <label for="nome">Nome:</label>
+                    <input type="text" name="nome" id="nome">
+                </div>
+                <div class="field">
+                    <label for="cognome">Cognome:</label>
+                    <input type="text" name="cognome" id="cognome">
+                </div>
+                <div class="field">
+                    <label for="cfRinnovo">Codice Fiscale:</label>
+                    <input type="text" name="cf" id="cfRinnovo">
+                </div>
+                <div class="field">
+                    <label for="locality-input">Comune di Spedizione:</label>
+                    <input type="text" name="indirizzo" id="locality-input" class="autocomplete">
+                </div>
+                <div class="field">
+                    <label for="emailRinnovo">Email:</label>
+                    <input type="email" name="email" id="emailRinnovo">
+                </div>
+                <div class="field">
+                    <label for="tel">Telefono:</label>
+                    <input type="tel" name="tel" id="tel">
+                </div>
+                <div class="field">
+                    <label for="note">Note:</label>
+                    <input type="text" name="note" id="note">
+                </div>
+                <div class="field">
+                    <label for="visita">Data e Ora Visita:</label>
+                    <input type="datetime-local" name="visita" id="visita">
+                </div>
+                <div class="field">
+                    <label for="nPatente">Numero Patente:</label>
+                    <input type="text" name="nPatente" id="nPatente">
+                </div>
+                <div class="field">
+                    <label for="protocollo">Protocollo MCTC:</label>
+                    <input type="text" name="protocollo" id="protocollo">
+                </div>
+                <div class="field">
+                    <button type="submit">
+                        <span class="material-symbols-outlined continue">
+                            line_end_arrow_notch
+                        </span>
+                    </button>
+                </div>
+            </form>
+            <div id="signatureContainer">
+                <h2>Disegna la Firma</h2>
+                <canvas id="signatureCanvas" width="236" height="47"></canvas>
+                <div class="field">
+                    <button onclick="clearCanvas()">
+                        <span class="material-symbols-outlined delete">
+                            delete
+                        </span>
+                    </button>
+                    <button id="saveSignatureBtn" onclick="saveSignature()">
+                        <span class="material-symbols-outlined continue">
+                            line_end_arrow_notch
+                        </span>
+                    </button>
+                </div>
             </div>
-            <div class="field">
-                <label for="cognome">Cognome:</label>
-                <input type="text" name="cognome" id="cognome">
-            </div>
-            <div class="field">
-                <label for="cfRinnovo">Codice Fiscale:</label>
-                <input type="text" name="cf" id="cfRinnovo">
-            </div>
-            <div class="field">
-                <label for="locality-input">Comune di Spedizione:</label>
-                <input type="text" name="indirizzo" id="locality-input" class="autocomplete">
-            </div>
-            <div class="field">
-                <label for="emailRinnovo">Email:</label>
-                <input type="email" name="email" id="emailRinnovo">
-            </div>
-            <div class="field">
-                <label for="tel">Telefono:</label>
-                <input type="tel" name="tel" id="tel">
-            </div>
-            <div class="field">
-                <label for="note">Note:</label>
-                <input type="text" name="note" id="note">
-            </div>
-            <div class="field">
-                <label for="visita">Data e Ora Visita:</label>
-                <input type="datetime-local" name="visita" id="visita">
-            </div>
-            <div class="field">
-                <label for="nPatente">Numero Patente:</label>
-                <input type="text" name="nPatente" id="nPatente">
-            </div>
-            <div class="field">
-                <label for="protocollo">Protocollo MCTC:</label>
-                <input type="text" name="protocollo" id="protocollo">
-            </div>
-            <div class="field">
-                <button type="submit">Salva</button>
-            </div>
-        </form>
+            <div id="profileImageContainer">
+                <h2>Foto Tessera</h2>
+                <div class="field">
+                    <label for="imageInput">Carica un Immagine</label>
+                    <input type="file" id="imageInput" accept="image/*">
+                </div>
+                <div>
+                    <img id="imagePreview">
+                </div>
+                <br>
+                <div class="field">
+                    <button id="uploadButton">
+                        <span class="material-symbols-outlined continue">
+                            done_all
+                        </span>
+                    </button>
+                </div>
 
+            </div>
+        </article>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const addUserForm = document.getElementById('addUserForm');
@@ -150,11 +246,9 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data.id)
-                document.getElementById('signatureContainer').style.display = 'block';
-                document.getElementById('saveSignatureBtn').addEventListener('click', () => {
-                    saveSignature(data.id); 
-                });
+                addUserForm.style.display = 'none';
+                id = data.id
+                document.getElementById('signatureContainer').style.display = 'grid';
             })
             .catch(error => {
                 console.error('Errore:', error);
@@ -162,13 +256,60 @@
         });
     });
 </script>
-        
-        <div id="signatureContainer" style="display: none;">
-            <canvas id="signatureCanvas" width="500" height="200"></canvas>
-            <br>
-            <button onclick="clearCanvas()">Cancella</button>
-            <button id="saveSignatureBtn">Salva Firma</button>
-        </div>
+
+        <script>
+            document.getElementById('imageInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+            
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = 260;
+                        canvas.height = 315;
+                    
+                        ctx.fillStyle = 'white';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+                        const x = (canvas.width / 2) - (img.width / 2) * scale;
+                        const y = (canvas.height / 2) - (img.height / 2) * scale;
+                        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                    
+                        const dataUrl = canvas.toDataURL('image/jpeg');
+                        document.getElementById('imagePreview').src = dataUrl;
+                    
+                        document.getElementById('uploadButton').addEventListener('click', function() {
+                            const payload = {
+                                image: dataUrl,
+                                id: id
+                            };
+                        
+                            fetch('/rinnovi/upload/profile', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(payload)
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                alert('Dati Utente Salvati Con Successo!');
+                                window.location.reload();
+                            })
+                            .catch((error) => {
+                                console.error('Error:', error);
+                            });
+                        });
+                    };
+                };
+                reader.readAsDataURL(file);
+            });
+        </script>
+        <script>var id;</script>
         <script src="/scripts/utils/firmaElettronica.js"></script>
     </main>
 </body>

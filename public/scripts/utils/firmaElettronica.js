@@ -2,6 +2,11 @@ const canvas = document.getElementById('signatureCanvas');
 const ctx = canvas.getContext('2d');
 let drawing = false;
 
+function setWhiteBackground() {
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
 function getMousePos(canvas, event) {
     const rect = canvas.getBoundingClientRect();
     return {
@@ -44,25 +49,27 @@ function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function saveSignature(id) {
+function saveSignature() {
     const dataURL = canvas.toDataURL('image/png');
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/rinnovi/saveSignature', true);
+    xhr.open('POST', '/rinnovi/upload/signature', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             alert('Firma salvata con successo');
+            document.getElementById('signatureContainer').style.display = 'none';
+            document.getElementById('profileImageContainer').style.display = 'block';
         }
-    };
+    }; 
     xhr.send(JSON.stringify({ image: dataURL, id: id }));
 }
 
-// Eventi per il mouse
 canvas.addEventListener('mousedown', startDrawing);
 canvas.addEventListener('mouseup', stopDrawing);
 canvas.addEventListener('mousemove', draw);
 
-// Eventi per il touch
 canvas.addEventListener('touchstart', startDrawing);
 canvas.addEventListener('touchend', stopDrawing);
 canvas.addEventListener('touchmove', draw);
+
+document.addEventListener('DOMContentLoaded', setWhiteBackground);
