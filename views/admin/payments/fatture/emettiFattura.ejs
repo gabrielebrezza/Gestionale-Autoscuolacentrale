@@ -63,9 +63,15 @@
 
             <fieldset>
                 <legend>Dati Generici Documento</legend>
-                
-                <label for="data">Data:</label><br>
-                <input type="date" id="data" name="data" value="<%= iscrizione ? data : '' %>"><br><br>
+                <% let dataFatturazione = iscrizione ? data : '' %>
+                <% if (!iscrizione) {
+                    const today = new Date();
+                    const DD = String(today.getDate()).padStart(2, '0'); 
+                    const MM = String(today.getMonth() + 1).padStart(2, '0'); 
+                    const YYYY = today.getFullYear(); 
+                    dataFatturazione = `${YYYY}-${MM}-${DD}`;
+                } %>
+                <input type="hidden" id="data" name="data" value="<%= dataFatturazione %>">
 
                 <label for="ImportoTotaleDocumento">ImportoTotaleDocumento</label>
                 <input type="text" id="ImportoTotaleDocumento" name="ImportoTotaleDocumento" value="<%= iscrizione ? Number(importo).toFixed(2) : '' %>">
