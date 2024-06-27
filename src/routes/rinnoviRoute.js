@@ -13,6 +13,7 @@ const rinnovi = require('../DB/Rinnovi');
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
+const { rectanglesAreEqual } = require('pdf-lib');
 
 router.get('/admin/rinnovi', authenticateJWT, async (req, res) =>{
     const users = await rinnovi.find({});
@@ -24,23 +25,30 @@ router.get('/admin/rinnovi/addUser', authenticateJWT, async (req, res) =>{
 });
 router.post('/rinnovi/addUser', authenticateJWT, async (req, res) => {
     const {nome, cognome, cf, email, tel, note, nPatente, protocollo} = req.body;
-    const [via, nCivico, cap, comune, provincia] = req.body.indirizzo.split(',');
-    const spedizione = {
-        via: via.trim(),
-        nCivico: nCivico.trim(),
-        cap: cap.trim(),
-        comune: comune.trim(),
-        provincia: provincia.trim()
+    let spedizione, visita, contatti;
+    try {
+        const [via, nCivico, cap, comune, provincia] = req.body.indirizzo.split(',');
+        spedizione = {
+            via: via.trim(),
+            nCivico: nCivico.trim(),
+            cap: cap.trim(),
+            comune: comune.trim(),
+            provincia: provincia.trim()
+        }
+        const [data, ora] = req.body.visita.split('T');
+        visita = {
+            data: data,
+            ora: ora
+        }
+        contatti = {
+            email: email,
+            tel: tel
+        }
+    } catch (error) {
+        return res.render('errorPage', {error: `errore nel recupero dell'indirizzo`});
     }
-    const [data, ora] = req.body.visita.split('T');
-    const visita = {
-        data: data,
-        ora: ora
-    }
-    const contatti = {
-        email: email,
-        tel: tel
-    }
+
+
     const saveUser = new rinnovi({
         "nome": nome.trim(),
         "cognome": cognome.trim(),
