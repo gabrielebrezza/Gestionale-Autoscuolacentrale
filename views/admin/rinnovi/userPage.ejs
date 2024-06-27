@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Allievi</title>
+    <style>
+        body{
+            background: #71a1cb;
+        }
+        .documentSection{
+            margin-top: 150px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .printForm{
+            margin: 10px;
+            max-width: 200px;
+            width: 100%;
+            color: #f1f1f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+        .printForm button{
+            cursor: pointer;
+            background: #0000;
+            outline: none;
+            border: none;
+            color: #f1f1f1;
+        }
+        #updateUserForm{
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            margin: 50px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            background: #f1f1f1;
+        }
+
+        th {
+            color: #fff;
+            background: #5681a9;
+            text-transform: uppercase;
+        }
+        th:first-child{
+            border-radius: 5px 0 0  0;
+        }
+        th:last-child{
+            border-radius:  0 5px 0  0;
+        }
+        tfoot td{
+            padding: 0;
+            background: #0000;
+            border: none;
+        }
+        #submitFormBtn{
+            width: 100%;
+            /* margin-top: 5px; */
+            cursor: pointer;
+            padding: 10px 20px;
+            background: green;
+            color: #fff;
+            transition: .5s;
+            outline: none;
+            border: none;
+            border-radius: 0 0 5px 5px;
+        }
+        #submitFormBtn:hover{
+            opacity: .7;
+        }
+        .imageForms{
+            width: 50%;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .imageForm{
+            max-width: 250px;
+            width: 100%;
+            background: #fff;
+            height: fit-content;
+            padding: 5px;
+            border-radius: 5px;
+            text-align: center;
+            color: #333;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            border: 2px solid #333;
+            margin-block: 15px;
+        }
+        #signPic{
+            width: 175px;
+            height: 50px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        } 
+        #profilePic{
+            object-fit: contain;
+            width: 50px;
+            height: 50px;
+            margin-bottom: 10px;
+        }
+
+        .imageForm button, .imageForm label{
+            width: fit-content;
+            background-color: #71a1cb;
+            color: #fff;
+            padding: 12px 12px;
+            margin: 10px auto;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            transition: .5s;
+            font-size: 1rem;
+        }
+        .uploadBtn{
+            padding: 12px 20px;
+        }
+        .imageForm button:hover, .imageForm label:hover {
+            background-color: #5681a9;
+        }
+        .imageForm input{
+            display: none;
+        }
+        tr:has(.attivo){
+            background: green;
+            color: #fff;
+        }
+        tr:has(.scaduto){
+            background: red;
+            color: #fff;
+        }
+        .field{
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            text-align: justify;
+        }
+        .field p{
+            font-weight: bold;
+        }
+        tr:has(input[value="respinto"]:checked){
+            background: red;
+            color: #fff;
+        }
+        tr:has(input[value="idoneo"]:checked){
+            background: green;
+            color: #fff;
+        }
+        tr:has(input[value="assente"]:checked){
+            background: orange;
+            color: #fff;
+        }
+
+        .formField{
+            display: flex;
+            align-items: center;
+        }
+        .formField button{
+            width: fit-content;
+            height: 40px;
+            margin-inline: 10px;
+            display: flex;
+            align-items: center;
+        }
+        button.deleteButton {
+            background: red;
+            transition: .5s;
+        }
+        button.deleteButton:hover {
+            background: rgb(119, 64, 64);
+        }
+    </style>
+    <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+    
+</head>
+<body>
+    <%- include('../components/header.ejs') %>
+    <section class="documentSection">
+        
+        <div class="imageForms">
+            <form class="imageForm" action="/uploadUserFirma" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="cf" value="<%= user.cFiscale %>">
+                <img id="signPic" src="<%= `/images?dir=${encodeURIComponent('firmeRinnovi/')}${encodeURIComponent(user._id)}.png` %>" alt="Scansione Firma">
+ 
+                <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
+                <div class="formField">
+                    <button type="submit" title="Salva Immagine">
+                        <span class="material-symbols-outlined">
+                            save
+                        </span>
+                    </button>
+                    <label class="uploadBtn" for="inputSigningFile" title="Carica Immagine">
+                        <span class="material-symbols-outlined">
+                            upload
+                        </span>
+                    </label>
+                    <input type="hidden" name="intent" value="firma">
+                    <button type="button" class="deleteButton" title="Elimina Immagine">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </div>
+                <div id="cropContainer">
+                    <img id="cropImage" style="max-width: 100%;">
+                </div>
+                <input type="hidden" id="croppedImage" name="croppedImage">
+            </form>
+
+            <form class="imageForm" action="/uploadUserImage" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="cf" value="<%= user.cFiscale %>">
+                <img id="profilePic" src="<%= `/images?dir=${encodeURIComponent('immaginiRinnovi/')}${encodeURIComponent(user._id)}.png'` %>" alt="Immagine Profilo">
+
+                <input type="file" id="inputProfileFile" name="inputProfileFile" accept="image/*">
+                <div class="formField">
+                    <button type="submit" title="Salva Immagine">
+                        <span class="material-symbols-outlined">
+                            save
+                        </span>
+                    </button>
+                    <label class="uploadBtn" for="inputProfileFile" title="Carica Immagine">
+                        <span class="material-symbols-outlined">
+                            upload
+                        </span>
+                    </label>
+                    <input type="hidden" name="intent" value="profilo">
+                    <button type="button" class="deleteButton" title="Elimina Immagine">
+                        <span class="material-symbols-outlined">
+                            delete
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <script>
+        document.querySelectorAll('.deleteButton').forEach(function(button) {
+            button.addEventListener('click', function() {
+              var form = this.closest('form');
+              var cf = form.querySelector('input[name="cf"]').value;
+              var intent = form.querySelector('input[name="intent"]').value;
+
+              var deleteForm = document.createElement('form');
+              deleteForm.action = '/deleteUserImage';
+              deleteForm.method = 'post';
+
+              var inputCf = document.createElement('input');
+              inputCf.type = 'hidden';
+              inputCf.name = 'cf';
+              inputCf.value = cf;
+              deleteForm.appendChild(inputCf);
+
+              var inputIntent = document.createElement('input');
+              inputIntent.type = 'hidden';
+              inputIntent.name = 'intent';
+              inputIntent.value = intent;
+              deleteForm.appendChild(inputIntent);
+
+              document.body.appendChild(deleteForm);
+              deleteForm.submit();
+            });
+        });
+        </script>
+        <script>
+            const profilePic = document.getElementById('profilePic');
+            const inputProfileFile = document.getElementById('inputProfileFile');
+            inputProfileFile.onchange = function() {
+                profilePic.src = URL.createObjectURL(inputProfileFile.files[0]);
+            }
+        </script>
+        <script>
+            const inputSigningFile = document.getElementById('inputSigningFile');
+            const cropImage = document.getElementById('cropImage');
+            const croppedImageInput = document.getElementById('croppedImage');
+            const croppedImagePreview = document.getElementById('signPic');
+            let cropper;
+
+            inputSigningFile.onchange = function(event) {
+                const files = event.target.files;
+                if (files && files.length > 0) {
+                    const file = files[0];
+                    const url = URL.createObjectURL(file);
+                    cropImage.src = url;
+
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+
+                    cropper = new Cropper(cropImage, {
+                        aspectRatio: 236 / 47,
+                        viewMode: 0,
+                        autoCropArea: 1,
+                        crop(event) {
+                            const canvas = cropper.getCroppedCanvas({
+                                width: 236,
+                                height: 47,
+                                fillColor: 'white'
+                            });
+
+                            const croppedDataUrl = canvas.toDataURL('image/jpeg');
+                            croppedImageInput.value = croppedDataUrl;
+                            croppedImagePreview.src = croppedDataUrl;
+                        },
+                    });
+
+                    document.getElementById('cropContainer').style.display = 'block';
+                }
+            };
+        </script>
+    </section>
+    <form id="updateUserForm" action="/updateUser" method="post">
+        <table>
+            <thead>
+                <tr>
+                    <th>Campo</th>
+                    <th>Valore</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Cognome</td>
+                    <td><input type="text" id="cognome" name="cognome" value="<%= user.cognome %>"></td>
+                </tr>
+                <tr>
+                    <td>Nome</td>
+                    <td><input type="text" id="nome" name="nome" value="<%= user.nome %>"></td>
+                </tr>
+                <tr>
+                    <td>Codice Fiscale</td>
+                    <td><input type="text" id="cf" name="cf" value="<%= user.cf %>"></td>
+                </tr>
+                <tr>
+                    <td>Via di Residenza</td>
+                    <td><input type="text" id="viaResidenza" name="viaResidenza" value="<%= user.spedizione.via %>"></td>
+                </tr>
+                <tr>
+                    <td>Numero Civico</td>
+                    <td><input type="text" id="civicoResidenza" name="civicoResidenza" value="<%= user.spedizione.nCivico %>"></td>
+                </tr>
+                <tr>
+                    <td>Cap</td>
+                    <td><input type="text" id="capResidenza" name="capResidenza" value="<%= user.spedizione.cap %>"></td>
+                </tr>
+                <tr>
+                    <td>Comune di Residenza</td>
+                    <td><input type="text" id="comuneResidenza" name="comuneResidenza" value="<%= user.spedizione.comune %>"></td>
+                </tr>
+                <tr>
+                    <td>Provincia di Residenza</td>
+                    <td>
+                        <select name="provinciaResidenza" class="provincia">
+                            <option value="<%= user.spedizione.provincia %>"><%= user.spedizione.provincia %></option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td><input type="email" id="email" name="email" value="<%= user.contatti.email %>" autocomplete="false"></td>
+                </tr>
+                <tr>
+                    <td>Telefono</td>
+                    <td><input type="tel" id="tel" name="tel" value="<%= user.contatti.tel %>" autocomplete="false"></td>
+                </tr>
+                <tr>
+                    <td>Tipo di Documento</td>
+                    <td><input type="text" id="documento" name="documento" value="<%= user.documento %>"></td>
+                </tr>
+                <tr>
+                    <td>Numero di Documento</td>
+                    <td><input type="text" id="nDocumento" name="nDocumento" value="<%= user.nDocumento %>"></td>
+                </tr>
+                <tr>
+                    <td>Visita Medica</td>
+                    <td><input type="datetime-local" id="visita" name="visita" value="<%= `${user.visita.data}T${user.visita.ora}` %>"></td>
+                </tr>
+                <tr> 
+                    <td>Numero Protocollo</td>
+                    <td>
+                        <input type="text" id="nProtocollo" name="nProtocollo" value="<%= user.protocollo %>"> <br>
+                    </td>
+                </tr>
+                <tr> 
+                    <td>Numero Patente</td>
+                    <td><input type="text" id="nPatente" name="nPatente" value="<%= user.nPatente %>"></td>
+                </tr>
+                <tr>
+                    <td>Note</td>
+                    <td><textarea name="note" id="note"><%= user.note %></textarea></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <!-- <td colspan="2"><button id="submitFormBtn" type="submit">Salva</button></td> -->
+            </tfoot>
+        </table>
+        
+    </form>
+
+    <script>
+        const provinceList = [
+            "AG", "AL", "AN", "AR", "AP", "AT", "AV", "BA", "BT", "BL",
+            "BN", "BG", "BI", "BO", "BZ", "BS", "BR", "CA", "CL", "CB",
+            "CI", "CE", "CT", "CZ", "CH", "CO", "CS", "CR", "KR", "CN",
+            "EN", "FM", "FE", "FI", "FG", "FC", "FR", "GE", "GO", "GR",
+            "IM", "IS", "AQ", "SP", "LT", "LE", "LC", "LI", "LO", "LU",
+            "MC", "MN", "MS", "MT", "VS", "ME", "MI", "MO", "MB", "NA",
+            "NO", "NU", "OG", "OT", "OR", "PD", "PA", "PR", "PV", "PG",
+            "PU", "PE", "PC", "PI", "PT", "PN", "PZ", "PO", "RG", "RA",
+            "RC", "RE", "RI", "RN", "RM", "RO", "SA", "SS", "SV", "SI",
+            "SR", "SO", "TA", "TE", "TR", "TO", "TP", "TN", "TV", "TS",
+            "UD", "AO", "VA", "VE", "VB", "VC", "VR", "VV", "VI", "VT"
+        ];
+    
+        const selectProvince = document.querySelectorAll(".provincia");
+
+        selectProvince.forEach((opt) => {
+            provinceList.forEach(province => {
+                // Verifica se l'opzione è già presente nel menu a discesa
+                if (!opt.querySelector(`option[value="${province}"]`)) {
+                    const option = document.createElement("option");
+                    option.value = province;
+                    option.textContent = province;
+                    opt.appendChild(option);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -117,4 +117,11 @@ router.post('/rinnovi/upload/profile', authenticateJWT, (req, res) => {
     });
 });
 
+
+router.get('/admin/rinnovi/userPage', authenticateJWT, async (req, res)=> {
+    const id = req.query.id;
+    const user = await rinnovi.findOne({"_id": id});
+    res.render('admin/rinnovi/userPage', {user});
+});
+
 module.exports = router;

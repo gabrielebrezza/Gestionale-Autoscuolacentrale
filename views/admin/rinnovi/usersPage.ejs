@@ -195,7 +195,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td><!-- <a href="<%#`/userPage?cf=${encodeURIComponent(user.cFiscale)}`%>"> --><%= user.nome %><!-- </a> --></td>
+                            <td><a href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>"><%= user.nome %></a></td>
                             <td><%= user.cognome %></td>
                             <td><%= user.contatti.email %></td>
                             <td><%= user.contatti.tel %></td>
