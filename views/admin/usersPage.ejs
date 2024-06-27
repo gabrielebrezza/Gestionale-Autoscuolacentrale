@@ -17,7 +17,7 @@
                         <span id="selectUsers" class="material-symbols-outlined">
                             checklist
                         </span>
-                        <button type="submit" class="elimina">
+                        <button type="submit" class="elimina action">
                             <span class="material-symbols-outlined">
                                 delete_forever
                             </span>
@@ -43,7 +43,7 @@
                         <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %>" data-archiviato="<%= user.archiviato %>">
                             <td>
                                 <div class="cellContent">
-                                    <input class="elimina" type="checkbox" name="codiceFiscale<%= index %>" value="<%= user.cFiscale %>">
+                                    <input class="action" type="checkbox" name="user<%= index %>" value="<%= user._id %>">
                                     <div class="numero">
                                         <%= user.archiviato ? enumArchiviati++ : enumUtenti++ %>
                                     </div>
@@ -98,7 +98,7 @@
     </table>
     <script>
         const selectUsersBtn = document.getElementById('selectUsers');
-        const usersTd = document.querySelectorAll('.elimina');
+        const usersTd = document.querySelectorAll('.action');
         const deleteUsersForm = document.getElementById('deleteUsersForm');
         selectUsersBtn.addEventListener('click', () => {
             usersTd.forEach((td) => {

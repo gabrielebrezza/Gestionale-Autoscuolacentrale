@@ -244,16 +244,21 @@
                 },
                 body: JSON.stringify(formData)
             })
-            .then(response => response.json())
+            .then(response => response.json().then(data => {
+                if (!response.ok) {
+                    throw new Error(data.error || 'Errore sconosciuto');
+                }
+                return data;
+            }))
             .then(data => {
-                alert(data)
-                console.log(data)
+                alert(data.message);
+                console.log(data);
                 addUserForm.style.display = 'none';
                 id = data.id
                 document.getElementById('signatureContainer').style.display = 'grid';
             })
             .catch(error => {
-                alert('Errore:', error)
+                alert(error.message)
                 console.error('Errore:', error);
             });
         });

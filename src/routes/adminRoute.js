@@ -281,9 +281,9 @@ router.get('/images', authenticateJWT, async (req, res) => {
 
 router.post('/deleteUsers', authenticateJWT, async (req, res) => {
   const users = req.body;
-  for (const cf of Object.values(users)) {
-      await utenti.deleteOne({"cFiscale": cf});
-      console.log(`utente ${cf} eliminato definitivamente`);
+  for (const id of Object.values(users)) {
+      await utenti.deleteOne({"_id": id});
+      console.log(`utente ${id} eliminato definitivamente`);
   }
   res.redirect('/admin');
 });
