@@ -251,6 +251,7 @@
                 document.getElementById('signatureContainer').style.display = 'grid';
             })
             .catch(error => {
+                alert('Errore:', error)
                 console.error('Errore:', error);
             });
         });
