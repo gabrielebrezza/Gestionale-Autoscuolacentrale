@@ -45,7 +45,7 @@ router.post('/rinnovi/addUser', authenticateJWT, async (req, res) => {
             tel: tel
         }
     } catch (error) {
-        return res.json({error: `Errore nel recupero dell'indirizzo`});
+        return res.send(500).json({error: `Errore nel recupero dell'indirizzo`});
     }
     const saveUser = new rinnovi({
         "nome": nome.trim(),
@@ -61,11 +61,11 @@ router.post('/rinnovi/addUser', authenticateJWT, async (req, res) => {
         saveUser.save()
         .then(() => {
             console.log(`Nuovo utente rinnovi salvato: ${nome} ${cognome}`);
-            return res.json({ message: 'Dati salvati con successo!', id: saveUser._id });
+            return res.send(200).json({ message: 'Dati salvati con successo!', id: saveUser._id });
         })
-        .catch((errore) => {
-            console.error(`Errore durante il salvataggio del nuovo utente rinnovi: ${errore}`);
-            return res.json({error: `Errore durante il salvataggio dell'utente`});
+        .catch((error) => {
+            console.error(`Errore durante il salvataggio del nuovo utente rinnovi: ${error}`);
+            return res.send(500).json({error: `Errore durante il salvataggio dell'utente`});
         });
 });
 router.post('/rinnovi/deleteUsers', authenticateJWT, async (req, res)=> {

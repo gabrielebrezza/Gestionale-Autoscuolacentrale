@@ -246,6 +246,8 @@
             })
             .then(response => response.json())
             .then(data => {
+                alert(data)
+                console.log(data)
                 addUserForm.style.display = 'none';
                 id = data.id
                 document.getElementById('signatureContainer').style.display = 'grid';
