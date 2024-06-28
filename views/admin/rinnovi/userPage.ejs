@@ -224,7 +224,7 @@
 
             <form class="imageForm" action="/uploadUserImage" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="cf" value="<%= user.cFiscale %>">
-                <img id="profilePic" src="<%= `/images?dir=${encodeURIComponent('immaginiRinnovi/')}${encodeURIComponent(user._id)}.png'` %>" alt="Immagine Profilo">
+                <img id="profilePic" src="<%= `/images?dir=${encodeURIComponent('immaginiRinnovi/')}${encodeURIComponent(user._id)}.png` %>" alt="Immagine Profilo">
 
                 <input type="file" id="inputProfileFile" name="inputProfileFile" accept="image/*">
                 <div class="formField">
