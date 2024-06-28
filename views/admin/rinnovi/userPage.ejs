@@ -196,7 +196,7 @@
         
         <div class="imageForms">
             <form class="imageForm" action="/uploadUserFirma" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="cf" value="<%= user.cFiscale %>">
+                <input type="hidden" name="cf" value="<%= user.cf %>">
                 <img id="signPic" src="<%= `/images?dir=${encodeURIComponent('firmeRinnovi/')}${encodeURIComponent(user._id)}.png` %>" alt="Scansione Firma">
  
                 <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
@@ -323,7 +323,7 @@
             };
         </script>
     </section>
-    <form id="updateUserForm" action="/updateUser" method="post">
+    <form id="updateUserForm" action="/rinnovi/updateUser" method="post">
         <table>
             <thead>
                 <tr>
@@ -333,6 +333,7 @@
             </thead>
             <tbody>
                 <tr>
+                    <input type="hidden" name="id" value="<%= user._id %>">
                     <td>Cognome</td>
                     <td><input type="text" id="cognome" name="cognome" value="<%= user.cognome %>"></td>
                 </tr>
@@ -374,15 +375,7 @@
                 </tr>
                 <tr>
                     <td>Telefono</td>
-                    <td><input type="tel" id="tel" name="tel" value="<%= user.contatti.tel %>" autocomplete="false"></td>
-                </tr>
-                <tr>
-                    <td>Tipo di Documento</td>
-                    <td><input type="text" id="documento" name="documento" value="<%= user.documento %>"></td>
-                </tr>
-                <tr>
-                    <td>Numero di Documento</td>
-                    <td><input type="text" id="nDocumento" name="nDocumento" value="<%= user.nDocumento %>"></td>
+                    <td><input type="tel" id="tel" name="tel" value="<%= user.contatti.tel %>"></td>
                 </tr>
                 <tr>
                     <td>Visita Medica</td>
@@ -404,7 +397,7 @@
                 </tr>
             </tbody>
             <tfoot>
-                <!-- <td colspan="2"><button id="submitFormBtn" type="submit">Salva</button></td> -->
+                <td colspan="2"><button id="submitFormBtn" type="submit">Salva</button></td>
             </tfoot>
         </table>
         

@@ -30,9 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    causaFilter.addEventListener('change', filterTransazioni);
-    fromDateFilter.addEventListener('change', filterTransazioni);
-    toDateFilter.addEventListener('change', filterTransazioni);
-    entrataFilter.addEventListener('change', filterTransazioni);
-    uscitaFilter.addEventListener('change', filterTransazioni);
+    causaFilter.addEventListener('input', filterTransazioni);
+    fromDateFilter.addEventListener('input', filterTransazioni);
+    toDateFilter.addEventListener('input', filterTransazioni);
+    entrataFilter.addEventListener('input', filterTransazioni);
+    uscitaFilter.addEventListener('input', filterTransazioni);
 });

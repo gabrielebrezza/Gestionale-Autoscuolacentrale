@@ -85,7 +85,6 @@
             
             <fieldset>
                 <!-- linea 2 -->
-                <legend>Anticipazioni Conto Cliente</legend>
                 <input type="hidden" id="descrizione" name="descrizione2" value="<%= iscrizione ? 'Costo Servizio' : 'anticipazioni conto cliente iva esclusa art.15 dpr 633/72' %>">
                 <label for="prezzoUnitario2">Prezzo Unitario:</label><br>
                 <input type="text" id="prezzoUnitario2" name="prezzoUnitario2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>

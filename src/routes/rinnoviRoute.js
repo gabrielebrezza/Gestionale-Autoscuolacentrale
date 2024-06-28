@@ -13,7 +13,6 @@ const rinnovi = require('../DB/Rinnovi');
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
-const { rectanglesAreEqual } = require('pdf-lib');
 
 router.get('/admin/rinnovi', authenticateJWT, async (req, res) =>{
     const users = await rinnovi.find({});
@@ -74,10 +73,15 @@ router.post('/rinnovi/deleteUsers', authenticateJWT, async (req, res)=> {
         .filter(key => key.startsWith('user')))
         .map(key => req.body[key]);
     try {
-        if(action == 'archivia'){
+        if(action == 'archive'){
             for (const id of ids) {
                 await rinnovi.findOneAndUpdate({"_id": id}, {"archiviato": true});
                 console.log(`utente rinnovi ${id} archiviato`);
+            }
+        }else if(action == 'unarchive'){
+            for (const id of ids) {
+                await rinnovi.findOneAndUpdate({"_id": id}, {"archiviato": false});
+                console.log(`utente rinnovi ${id} disarchiviato`);
             }
         }else{
             for (const id of ids) {
@@ -128,6 +132,37 @@ router.get('/admin/rinnovi/userPage', authenticateJWT, async (req, res)=> {
     const id = req.query.id;
     const user = await rinnovi.findOne({"_id": id});
     res.render('admin/rinnovi/userPage', {user});
+});
+
+router.post('/rinnovi/updateUser', authenticateJWT, async (req, res)=> {
+    const id = req.body.id;
+    const dati = req.body;
+    const [dataVisita, oraVisita] = dati.visita.split('T');
+    const userData= {
+        nome: dati.nome,
+        cognome: dati.cognome,
+        cf: dati.cf,
+        contatti: {
+            email: dati.email,
+            tel: dati.tel,
+        },
+        spedizione: {
+            via: dati.viaResidenza,
+            nCivico: dati.civicoResidenza,
+            cap: dati.capResidenza,
+            comune: dati.comuneResidenza,
+            provincia: dati.provinciaResidenza,
+        },
+        visita: {
+            data: dataVisita,
+            ora: oraVisita
+        },
+        protocollo: dati.nProtocollo,
+        numeroPatente: dati.nPatente,
+        note: dati.note
+    };
+    await rinnovi.findOneAndUpdate({"_id": id}, userData);
+    res.redirect(`/admin/rinnovi/userPage?id=${id}`);
 });
 
 module.exports = router;

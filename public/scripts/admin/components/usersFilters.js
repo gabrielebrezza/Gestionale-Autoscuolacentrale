@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const patenteTd = row.getElementsByTagName('td')[6].textContent.toLowerCase();
             const dataRegTd = row.getElementsByTagName('td')[7].textContent.toLowerCase();
             const dataEsamiTd = row.getElementsByTagName('td')[8].textContent.toLowerCase().replace(/\s+/g, ' ').trim().split(' ');
-            const isArchiviato = Boolean(row.dataset.archiviato);
+            const isArchiviato = row.dataset.archiviato == 'true';
             let isDateEsameInRange;
             for (const esame of dataEsamiTd) {
                 const dataEsame = new Date(esame.split('/').reverse().join('-'));

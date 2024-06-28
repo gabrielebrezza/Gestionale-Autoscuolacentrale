@@ -53,6 +53,10 @@
                 <input type="tel" name="filterPhone" id="filterPhone">
             </div>
             <div class="field">
+                <label for="filterArchived">Archiviato</label>
+                <input type="checkbox" name="filterArchived" id="filterArchived">
+            </div>
+            <div class="field">
                 <h3>Visita Medica</h3><br>
                 <div>
                     <label for="filterVisitaFromDate">Da Data:</label>
@@ -168,7 +172,7 @@
                                 delete_forever
                             </span>
                         </button>
-                        <button type="submit" class="archivia theadBtn action" name="action" value="archivia">
+                        <button type="submit" class="archivia theadBtn action" name="action" value="archive">
                             <span class="material-symbols-outlined">
                                 archive
                             </span>
@@ -186,7 +190,7 @@
                 <% let enumArchiviati = 1 %>
                 <% let enumUtenti = 1 %>
                 <% users.forEach(function(user, index) { %>
-                        <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %> row" data-archiviato="<%= user.archiviato %>">
+                        <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %> row" data-archiviato="<%= !!user.archiviato %>">
                             <td>
                                 <div class="cellContent">
                                     <input class="action" type="checkbox" name="user<%= index %>" value="<%= user._id %>">
@@ -199,7 +203,9 @@
                             <td><%= user.cognome %></td>
                             <td><%= user.contatti.email %></td>
                             <td><%= user.contatti.tel %></td>
-                            <td><%= user.visita ? `${user.visita.data.split('-').reverse().join('/')} ${user.visita.ora}`  : 'Mancante' %></td>
+                            <% const dataVisita = user.visita.data ? user.visita.data.split('-').reverse().join('/') : '' %>
+                            <% const oraVisita = user.visita.ora ? user.visita.ora : '' %>
+                            <td><%= dataVisita || oraVisita ? `${dataVisita} ${oraVisita}`  : 'Mancante' %></td>
                         </tr>
                 <% }); %>
             </tbody>
@@ -232,6 +238,9 @@
         const filterVisitaToDate = document.getElementById('filterVisitaToDate');
         const filterVisitaFromHour = document.getElementById('filterVisitaFromHour');
         const filterVisitaToHour = document.getElementById('filterVisitaToHour');
+        const filterArchived = document.getElementById('filterArchived');
+        const archiveBtn = document.querySelector('.archivia')
+        const archiveBtnSpan = document.querySelector('.archivia span')
         const rows = document.querySelectorAll('.row');
     
     const filterRinnovi = () => {
@@ -243,7 +252,10 @@
         const toDate = new Date(filterVisitaToDate.value); 
         const fromHour = filterVisitaFromHour.value.split(':')[0]*60 + +filterVisitaFromHour.value.split(':')[1];
         const toHour = filterVisitaToHour.value.split(':')[0]*60 + +filterVisitaToHour.value.split(':')[1];
+        const archived = filterArchived.checked;
         for(const row of rows){
+            const isArchived = row.dataset.archiviato == 'true';
+            console.log(Boolean('false'));
             const nomeTd = row.getElementsByTagName('td')[1].textContent.toLocaleLowerCase();
             const cognomeTd = row.getElementsByTagName('td')[2].textContent.toLocaleLowerCase();
             const emailTd = row.getElementsByTagName('td')[3].textContent.toLocaleLowerCase();
@@ -259,11 +271,21 @@
                 (email === '' || emailTd.includes(email)) &&
                 (tel === '' || telTd.includes(tel)) &&
                 ((oraCompresa) || !filterVisitaFromHour.value || !filterVisitaToHour.value) &&
-                 ((dataCompresa) || !filterVisitaFromDate.value || !filterVisitaToDate.value)
+                ((dataCompresa) || !filterVisitaFromDate.value || !filterVisitaToDate.value) &&
+                ((archived && isArchived) || (!archived && !isArchived))
             ){
                 row.style.display = 'table-row'
             }else{
                 row.style.display = 'none'
+            }
+            if(archived){
+                archiveBtn.value = 'unarchive';
+                archiveBtnSpan.style.color = 'green';
+                archiveBtnSpan.innerText = 'unarchive'
+            }else{
+                archiveBtn.value = 'archive';
+                archiveBtnSpan.style.color = 'orange';
+                archiveBtnSpan.innerText = 'archive'
             }
         }
     }
@@ -276,6 +298,7 @@
     filterVisitaToDate.addEventListener('input', filterRinnovi);
     filterVisitaFromHour.addEventListener('input', filterRinnovi);
     filterVisitaToHour.addEventListener('input', filterRinnovi);
+    filterArchived.addEventListener('input', filterRinnovi);
 });
 
 </script>
