@@ -272,28 +272,28 @@ router.post('/createCode', async (req, res) => {
 });
 
 router.post('/stampa', async (req, res)=> {
-  const { cf, modulo } = req.body;
+  const { id, modulo } = req.body;
   
-  const filePath = path.resolve(__dirname, '../../certificati', `${modulo}` , `${modulo}_${cf}.pdf`);
+  const filePath = path.resolve(__dirname, '../../certificati', `${modulo}` , `${modulo}_${id}.pdf`);
   try {
       await fsp.access(filePath);
       res.setHeader('Content-Type', 'application/pdf');
 
       res.sendFile(filePath, { 
         headers: {
-          'Content-Disposition': `inline; filename=${modulo}_${cf}.pdf`
+          'Content-Disposition': `inline; filename=${modulo}_${id}.pdf`
         }
       });
   } catch (err) {
       if(modulo == 'residenza'){
-        await compilaCertResidenza(cf);
+        await compilaCertResidenza(id);
       }else{
-        await compilaTt2112(cf);
+        await compilaTt2112(id);
       }
       res.setHeader('Content-Type', 'application/pdf');
       res.sendFile(filePath, { 
         headers: {
-          'Content-Disposition': `inline; filename=${modulo}_${cf}.pdf`
+          'Content-Disposition': `inline; filename=${modulo}_${id}.pdf`
         }
       });
   }

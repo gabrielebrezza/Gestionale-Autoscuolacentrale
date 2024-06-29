@@ -196,7 +196,7 @@
         <div class="certificatiActions">
             <form class="printForm" action="/stampa" method="POST"> 
                 <label for="printTT2112">TT2112:</label>
-                <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
+                <input type="hidden" name="id" value="<%= user._id %>"> 
                 <input type="hidden" name="modulo" value="tt2112"> 
                 <button id="printTT2112" type="submit" title="Stampa TT2112">
                     <span class="material-symbols-outlined">
@@ -207,7 +207,7 @@
 
             <form class="printForm" action="/stampa" method="POST"> 
                 <label for="printResidenza">RESIDENZA:</label>
-                <input type="hidden" name="cf" value="<%= user.cFiscale %>"> 
+                <input type="hidden" name="id" value="<%= user._id %>"> 
                 <input type="hidden" name="modulo" value="residenza"> 
                 <button id="printResidenza" type="submit"  title="Stampa Autocertificazione di Residenza">
                     <span class="material-symbols-outlined">
