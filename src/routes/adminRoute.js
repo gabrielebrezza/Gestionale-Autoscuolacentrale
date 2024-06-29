@@ -17,11 +17,13 @@ const cassa = require('../DB/Cassa');
 const ClientiGenerici = require('../DB/ClientiGenerici');
 const numeroFattura = require('../DB/NumeroFattura');
 const storicoFatture = require('../DB/StoricoFatture');
+const rinnovi = require('../DB/Rinnovi');
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
 const {creaFatturaElettronica, creaFatturaCortesia} = require('../utils/fattureUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
 const {compilaTt2112, compilaCertResidenza} = require('../utils/compileUtils');
+const Rinnovi = require('../DB/Rinnovi.js');
 
 router.use(cookieParser());
 
@@ -316,17 +318,24 @@ router.get('/admin/emettiFattura', authenticateJWT, async (req, res)=> {
   try{
     const nFattura = await numeroFattura.findOne();
     if( req.query.cf && req.query.data && req.query.importo){
-      const cf = req.query.cf; 
+      const cf = req.query.cf;
       const data = req.query.data.split('/').reverse().join('-'); 
       const importo = req.query.importo; 
-      const datiUtente = await utenti.findOne(
+      const dati = await utenti.findOne(
         { "cFiscale": cf },
         { nome: 1, cognome: 1, cFiscale: 1, residenza: 1 }
       );
-      return res.render('admin/payments/fatture/emettiFattura', {numeroFattura: nFattura.numero, dati: datiUtente, cf, data, importo, iscrizione: true});
+      return res.render('admin/payments/fatture/emettiFattura', {numeroFattura: nFattura.numero, dati, cf, data, importo, iscrizione: true, rinnovo : false});
+    }else if(req.query.id){
+      const id = req.query.id;
+      const dati = await utenti.findOne(
+        { "_id": id },
+        { nome: 1, cognome: 1, cf: 1, spedizione: 1, fatture: 1}
+      );
+      return res.render('admin/payments/fatture/emettiFattura', {numeroFattura: nFattura.numero, dati, iscrizione: false, rinnovo : true});
     }
     const clienti = await ClientiGenerici.find();
-    res.render('admin/payments/fatture/emettiFattura', {numeroFattura: nFattura.numero, clienti, iscrizione: false});
+    res.render('admin/payments/fatture/emettiFattura', {numeroFattura: nFattura.numero, clienti, iscrizione: false, rinnovo : false});
   }catch(error){
       res.render('errorPage', {error: 'Utente non trovato'})
   }
@@ -334,26 +343,75 @@ router.get('/admin/emettiFattura', authenticateJWT, async (req, res)=> {
 
 
 router.post('/createFattura', authenticateJWT, async (req, res) =>{
-  let dati = req.body;
+  let dati;
+  if(req.body.id){
+    const user = await rinnovi.findOne({"_id": req.body.id});
+    const today = new Date();
+    const DD = String(today.getDate()).padStart(2, '0'); 
+    const MM = String(today.getMonth() + 1).padStart(2, '0'); 
+    const YYYY = today.getFullYear(); 
+    const data = `${YYYY}-${MM}-${DD}`;
+    const importo = req.body.importo;
+    dati = {
+      codiceDestinatario: '0000000',
+      nomeCliente: user.nome,
+      cognomeCliente: user.cognome,
+      codiceFiscaleCliente: user.cf,
+      emailCliente: user.contatti.email,
+      indirizzoSedeCliente: `${user.spedizione.via} ${user.spedizione.nCivico}`,
+      capSedeCliente: user.spedizione.cap,
+      comuneSedeCliente: user.spedizione.comune,
+      provinciaSedeCliente: user.spedizione.provincia,
+      nazioneSedeCliente: 'IT',
+      data: data,
+      ImportoTotaleDocumento: Number(importo).toFixed(2),
+      descrizione1: 'Servizio generazione IUV',
+      prezzoUnitario1: ((importo-27.80)/1.22).toFixed(2),
+      prezzoTotale1: ((importo-27.80)/1.22).toFixed(2),
+      aliquotaIVA: '22.00',
+      descrizione2: 'anticipazioni conto cliente iva esclusa art.15 dpr 633/72',
+      prezzoUnitario2: '27.80',
+      prezzoTotale2: '27.80',
+      aliquotaIVA2: '0.00',
+      aliquotaIVARiepilogo1: '22.00',
+      imponibileImporto1: ((importo-27.80)/1.22).toFixed(2),
+      imposta1: (((((importo-27.80)/1.22))*22)/100).toFixed(2),
+      esigibilitaIVA1: 'I',
+      aliquotaIVARiepilogo2: '0.00',
+      imponibileImporto2: '27.80',
+      imposta2: '0.00',
+      RiferimentoNormativo2: 'Anticipazioni conto cliente art. 15 DPR 633/72',
+      condizioniPagamento: 'TP02',
+      modalitaPagamento: 'MP05',
+      importoPagamento: Number(importo).toFixed(2)
+    }
+  }else{
+    dati = req.body;
+  }
+  const rinnovo = req.body.id ? true : false;
   const iscrizione = req.body.iscrizione == 'true';
   if(iscrizione){
     const {numeroIscrizioni} = await numeroFattura.findOne();
     dati.progressivoInvio = `i00${numeroIscrizioni}`;
     dati.numeroDocumento = `i00${numeroIscrizioni}`;
+  }else if(rinnovo){
+    const {numeroRinnovi} = await numeroFattura.findOne();
+    dati.progressivoInvio = `r00${numeroRinnovi}`;
+    dati.numeroDocumento = `r00${numeroRinnovi}`;
   }else{
     const {numeroGeneriche} = await numeroFattura.findOne();
     dati.progressivoInvio = `m00${numeroGeneriche}`;
     dati.numeroDocumento = `m00${numeroGeneriche}`;
   }
   try {
-    const result = await creaFatturaElettronica(dati, iscrizione);
+    const result = await creaFatturaElettronica(dati, iscrizione, rinnovo);
     console.log(result);
   } catch (error) {
     console.error('Errore nell\'emissione della fattura elettronica: ', error);
     return res.render('errorPage', { error: 'errore nell\'emissione della fattura elettronica' });
   }
   try {
-    const result = await creaFatturaCortesia(dati, iscrizione);
+    const result = await creaFatturaCortesia(dati, iscrizione, rinnovo);
     console.log(result);
   } catch (error) {
     console.error(error);
@@ -377,9 +435,13 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
           "fatture.$.emessa": true
         }
     });
+  }else if(rinnovo){
+    await rinnovi.findOneAndUpdate({"_id": req.body.id}, {"fatture": {"data": dati.data, "importo": dati.importoPagamento, "emessa": true}});
   }
   if(iscrizione){
     await numeroFattura.updateOne({$inc: {"numeroIscrizioni": 1}});
+  }else if(rinnovo){
+    await numeroFattura.updateOne({$inc: {"numeroRinnovi": 1}});
   }else{
     await numeroFattura.updateOne({$inc: {"numeroGeneriche": 1}});
   }
@@ -390,7 +452,7 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
   const dataFatturazione = `${DD}/${MM}/${YYYY}`;
   try{
     const nuovaFattura = new storicoFatture({
-      tipo: iscrizione ? 'iscrizione' : 'generica',
+      tipo: iscrizione ? 'iscrizione' : rinnovo ? 'rinnovo' : 'generica',
       numero: parseInt(dati.progressivoInvio.replace(/\D/g, ''), 10),
       importo: dati.importoPagamento,
       data: dataFatturazione,
@@ -419,7 +481,7 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
     console.log('errore: ', error);
   }
 
-  if(!iscrizione){
+  if(!iscrizione && !rinnovo){
     if(req.body.saveCustomerData == 'save'){
       try{
         const nuovoCliente = new ClientiGenerici({
@@ -444,6 +506,9 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
         return res.render('errorPage', {error: 'errore nell\'aggiunta del nuovo utente'});
       }
     }
+  }
+  if(rinnovo){
+    return res.redirect(`/admin/rinnovi`);
   }
   res.redirect(`/admin`);
 });

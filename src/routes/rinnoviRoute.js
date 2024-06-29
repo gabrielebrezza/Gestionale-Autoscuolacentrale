@@ -95,6 +95,18 @@ router.post('/rinnovi/deleteUsers', authenticateJWT, async (req, res)=> {
         return res.render('errorPage', {error: `errore durante l'eliminazione degli alievi`});
     }
 });
+router.get('/admin/rinnovi/pagamenti', async (req, res) => {
+    const pagamenti = await rinnovi.findOne({"_id": req.query.id}, {"fatture": 1}); 
+    if(!pagamenti.fatture.data) return res.render('errorPage', {error: "Questo utente non ha effetuato ancora un pagamento"});
+    res.render('admin/rinnovi/payments/storicoPagamenti',{pagamento: pagamenti.fatture})
+});
+
+
+
+
+
+
+
 
 router.post('/uploadUserImage', authenticateJWT, async (req, res) => {
     const data = req.body.image;
@@ -133,6 +145,7 @@ router.get('/admin/rinnovi/userPage', authenticateJWT, async (req, res)=> {
     const user = await rinnovi.findOne({"_id": id});
     res.render('admin/rinnovi/userPage', {user});
 });
+
 
 router.post('/rinnovi/updateUser', authenticateJWT, async (req, res)=> {
     const id = req.body.id;

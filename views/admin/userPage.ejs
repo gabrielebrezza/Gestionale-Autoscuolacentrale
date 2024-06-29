@@ -90,7 +90,7 @@
         .imageForm{
             max-width: 250px;
             width: 100%;
-            background: #fff;
+            background: #eee;
             height: fit-content;
             padding: 5px;
             border-radius: 5px;
@@ -99,7 +99,6 @@
             display: flex;
             align-items: center;
             flex-direction: column;
-            border: 2px solid #333;
             margin-block: 15px;
         }
         #signPic{
@@ -132,7 +131,7 @@
             padding: 12px 20px;
         }
         .imageForm button:hover, .imageForm label:hover {
-            background-color: #5681a9;
+            background: #5681a9;
         }
         .imageForm input{
             display: none;
@@ -248,7 +247,7 @@
             </form>
 
             <form class="imageForm"  id="profileImageForm" enctype="multipart/form-data">
-                <h2>FotoTessera</h2>
+                <h2>Foto Tessera</h2>
                 <input type="hidden" name="id" value="<%= user._id %>">
                 <input type="hidden" name="location" id="profileLocation" value="immaginiIscrizioni">
                 <img id="profilePic" src="<%= `/images?dir=${encodeURIComponent('immaginiIscrizioni/')}${encodeURIComponent(user._id)}.jpeg` %>" alt="Immagine Profilo" onerror="this.style.display='none';">

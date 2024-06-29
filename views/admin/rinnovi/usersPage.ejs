@@ -183,7 +183,7 @@
                     <th>Email</th>
                     <th>Telefono</th>
                     <th>Visita Medica</th>
-                    <!-- <th>Fatture</th> -->
+                    <th>Fatture</th>
                 </tr>
             </thead>
             <tbody id="usersTableBody">
@@ -206,6 +206,13 @@
                             <% const dataVisita = user.visita.data ? user.visita.data.split('-').reverse().join('/') : '' %>
                             <% const oraVisita = user.visita.ora ? user.visita.ora : '' %>
                             <td><%= dataVisita || oraVisita ? `${dataVisita} ${oraVisita}`  : 'Mancante' %></td>
+                            <td class="buttonCell">
+                                <a class="pagamenti" href="<%= `/admin/rinnovi/pagamenti?id=${encodeURIComponent(user._id)}` %>">
+                                    <span class="material-symbols-outlined">
+                                       payments
+                                    </span>
+                                </a>
+                            </td>
                         </tr>
                 <% }); %>
             </tbody>

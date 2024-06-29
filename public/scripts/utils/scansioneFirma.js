@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     const inputSigningFile = document.getElementById('inputSigningFile');
     const cropImage = document.getElementById('cropImage');
-    const croppedImageInput = document.getElementById('croppedImage');
     const croppedImagePreview = document.getElementById('signPic');
     let cropper;
 
     inputSigningFile.onchange = function(event) {
+        croppedImagePreview.style.display = 'block';
         const files = event.target.files;
         if (files && files.length > 0) {
             const file = files[0];

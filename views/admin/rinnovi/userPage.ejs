@@ -11,7 +11,8 @@
         .documentSection{
             margin-top: 150px;
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
+            align-items: center;
             flex-wrap: wrap;
         }
         .printForm{
@@ -90,16 +91,15 @@
         .imageForm{
             max-width: 250px;
             width: 100%;
-            background: #fff;
+            background: #eee;
             height: fit-content;
-            padding: 5px;
+            padding: 25px;
             border-radius: 5px;
             text-align: center;
             color: #333;
             display: flex;
             align-items: center;
             flex-direction: column;
-            border: 2px solid #333;
             margin-block: 15px;
         }
         #signPic{
@@ -117,7 +117,7 @@
 
         .imageForm button, .imageForm label{
             width: fit-content;
-            background-color: #71a1cb;
+            background: #71a1cb;
             color: #fff;
             padding: 12px 12px;
             margin: 10px auto;
@@ -132,7 +132,7 @@
             padding: 12px 20px;
         }
         .imageForm button:hover, .imageForm label:hover {
-            background-color: #5681a9;
+            background: #5681a9;
         }
         .imageForm input{
             display: none;
@@ -185,6 +185,38 @@
         button.deleteButton:hover {
             background: rgb(119, 64, 64);
         }
+
+
+        .pay form{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #eee;
+            padding: 25px;
+            border-radius: 5px;
+            row-gap: 15px;
+        }
+        .pay form label{
+            font-size: 1.3rem;
+        }
+        .pay form input{
+            border: none;
+            outline: none;
+            padding: 5px;
+        }
+        .pay form button{
+            background: #71a1cb;
+            color: #eee;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            width: fit-content;
+            padding: 12px;
+            transition: .5s;
+        }
+        .pay form button:hover{
+            background: #5681a9;
+        }
     </style>
     <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
@@ -223,7 +255,7 @@
             </form>
 
             <form class="imageForm" id="profileImageForm">
-                <h2>FotoTessera</h2>
+                <h2>Foto Tessera</h2>
                 <input type="hidden" name="id" value="<%= user._id %>">
                 <input type="hidden"  name="location" id="profileLocation" value="immaginiRinnovi">
                 <img id="profilePic" src="<%= `/images?dir=${encodeURIComponent('immaginiRinnovi/')}${encodeURIComponent(user._id)}.jpeg` %>" alt="Immagine Profilo" onerror="this.style.display='none';">
@@ -252,6 +284,16 @@
         <script src="/scripts/utils/scansioneFirma.js"></script>
         <script src="/scripts/utils/saveProfileImage.js"></script>
         <script src="/scripts/utils/deleteUserImage.js"></script>
+        <% if (!user.fatture.importo) { %>
+            <div class="pay">
+                <form action="/createFattura" method="POST">
+                    <input type="hidden" name="id" value="<%= user._id %>">
+                    <label for="importo">Importo:</label>
+                    <input type="number" name="importo" id="importo" value="<%= user.fatture.importo %>">
+                    <button type="submit">Pagato</button>
+                </form>
+            </div>
+        <% } %>
     </section>
     <form id="updateUserForm" action="/rinnovi/updateUser" method="post">
         <table>

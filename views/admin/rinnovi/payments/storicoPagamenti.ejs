@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storico Pagamenti</title>
+    <link rel="stylesheet" href="/styles/admin/payments/storicoPagamenti.css">
+</head>
+<body>
+    <%- include('../../components/header.ejs') %>
+    <main>
+        <table>
+            <thead>
+                <th>data</th>
+                <th>importo</th>
+            </thead>
+            <tbody>
+                <tr>
+                    <tr>
+                        <td><%= pagamento.data %></td>
+                        <td><%= pagamento.importo %>€</td>
+                    </tr>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>
