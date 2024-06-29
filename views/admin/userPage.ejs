@@ -220,9 +220,10 @@
 
         <div class="imageForms">
             <form class="imageForm" id="firmaImageForm">
+                <h2>Firma</h2>
                 <input type="hidden" name="id" value="<%= user._id %>">
                 <input type="hidden" name="location" id="firmaLocation" value="firmeIscrizioni">
-                <img id="signPic" src="<%= `/images?dir=${encodeURIComponent('firmeIscrizioni/')}${encodeURIComponent(user._id)}.jpeg` %>" alt="Scansione Firma">
+                <img id="signPic" src="<%= `/images?dir=${encodeURIComponent('firmeIscrizioni/')}${encodeURIComponent(user._id)}.jpeg` %>" alt="Scansione Firma" onerror="this.style.display='none';">
  
                 <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
                 <div class="formField">
@@ -247,9 +248,10 @@
             </form>
 
             <form class="imageForm"  id="profileImageForm" enctype="multipart/form-data">
+                <h2>FotoTessera</h2>
                 <input type="hidden" name="id" value="<%= user._id %>">
                 <input type="hidden" name="location" id="profileLocation" value="immaginiIscrizioni">
-                <img id="profilePic" src="<%= `/images?dir=${encodeURIComponent('immaginiIscrizioni/')}${encodeURIComponent(user._id)}.jpeg` %>" alt="Immagine Profilo">
+                <img id="profilePic" src="<%= `/images?dir=${encodeURIComponent('immaginiIscrizioni/')}${encodeURIComponent(user._id)}.jpeg` %>" alt="Immagine Profilo" onerror="this.style.display='none';">
 
                 <input type="file" id="inputProfileFile" name="inputProfileFile" accept="image/*">
                 <div class="formField">

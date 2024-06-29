@@ -148,14 +148,6 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    immagineProfilo: {
-        type: String,
-        required: false
-    },
-    firma: {
-        type: String,
-        required: false
-    },
     fatture: [
         {
             data: {
