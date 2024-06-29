@@ -50,18 +50,18 @@ function clearCanvas() {
 }
 
 function saveSignature() {
-    const dataURL = canvas.toDataURL('image/png');
+    const dataURL = canvas.toDataURL('image/jpeg');
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/rinnovi/upload/signature', true);
+    xhr.open('POST', '/uploadUserImage', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             alert('Firma salvata con successo');
             document.getElementById('signatureContainer').style.display = 'none';
-            document.getElementById('profileImageContainer').style.display = 'block';
+            document.getElementById('profileImageForm').style.display = 'block';
         }
     }; 
-    xhr.send(JSON.stringify({ image: dataURL, id: id }));
+    xhr.send(JSON.stringify({ image: dataURL, id: document.querySelector('input[name="id"]').value, location: 'firmeRinnovi' }));
 }
 
 canvas.addEventListener('mousedown', startDrawing);

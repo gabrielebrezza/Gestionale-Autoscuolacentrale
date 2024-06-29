@@ -22,8 +22,8 @@ router.post('/stripeHooks', express.raw({type: 'application/json'}), async (req,
     if(event.type == 'checkout.session.completed') {
         const session = event.data.object;
         const price = session.amount_total/100;
-        const {cFiscale, patente, email} = session.metadata;
-        await setPayment(cFiscale, patente, price, email);
+        const {id, patente, email} = session.metadata;
+        await setPayment(id, patente, price, email);
     }
     res.json({success: true});
   })
@@ -54,16 +54,16 @@ router.post('/stripeHooks', express.raw({type: 'application/json'}), async (req,
               throw error
           }else{
             try{
-              const {cFiscale, patente, email} = JSON.parse(payment.transactions[0].custom);
-              await setPayment(cFiscale, patente, price, email);
-              return res.redirect(`/successPayment?cf=${encodeURIComponent(cFiscale)}`);
+              const {id, patente, email} = JSON.parse(payment.transactions[0].custom);
+              await setPayment(id, patente, price, email);
+              return res.redirect(`/successPayment?id=${encodeURIComponent(id)}`);
             }catch(error){
               return res.status(500).json({error: error.message});
             }
           }
     });
   });
-  router.get('/successPayment', async (req, res) =>{ res.render('payments/paymentSuccess', {text: 'Grazie per esserti iscritto da noi!!', cf: req.query.cf})});
+  router.get('/successPayment', async (req, res) =>{ res.render('payments/paymentSuccess', {text: 'Grazie per esserti iscritto da noi!!', id: req.query.id})});
   router.get('/cancelPayment', async (req, res) => res.render('payments/cancelPayment', {text: 'Ci spiace che tu abbia deciso di non iscriverti da noi.'}));
 
 module.exports = router;

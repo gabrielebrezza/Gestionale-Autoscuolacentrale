@@ -4,9 +4,9 @@ const { PDFDocument, rgb } = require('pdf-lib');
 
 const utenti = require('../DB/User');
 
-async function compilaTt2112(cFiscale) {
+async function compilaTt2112(id) {
     try {
-      const data = await utenti.findOne({"cFiscale": cFiscale});
+      const data = await utenti.findOne({"_id": id});
 
       const patenteRichiesta = data.patente.find(patente => patente.bocciato === null)?.tipo;
       const existingPdfBytes = await fs.readFile('public/download/tt2112.pdf');
@@ -34,7 +34,7 @@ async function compilaTt2112(cFiscale) {
       form.getTextField('Cat. richiesta').setText(patenteRichiesta);
       const pdfBytes = await pdfDoc.save();
 
-      const savePath = path.join('certificati', 'tt2112', `tt2112_${data.cFiscale}.pdf`);
+      const savePath = path.join('certificati', 'tt2112', `tt2112_${id}.pdf`);
 
       await fs.mkdir(path.dirname(savePath), { recursive: true });
       
@@ -46,10 +46,10 @@ async function compilaTt2112(cFiscale) {
   }
 
 
-  async function compilaCertResidenza(cFiscale) {
+  async function compilaCertResidenza(id) {
     return new Promise(async (resolve, reject) => {
       try {
-          const data = await utenti.findOne({"cFiscale": cFiscale});
+          const data = await utenti.findOne({"_id": id});
   
           const existingPdfBytes = await fs.readFile('./public/download/autocertificazioneResidenza.pdf');
   
@@ -110,7 +110,7 @@ async function compilaTt2112(cFiscale) {
           });
         
           const pdfBytes = await pdfDoc.save();
-          await fs.writeFile(`./certificati/residenza/residenza_${cFiscale}.pdf`, pdfBytes);
+          await fs.writeFile(`./certificati/residenza/residenza_${id}.pdf`, pdfBytes);
           resolve(`autocertificazione di residenza salvata con successo`);
         }catch (error) {
           reject(error);

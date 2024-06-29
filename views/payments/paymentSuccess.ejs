@@ -17,7 +17,7 @@
         <p>Per completare la registrazione online, ti preghiamo di caricare la scansione della foto tessera (deve essere la stessa che porterai in duplice copia originale in autoscuola) e la scansione della tua firma (è quella che verrà riportata sulla patente)</p>
         <div class="imageForms">
             <form id="combinedForm" class="imageForm" enctype="multipart/form-data">
-                <input type="hidden" name="cf" value="<%= cf %>">
+                <input type="hidden" name="id" value="<%= id %>">
                 <div class="field">
                     <label for="inputSigningFile">Carica Firma:</label>
                     <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
@@ -74,29 +74,55 @@
                     event.preventDefault();
         
                     const form = event.target;
-                    const formDataFirma = new FormData();
-                    const formDataImage = new FormData();
-        
-                    formDataFirma.append('cf', form.querySelector('input[name="cf"]').value);
-                    formDataFirma.append('croppedImage', form.querySelector('input[name="croppedImage"]').value);
-        
-                    formDataImage.append('cf', form.querySelector('input[name="cf"]').value);
-                    formDataImage.append('inputProfileFile', form.querySelector('input[name="inputProfileFile"]').files[0]);
-        
+                    const id = form.querySelector('input[name="id"]').value; 
+                    const payloadFirma = {
+                        image: form.querySelector('input[name="croppedImage"]').value,
+                        location: 'firmeIscrizioni',
+                        id: id
+                    }
+                    const profileImage = form.querySelector('input[name="inputProfileFile"]').files[0];
+
+                    function readFileAsDataURL(file) {
+                        return new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = function(event) {
+                                resolve(event.target.result);
+                            };
+                            reader.onerror = function(error) {
+                                reject(error);
+                            };
+                            reader.readAsDataURL(file);
+                        });
+                    }
+                
                     try {
+                        const profileImageDataURL = await readFileAsDataURL(profileImage);
+                        const payloadProfile = {
+                            image: profileImageDataURL,
+                            location: 'immaginiIscrizioni',
+                            id: id
+                        }
+                    
                         const [responseFirma, responseImage] = await Promise.all([
-                            fetch('/uploadUserFirma', {
+                            fetch('/uploadUserImage', {
                                 method: 'POST',
-                                body: formDataFirma
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(payloadFirma)
                             }),
                             fetch('/uploadUserImage', {
                                 method: 'POST',
-                                body: formDataImage
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(payloadProfile)
                             })
                         ]);
-        
+                        
                         if (responseFirma.ok && responseImage.ok) {
                             alert('Entrambi i file sono stati caricati con successo!');
+                            window.location.assign('https://autoscuolacentrale.com/');
                         } else {
                             alert('Errore durante il caricamento dei file.');
                         }

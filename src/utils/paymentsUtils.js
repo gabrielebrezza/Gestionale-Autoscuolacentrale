@@ -4,11 +4,11 @@ const utenti = require('../DB/User');
 const sendEmail = require('../utils/emailsUtils.js');
 const {compilaTt2112, compilaCertResidenza} = require('../utils/compileUtils');
 
-async function setPayment(cFiscale, patente, price, email) {
+async function setPayment(id, patente, price, email) {
     try {
         await utenti.findOneAndUpdate(
           {
-            "cFiscale": cFiscale,
+            "_id": id,
             "patente": {
               $elemMatch: {
                 "tipo": patente,
@@ -28,7 +28,7 @@ async function setPayment(cFiscale, patente, price, email) {
         const YYYY = today.getFullYear(); 
         const dataFatturazione = `${DD}/${MM}/${YYYY}`;
         await utenti.findOneAndUpdate(
-            {"cFiscale": cFiscale},
+            {"_id": id},
             {
                 $addToSet: {
                     "fatture": {"data": dataFatturazione, "importo": price, "emessa": false},
@@ -37,18 +37,18 @@ async function setPayment(cFiscale, patente, price, email) {
             {new: true}
         );
         try {
-          await compilaTt2112(cFiscale);
+          await compilaTt2112(id);
         }catch (error) {
           console.error(error.message);
         }
         try {
-          await compilaCertResidenza(cFiscale);
+          await compilaCertResidenza(id);
         }catch (error) {
           console.error(error.message);
         }
         const fileNames = [
-          `certificati/tt2112/tt2112_${cFiscale}.pdf`,
-          `certificati/residenza/residenza_${cFiscale}.pdf`
+          `certificati/tt2112/tt2112_${id}.pdf`,
+          `certificati/residenza/residenza_${id}.pdf`
         ];
         try{
           const result = await sendEmail(email, 'Iscrizione effettuata con successo', `Grazie per esserti iscritto alla patente ${patente}. Ti chiediamo gentilmente in caso tu non l'avessi ancora fatto di inviarci la scansione della tua firma e della fototessera che apparirà sulla patente`, fileNames );
@@ -56,7 +56,7 @@ async function setPayment(cFiscale, patente, price, email) {
         }catch (error){
           console.error('Errore durante l\'invio dell\'email:', error);
         }
-        console.log(`l'utente con codice fiscale ${cFiscale} ha completato il pagamento con successo per la patente ${patente}`);
+        console.log(`l'utente ${id} ha completato il pagamento con successo per la patente ${patente}`);
     } catch (error) {
         console.error('Errore durante il recupero dei dati dell\'utente:', error);
         return res.status(500).json({ message: 'Errore del server' });

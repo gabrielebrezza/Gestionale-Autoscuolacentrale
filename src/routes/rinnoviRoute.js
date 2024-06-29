@@ -96,37 +96,37 @@ router.post('/rinnovi/deleteUsers', authenticateJWT, async (req, res)=> {
     }
 });
 
-router.post('/rinnovi/upload/signature', authenticateJWT, async (req, res) => {
+router.post('/uploadUserImage', authenticateJWT, async (req, res) => {
     const data = req.body.image;
     const id = req.body.id;
-    const base64Data = data.replace(/^data:image\/png;base64,/, "");
-    const filePath = path.join('privateImages', 'firmeRinnovi' , `${id}.png`);
-
-    fs.writeFile(filePath, base64Data, 'base64', (err) => {
-        if (err) {
-            console.error('Errore nel salvataggio della firma:', err);
-            return res.status(500).json({ message: 'Errore nel salvataggio della firma' });
-        }
-        res.status(200).json({ message: 'Firma salvata con successo' });
-    });
+    const location = req.body.location;
+    try{
+        const base64Data = data.replace(/^data:image\/jpeg;base64,/, "").replace(/\s/g, '');
+        const filePath = path.join('privateImages', location , `${id}.jpeg`);
+        fs.writeFile(filePath, base64Data, 'base64', (err) => {
+            if (err) {
+                console.error(`Errore nel salvataggio dell'immagine ${location} ${err}`);
+                return res.status(500).json({ message: `Errore nel salvataggio dell'immagine ${location}` });
+            }
+            res.status(200).json({ message: 'immagine salvata con successo' });
+        });
+    }catch(err){
+        console.error(`si è verificato un errore ${err}`);
+    }
 });
-
-
-router.post('/rinnovi/upload/profile', authenticateJWT, (req, res) => {
-    const data = req.body.image;
-    const id = req.body.id;
-    const base64Data = data.replace(/^data:image\/jpeg;base64,/, "").replace(/\s/g, '');
-    const filePath = path.join('privateImages', 'immaginiRinnovi' , `${id}.png`);
-
-    fs.writeFile(filePath, base64Data, 'base64', (err) => {
-        if (err) {
-            console.error('Errore nel salvataggio della firma:', err);
-            return res.status(500).json({ message: `Errore nel salvataggio dell'immagine rinnovi` });
+router.delete('/deleteUserImage', authenticateJWT, async (req, res) => {
+    const { id, location } = req.body;
+    const filePath = path.join('privateImages', location , `${id}.jpeg`);
+    try {
+        if (fs.existsSync(filePath)) {
+            await fs.promises.unlink(filePath);
         }
-        res.status(200).json({ message: 'immagine rinnovi salvata con successo' });
-    });
+        res.status(200).json({ message: 'Immagine eliminata con successo' });
+    } catch (err) {
+        console.error(`Errore durante l'eliminazione dell'immagine:`, err);
+        res.status(500).send(`Errore durante l'eliminazione dell'immagine`);
+    }
 });
-
 
 router.get('/admin/rinnovi/userPage', authenticateJWT, async (req, res)=> {
     const id = req.query.id;

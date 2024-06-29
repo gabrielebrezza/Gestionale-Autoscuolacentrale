@@ -242,7 +242,9 @@ app.post('/payment', async (req, res) =>{
   } else {
     prezzo = prices.prezzoIscrizioniSuccessive;
   }
+  const user = await utenti.findOne({"cFiscale": cFiscale});
   
+  const id = `${user._id}`;
   if(paymentMethod == 'stripe'){
     try {
       const session = await stripe.checkout.sessions.create({
@@ -260,10 +262,10 @@ app.post('/payment', async (req, res) =>{
             quantity: 1
           }
         ],
-        success_url: `${process.env.SERVER_URL}/successPayment?cf=${encodeURIComponent(cFiscale)}`,
+        success_url: `${process.env.SERVER_URL}/successPayment?id=${encodeURIComponent(id)}`,
         cancel_url: `${process.env.SERVER_URL}/cancelPayment`,
         metadata: {
-          cFiscale: cFiscale,
+          id: id,
           patente: tipoPatente,
           email: email
         }
@@ -301,7 +303,7 @@ app.post('/payment', async (req, res) =>{
                       currency: "EUR",
                       total: prezzo
                   },
-                  custom: JSON.stringify({cFiscale: cFiscale, patente: tipoPatente, email: email}),
+                  custom: JSON.stringify({id: id, patente: tipoPatente, email: email}),
                   description: `Iscrizione a Scuola Guida per la patente di tipo ${tipoPatente}`
               }
           ]
@@ -322,13 +324,13 @@ app.post('/payment', async (req, res) =>{
       res.status(500).json({error: error.message});
     }
   }else if(paymentMethod == 'code'){
-    const code = req.body.code;
+    const code = req.body.code; 
     const codeExist = await codes.findOne({"cFiscale": cFiscale, "code": code, "email": email, "importo": prezzo});
     if(!codeExist){
       return res.render('errorPage', {error: 'Il Codice inserito è errato o altrimenti codice fiscale, email o patente sono diversi da quelli con cui è stato creato il codice.'});
     }
     try {
-      await setPayment(cFiscale, tipoPatente, prezzo, email);
+      await setPayment(id, tipoPatente, prezzo, email);
     } catch (error) {
       console.log(`errore durante il pagamento con codice ${error}`);
       return res.render('errorPage', {error: 'Si è verificato un errore con il pagamento riprova.'})

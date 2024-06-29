@@ -195,9 +195,10 @@
     <section class="documentSection">
         
         <div class="imageForms">
-            <form class="imageForm" action="/uploadUserFirma" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="cf" value="<%= user.cf %>">
-                <img id="signPic" src="<%= `/images?dir=${encodeURIComponent('firmeRinnovi/')}${encodeURIComponent(user._id)}.png` %>" alt="Scansione Firma">
+            <form class="imageForm" id="firmaImageForm">
+                <input type="hidden" name="id" value="<%= user._id %>">
+                <input type="hidden" name="location" id="firmaLocation" value="firmeRinnovi">
+                <img id="signPic" src="<%= `/images?dir=${encodeURIComponent('firmeRinnovi/')}${encodeURIComponent(user._id)}.jpeg` %>" alt="Scansione Firma">
  
                 <input type="file" id="inputSigningFile" name="inputSigningFile" accept="image/*">
                 <div class="formField">
@@ -211,7 +212,6 @@
                             upload
                         </span>
                     </label>
-                    <input type="hidden" name="intent" value="firma">
                     <button type="button" class="deleteButton" title="Elimina Immagine">
                         <span class="material-symbols-outlined">delete</span>
                     </button>
@@ -219,12 +219,12 @@
                 <div id="cropContainer">
                     <img id="cropImage" style="max-width: 100%;">
                 </div>
-                <input type="hidden" id="croppedImage" name="croppedImage">
             </form>
 
-            <form class="imageForm" action="/uploadUserImage" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="cf" value="<%= user.cFiscale %>">
-                <img id="profilePic" src="<%= `/images?dir=${encodeURIComponent('immaginiRinnovi/')}${encodeURIComponent(user._id)}.png` %>" alt="Immagine Profilo">
+            <form class="imageForm" id="profileImageForm">
+                <input type="hidden" name="id" value="<%= user._id %>">
+                <input type="hidden"  name="location" id="profileLocation" value="immaginiRinnovi">
+                <img id="profilePic" src="<%= `/images?dir=${encodeURIComponent('immaginiRinnovi/')}${encodeURIComponent(user._id)}.jpeg` %>" alt="Immagine Profilo">
 
                 <input type="file" id="inputProfileFile" name="inputProfileFile" accept="image/*">
                 <div class="formField">
@@ -238,7 +238,6 @@
                             upload
                         </span>
                     </label>
-                    <input type="hidden" name="intent" value="profilo">
                     <button type="button" class="deleteButton" title="Elimina Immagine">
                         <span class="material-symbols-outlined">
                             delete
@@ -246,82 +245,11 @@
                     </button>
                 </div>
             </form>
+
         </div>
-
-        <script>
-        document.querySelectorAll('.deleteButton').forEach(function(button) {
-            button.addEventListener('click', function() {
-              var form = this.closest('form');
-              var cf = form.querySelector('input[name="cf"]').value;
-              var intent = form.querySelector('input[name="intent"]').value;
-
-              var deleteForm = document.createElement('form');
-              deleteForm.action = '/deleteUserImage';
-              deleteForm.method = 'post';
-
-              var inputCf = document.createElement('input');
-              inputCf.type = 'hidden';
-              inputCf.name = 'cf';
-              inputCf.value = cf;
-              deleteForm.appendChild(inputCf);
-
-              var inputIntent = document.createElement('input');
-              inputIntent.type = 'hidden';
-              inputIntent.name = 'intent';
-              inputIntent.value = intent;
-              deleteForm.appendChild(inputIntent);
-
-              document.body.appendChild(deleteForm);
-              deleteForm.submit();
-            });
-        });
-        </script>
-        <script>
-            const profilePic = document.getElementById('profilePic');
-            const inputProfileFile = document.getElementById('inputProfileFile');
-            inputProfileFile.onchange = function() {
-                profilePic.src = URL.createObjectURL(inputProfileFile.files[0]);
-            }
-        </script>
-        <script>
-            const inputSigningFile = document.getElementById('inputSigningFile');
-            const cropImage = document.getElementById('cropImage');
-            const croppedImageInput = document.getElementById('croppedImage');
-            const croppedImagePreview = document.getElementById('signPic');
-            let cropper;
-
-            inputSigningFile.onchange = function(event) {
-                const files = event.target.files;
-                if (files && files.length > 0) {
-                    const file = files[0];
-                    const url = URL.createObjectURL(file);
-                    cropImage.src = url;
-
-                    if (cropper) {
-                        cropper.destroy();
-                    }
-
-                    cropper = new Cropper(cropImage, {
-                        aspectRatio: 236 / 47,
-                        viewMode: 0,
-                        autoCropArea: 1,
-                        crop(event) {
-                            const canvas = cropper.getCroppedCanvas({
-                                width: 236,
-                                height: 47,
-                                fillColor: 'white'
-                            });
-
-                            const croppedDataUrl = canvas.toDataURL('image/jpeg');
-                            croppedImageInput.value = croppedDataUrl;
-                            croppedImagePreview.src = croppedDataUrl;
-                        },
-                    });
-
-                    document.getElementById('cropContainer').style.display = 'block';
-                }
-            };
-        </script>
+        <script src="/scripts/utils/scansioneFirma.js"></script>
+        <script src="/scripts/utils/saveProfileImage.js"></script>
+        <script src="/scripts/utils/deleteUserImage.js"></script>
     </section>
     <form id="updateUserForm" action="/rinnovi/updateUser" method="post">
         <table>

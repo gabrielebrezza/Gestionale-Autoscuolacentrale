@@ -99,19 +99,19 @@
                     color: #eee;
                 }
             }
-            #profileImageContainer{
+            #profileImageForm{
                 display: none;
             }
             label[for="imageInput"]{
                 cursor: pointer;
                 text-decoration: underline;
             }
-            #imageInput{
+            #inputProfileFile{
                 display: none;
             }
             #imagePreview{
-                max-width: 300px;
-                max-height: 300px;
+                max-width: 250px;
+                max-height: 250px;
             }
             #imagePreview:not([src]){
                 display: none;
@@ -176,6 +176,7 @@
             </form>
             <div id="signatureContainer">
                 <h2>Disegna la Firma</h2>
+                <input type="hidden" name="id">
                 <canvas id="signatureCanvas" width="236" height="47"></canvas>
                 <div class="field">
                     <button onclick="clearCanvas()">
@@ -190,25 +191,26 @@
                     </button>
                 </div>
             </div>
-            <div id="profileImageContainer">
+            <form id="profileImageForm">
                 <h2>Foto Tessera</h2>
                 <div class="field">
-                    <label for="imageInput">Carica un Immagine</label>
-                    <input type="file" id="imageInput" accept="image/*">
+                    <label for="inputProfileFile">Carica un Immagine</label>
+                    <input type="file" id="inputProfileFile" accept="image/*">
+                    <input type="hidden" name="location" id="profileLocation" value="immaginiRInnovi">
                 </div>
                 <div>
-                    <img id="imagePreview">
+                    <img id="profilePic">
                 </div>
                 <br>
                 <div class="field">
-                    <button id="uploadButton">
+                    <button type="submit" id="uploadButton">
                         <span class="material-symbols-outlined continue">
                             done_all
                         </span>
                     </button>
                 </div>
 
-            </div>
+            </form>
         </article>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -252,9 +254,8 @@
             }))
             .then(data => {
                 alert(data.message);
-                console.log(data);
                 addUserForm.style.display = 'none';
-                id = data.id
+                document.querySelector('input[name="id"]').value = data.id;
                 document.getElementById('signatureContainer').style.display = 'grid';
             })
             .catch(error => {
@@ -264,60 +265,7 @@
         });
     });
 </script>
-
-        <script>
-            document.getElementById('imageInput').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-            
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = function() {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        canvas.width = 260;
-                        canvas.height = 315;
-                    
-                        ctx.fillStyle = 'white';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
-                        const x = (canvas.width / 2) - (img.width / 2) * scale;
-                        const y = (canvas.height / 2) - (img.height / 2) * scale;
-                        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
-                    
-                        const dataUrl = canvas.toDataURL('image/jpeg');
-                        document.getElementById('imagePreview').src = dataUrl;
-                    
-                        document.getElementById('uploadButton').addEventListener('click', function() {
-                            const payload = {
-                                image: dataUrl,
-                                id: id
-                            };
-                        
-                            fetch('/rinnovi/upload/profile', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify(payload)
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                alert('Dati Utente Salvati Con Successo!');
-                                window.location.reload();
-                            })
-                            .catch((error) => {
-                                console.error('Error:', error);
-                            });
-                        });
-                    };
-                };
-                reader.readAsDataURL(file);
-            });
-        </script>
-        <script>var id;</script>
+<script src="/scripts/utils/saveProfileImage.js"></script>
         <script src="/scripts/utils/firmaElettronica.js"></script>
     </main>
 </body>

@@ -38,58 +38,6 @@ router.get('/userPage', authenticateJWT, async (req, res) =>{
 });
 const storage = multer.memoryStorage();
 
-const uploadProfilePic = multer({
-  storage: storage,
-  fileFilter: function (req, file, cb) {
-    if (!file.originalname.match(/\.(jpg|jpeg|png|webp)$/)) {
-      return cb(new Error('Solo file JPG, JPEG, o PNG sono consentiti!'));
-    }
-    cb(null, true);
-  }
-}).single('inputProfileFile');
-
-router.post('/uploadUserImage', (req, res) => {
-
-    uploadProfilePic(req, res, async function (err) {
-    if (err) {
-      return res.status(400).send(err.message);
-    }
-    if(!req.file){
-        return res.render('errorPage',{error: 'Nessuna immagine caricata'});
-    }
-    const cf = req.body.cf; 
-    const file = req.file;
- 
-    const webpBuffer = await sharp(file.buffer)
-    .resize({ width: 260, height: 315, fit: 'cover', position: 'center' })
-      .toFormat('jpg')
-      .toBuffer();
-
-    const fileName = cf + '_' + Date.now() + '.jpg';
-    const filePath = path.resolve(__dirname, '../../privateImages', 'profileImages' , fileName);
-
-    fs.writeFile(filePath, webpBuffer, async (err) => {
-      if (err) {
-        console.error('Errore durante il salvataggio del file:', err);
-        return res.status(500).send('Errore durante il salvataggio del file');
-      }
-
-      const existingUser = await utenti.findOne({ cFiscale: cf });
-      if (existingUser && existingUser.immagineProfilo) {
-        const imagePath = path.resolve(__dirname, '../../privateImages', 'profileImages' , existingUser.immagineProfilo);
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
-        }
-      }
-      await utenti.findOneAndUpdate({ cFiscale: cf }, { immagineProfilo: fileName });
-      
-
-      res.redirect(req.get('referer'));
-    });
-  });
-});
-
-
 const uploadFirmaPic = multer({
   storage: storage,
   fileFilter: function (req, file, cb) {
@@ -242,25 +190,6 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
         console.error('Errore durante l\'aggiornamento dei dati dell\'utente:', error);
         res.status(500).send({ error: 'Si è verificato un errore durante l\'aggiornamento dei dati dell\'utente' });
     }
-});
-
-router.post('/deleteUserImage', authenticateJWT, async (req, res) => {
-  const { cf, intent } = req.body;
-  const existingUser = await utenti.findOne({ cFiscale: cf });
-  if(intent == 'firma' && existingUser){
-    const imagePath = path.resolve(__dirname, '../../privateImages', 'firme', existingUser.firma);
-    if (fs.existsSync(imagePath)) {
-      fs.unlinkSync(imagePath);
-    }
-    await utenti.findOneAndUpdate({ "cFiscale": cf }, {$unset : {"firma" : ""}});
-  }else if(intent == 'profilo' && existingUser){
-    const imagePath = path.resolve(__dirname, '../../privateImages', 'profileImages', existingUser.immagineProfilo);
-    if (fs.existsSync(imagePath)) {
-      fs.unlinkSync(imagePath);
-    }
-    await utenti.findOneAndUpdate({ "cFiscale": cf }, {$unset : {"immagineProfilo" : ""}});
-  }
-  res.redirect(`/userPage?cf=${cf}`);
 });
 
 router.get('/images', authenticateJWT, async (req, res) => {
