@@ -207,11 +207,18 @@
                             <% const oraVisita = user.visita.ora ? user.visita.ora : '' %>
                             <td><%= dataVisita || oraVisita ? `${dataVisita} ${oraVisita}`  : 'Mancante' %></td>
                             <td class="buttonCell">
-                                <a class="pagamenti" href="<%= `/admin/rinnovi/pagamenti?id=${encodeURIComponent(user._id)}` %>">
-                                    <span class="material-symbols-outlined">
-                                       payments
+                                <% if (!user.fatture.importo) { %>
+                                    <a class="pagamenti" href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>">
+                                        <span class="material-symbols-outlined">
+                                            euro_symbol
+                                        </span>
+                                    </a>
+                                <% }else{ %>
+                                    <span class="material-symbols-outlined pagamenti">
+                                        receipt_long
                                     </span>
-                                </a>
+                                <% } %>
+                                
                             </td>
                         </tr>
                 <% }); %>
