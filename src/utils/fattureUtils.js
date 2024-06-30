@@ -335,17 +335,11 @@ async function creaFatturaElettronica(dati, iscrizione, rinnovo) {
         .up();
         }
         const xmlString = xml.end({ prettyPrint: true });
-        const nomeBaseFile = `IT06498290011_${dati.progressivoInvio}.xml`;
-        let nomeFile = nomeBaseFile;
+        const nomeFile = `IT06498290011_${dati.progressivoInvio}.xml`;
 
-        let counter = 1;
-
-            while (await fs.access(path.join('fatture/elettroniche', nomeFile)).then(() => true).catch(() => false)) {
-                nomeFile = `${nomeBaseFile}_${counter}.xml`;
-                counter++;
-            }
-            await fs.writeFile(path.join('fatture/elettroniche', nomeFile), xmlString);
-            resolve('Fattura elettronica salvata con successo');
+        await fs.writeFile(path.join('fatture/elettroniche', nomeFile), xmlString);
+        resolve('Fattura elettronica salvata con successo');
+        
         } catch (err) {
             console.error('Errore durante il salvataggio del file:', err);
             reject(new Error('Errore durante il salvataggio della fattura elettronica'));
