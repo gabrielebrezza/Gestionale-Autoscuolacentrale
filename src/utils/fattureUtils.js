@@ -2,6 +2,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const PDFDocument = require('pdfkit');
 const { create } = require('xmlbuilder2');
+const axios = require('axios');
 
 async function creaFatturaElettronica(dati, iscrizione, rinnovo) {
     return new Promise(async (resolve, reject) => {

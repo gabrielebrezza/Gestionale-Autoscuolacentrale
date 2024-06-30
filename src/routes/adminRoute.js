@@ -7,7 +7,6 @@ const multer  = require('multer');
 const sharp = require('sharp');
 const archiver = require('archiver');
 const cookieParser = require('cookie-parser');
-const axios = require('axios');
 const router = express.Router();
 
 //databases
@@ -520,7 +519,6 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
 router.get('/admin/storicoFatture', authenticateJWT, async (req, res)=> {
   try {
     const fattureGenerali = await storicoFattureGenerali.find();
-    console.log(fattureGenerali)
     const fattureAgenda = await storicoFattureAgenda.find();
     let fatture = [...fattureGenerali, ...fattureAgenda];
     res.render('admin/payments/fatture/storicoFatture', { fatture });
