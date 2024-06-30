@@ -437,21 +437,14 @@ const scaricaFatturaAPI = async (invoiceId) => {
     const filePath = path.join('fatture', 'elettroniche', `IT06498290011_g00${invoiceId}.xml`);
    
     try {
-        const response = await axios.get(url, { 
+        const response = await axios.get(url, {
             headers: {
                 'Authorization': process.env.API_KEY_AGENDA
             },
-            responseType: 'stream' 
+            responseType: 'arraybuffer'
         });
-  
-        response.data.pipe(fs.createWriteStream(filePath))
-            .on('finish', () => {
-                console.log(`fattura ${invoiceId} scaricata con successo`);
-            })
-            .on('error', (err) => {
-                console.error(`Errore nello scaricamento della fattura ${invoiceId}:`, err.message);
-            });
-  
+
+        await fs.writeFile(filePath, response.data);
     } catch (error) {
         console.error(`Failed to download invoice ${invoiceId}:`, error.message);
     }
