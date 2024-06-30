@@ -594,6 +594,22 @@ router.post('/downloadFatture', authenticateJWT, async (req, res) => {
           }
       }
     }
+    const tipo = req.body.tipo;
+    if(tipo != 'all'){
+      if(tipo == 'g'){
+        fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('g'));
+      }
+      if(tipo == 'r'){
+        fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('r'));
+      }
+      if(tipo == 'i'){
+        fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('i'));
+      }
+      if(tipo == 'm'){
+        fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('m'));
+      }
+    }
+
     res.set('Content-Type', 'application/zip');
     res.set('Content-Disposition', 'attachment; filename="fatture_gestionale.zip"');
 

@@ -359,7 +359,6 @@ const utenti = require('../DB/User');
 async function creaFatturaCortesia(dati, iscrizione) {
     return new Promise(async (resolve, reject) => {
         try {
-            
             if(iscrizione){
                 const utente = await utenti.findOne({ "cFiscale": dati.codiceFiscaleCliente });
                 const patente = utente.patente.find(item => item.pagato === true && item.bocciato === null);

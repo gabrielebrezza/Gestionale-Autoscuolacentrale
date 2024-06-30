@@ -14,16 +14,25 @@
             <form id="fattureFilters" action="/downloadFatture" method="POST">
             <thead>
                 <tr class="filters">
-                    
+                        <th colspan="1">
+                            <label for="tipo">tipo</label>
+                            <select name="tipo" id="tipo">
+                                <option value="all">tutti</option>
+                                <option value="g">guide</option>
+                                <option value="r">rinnovi</option>
+                                <option value="m">medici</option>
+                                <option value="i">iscrizioni</option>
+                            </select>
+                        </th>
                         <th colspan="2">
                             <label for="fromDate">Da</label>
                             <input type="date" name="fromDate" id="fromDate">
                         </th>
-                        <th colspan="2">
+                        <th colspan="1">
                             <label for="toDate">A</label>
                             <input type="date" name="toDate" id="toDate">
                         </th>
-                        <th colspan="2">
+                        <th colspan="1">
                             <button type="submit">
                                 <span class="material-symbols-outlined">
                                     download
