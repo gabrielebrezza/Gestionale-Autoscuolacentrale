@@ -17,7 +17,7 @@ const codes = require('../DB/Codes');
 const cassa = require('../DB/Cassa');
 const ClientiGenerici = require('../DB/ClientiGenerici');
 const numeroFattura = require('../DB/NumeroFattura');
-const storicoFattureGenerali = require('../DB/storicoFattureGenerali');
+const {storicoFattureGenerali} = require('../DB/StoricoFattureGenerali.js');
 const storicoFattureAgenda = require('../DB/storicoFattureAgenda');
 const rinnovi = require('../DB/Rinnovi');
 //functions
