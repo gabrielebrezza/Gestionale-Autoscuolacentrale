@@ -11,27 +11,37 @@
     <%- include('../../components/header.ejs') %>
     <main>
         <table>
+            <form id="fattureFilters" action="/downloadFatture" method="POST">
             <thead>
                 <tr class="filters">
-                    <form id="fattureFilters" action="/downloadFatture" method="POST">
+                    
                         <th colspan="2">
                             <label for="fromDate">Da</label>
                             <input type="date" name="fromDate" id="fromDate">
                         </th>
-                        <th>
+                        <th colspan="2">
                             <label for="toDate">A</label>
                             <input type="date" name="toDate" id="toDate">
                         </th>
-                        <th>
+                        <th colspan="2">
                             <button type="submit">
                                 <span class="material-symbols-outlined">
                                     download
                                 </span>
                             </button>
                         </th>
-                    </form>
+                    
                 </tr>
                 <tr>
+                    <th>
+                        <label for="selectUsersBtn" style="user-select: none; cursor: pointer;">
+                            <span id="selectUsers" class="material-symbols-outlined">
+                                checklist
+                            </span>
+                        </label>
+                        <input type="checkbox" id="selectUsersBtn" style="display: none;">
+
+                    </th>
                     <th>numero</th>
                     <th>data</th>
                     <th>importo</th>
@@ -42,6 +52,7 @@
             <tbody>
                 <% for(const fattura of fatture){ %>
                     <tr class="row">
+                        <td><input type="checkbox" class="checkboxFatture" name="<%= fattura.nomeFile %>" value="<%= fattura.nomeFile %>" style="display: none;"></td>
                         <td><%= fattura.numero %></td>
                         <td><%= fattura.data %></td>
                         <td><%= fattura.importo %>€</td>
@@ -49,7 +60,23 @@
                     </tr>
                 <% } %>
             </tbody>
+        </form>
         </table>
     </main>
+    <script>
+        const selectUsersBtn = document.getElementById('selectUsersBtn');
+        const checkboxFatture = document.querySelectorAll('.checkboxFatture');
+        selectUsersBtn.addEventListener('input', () => {
+            if(selectUsersBtn.checked){
+                for(const checkbox of checkboxFatture){
+                    checkbox.style.display = 'inline-flex';
+                }
+            }else{
+                for(const checkbox of checkboxFatture){
+                    checkbox.style.display = 'none';
+                }
+            }
+        })
+    </script>
 </body>
 </html>

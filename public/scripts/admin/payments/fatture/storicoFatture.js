@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const toDate = new Date(toDateInput.value); 
         for(const row of rows){
-            const dataFattura = new Date(row.getElementsByTagName('td')[1].textContent.split('/').reverse().join('-'));
+            const dataFattura = new Date(row.getElementsByTagName('td')[2].textContent.split('/').reverse().join('-'));
             if(fromDate <= dataFattura && dataFattura <= toDate){
                 row.style.display = 'table-row'
             }else{

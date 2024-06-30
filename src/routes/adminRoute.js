@@ -536,45 +536,64 @@ router.get('/admin/storicoFatture', authenticateJWT, async (req, res)=> {
 
 router.post('/downloadFatture', authenticateJWT, async (req, res) => {
   try {
-    const fromDate = new Date(req.body.fromDate);
-    const toDate = new Date(req.body.toDate);
-    const fattureGenerali = await storicoFattureGenerali.find();
-    let fattureArr = [];
-    for(const fattura of fattureGenerali){
-      const dataFattura = new Date(fattura.data.split('/').reverse().join('-'));
-      if(fromDate <= dataFattura && dataFattura <= toDate){
-        fattureArr.push(fattura.nomeFile);
-        continue;
-      }
-      if( !req.body.fromDate || !req.body.toDate ){
-        fattureArr.push(fattura.nomeFile);
-      }
-    }
-    const fattureAgenda = await storicoFattureAgenda.find();
-    for(const fattura of fattureAgenda){
-      const dataFattura = new Date(fattura.data.split('/').reverse().join('-'));
-      if(fromDate <= dataFattura && dataFattura <= toDate){
-        fattureArr.push(fattura.nomeFile);
-        const filePath = path.join(__dirname, '../../fatture/elettroniche', fattura.nomeFile);
-        try {
-          fs.accessSync(filePath, fs.constants.F_OK);
-        } catch (err) {
-          if (err.code === 'ENOENT') {
-            await scaricaFatturaAPI(fattura.numero);
-          } else {
-            console.error(`Errore durante il controllo del file ${fattura.nomeFile}: `, err);
-          }
+    let fattureArr = (Object.keys(req.body)
+    .filter(key => key.startsWith('IT06498290011')))
+    .map(key => req.body[key]);
+    if(fattureArr == ''){
+      const fromDate = new Date(req.body.fromDate);
+      const toDate = new Date(req.body.toDate);
+      const fattureGenerali = await storicoFattureGenerali.find();
+      for(const fattura of fattureGenerali){
+        const dataFattura = new Date(fattura.data.split('/').reverse().join('-'));
+        if(fromDate <= dataFattura && dataFattura <= toDate){
+          fattureArr.push(fattura.nomeFile);
+          continue;
         }
-        continue;
+        if( !req.body.fromDate || !req.body.toDate ){
+          fattureArr.push(fattura.nomeFile);
+        }
       }
-      if( !req.body.fromDate || !req.body.toDate ){
-        fattureArr.push(fattura.nomeFile);
+      const fattureAgenda = await storicoFattureAgenda.find();
+      for(const fattura of fattureAgenda){
+        const dataFattura = new Date(fattura.data.split('/').reverse().join('-'));
+        if(fromDate <= dataFattura && dataFattura <= toDate){
+          fattureArr.push(fattura.nomeFile);
+          const filePath = path.join(__dirname, '../../fatture/elettroniche', fattura.nomeFile);
+          try {
+            fs.accessSync(filePath, fs.constants.F_OK);
+          } catch (err) {
+            if (err.code === 'ENOENT') {
+              await scaricaFatturaAPI(fattura.numero);
+            } else {
+              console.error(`Errore durante il controllo del file ${fattura.nomeFile}: `, err);
+            }
+          }
+          continue;
+        }
+        if( !req.body.fromDate || !req.body.toDate ){
+          fattureArr.push(fattura.nomeFile);
+        }
+      }
+      if(fattureArr == '' ){
+        return res.render('errorPage', {error: `Nessuna fattura emessa nell'intervallo di tempo selezionato `});
+      }
+    }else{
+      for(const fattura of fattureArr){
+          const filePath = path.join(__dirname, '../../fatture/elettroniche', fattura);
+          try {
+            fs.accessSync(filePath, fs.constants.F_OK);
+          } catch (err) {
+            if (err.code === 'ENOENT') {
+              const numeroFattura = fattura.replace('.xml', '').replace('IT06498290011_', '');
+              if(numeroFattura.startsWith('g')){
+                await scaricaFatturaAPI(numeroFattura.replace('g00', ''));
+              }
+            } else {
+              console.error(`Errore durante il controllo del file ${fattura}: `, err);
+            }
+          }
       }
     }
-    if(fattureArr == '' ){
-      return res.render('errorPage', {error: `Nessuna fattura emessa nell'intervallo di tempo selezionato `});
-    }
-
     res.set('Content-Type', 'application/zip');
     res.set('Content-Disposition', 'attachment; filename="fatture_gestionale.zip"');
 
