@@ -1,12 +1,5 @@
 const mongoose = require('mongoose');
-const connect = mongoose.connect(process.env.MONGODB_CONNECTION_URL);
 
-connect.then(() =>{
-    console.log('Clienti Database connected successfully');
-})
-.catch(() =>{
-    console.log('Clienti Database cannot be connected ');
-});
 
 const ClientiSchema = new mongoose.Schema({
     cDestinatario: {

@@ -7,6 +7,7 @@ const multer  = require('multer');
 const sharp = require('sharp');
 const archiver = require('archiver');
 const cookieParser = require('cookie-parser');
+const axios = require('axios');
 const router = express.Router();
 
 //databases
@@ -16,16 +17,19 @@ const codes = require('../DB/Codes');
 const cassa = require('../DB/Cassa');
 const ClientiGenerici = require('../DB/ClientiGenerici');
 const numeroFattura = require('../DB/NumeroFattura');
-const storicoFatture = require('../DB/StoricoFatture');
+const storicoFattureGenerali = require('../DB/storicoFattureGenerali');
+const storicoFattureAgenda = require('../DB/storicoFattureAgenda');
 const rinnovi = require('../DB/Rinnovi');
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
-const {creaFatturaElettronica, creaFatturaCortesia} = require('../utils/fattureUtils.js');
+const {creaFatturaElettronica, creaFatturaCortesia, scaricaFatturaAPI} = require('../utils/fattureUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
 const {compilaTt2112, compilaCertResidenza} = require('../utils/compileUtils');
-const Rinnovi = require('../DB/Rinnovi.js');
 
 router.use(cookieParser());
+
+
+
 
 router.get('/admin', authenticateJWT, async (req, res) =>{
     const users = await utenti.find({});
@@ -451,7 +455,7 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
   const YYYY = today.getFullYear(); 
   const dataFatturazione = `${DD}/${MM}/${YYYY}`;
   try{
-    const nuovaFattura = new storicoFatture({
+    const nuovaFattura = new storicoFattureGenerali({
       tipo: iscrizione ? 'iscrizione' : rinnovo ? 'rinnovo' : 'generica',
       numero: parseInt(dati.progressivoInvio.replace(/\D/g, ''), 10),
       importo: dati.importoPagamento,
@@ -515,23 +519,53 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
 
 router.get('/admin/storicoFatture', authenticateJWT, async (req, res)=> {
   try {
-    const fatture = await storicoFatture.find();
+    const fattureGenerali = await storicoFattureGenerali.find();
+    const fattureAgenda = await storicoFattureAgenda.find();
+    let fatture = [...fattureGenerali, ...fattureAgenda];
     res.render('admin/payments/fatture/storicoFatture', { fatture });
   } catch (error) {
     console.error('Si è verificato un errore durante il recupero delle fatture:', error);
     res.render('errorPage', {error: 'Si è verificato un errore durante il recupero delle fatture'});
   }
 });
+
+
+
+
+
+
+
 router.post('/downloadFatture', authenticateJWT, async (req, res) => {
   try {
     const fromDate = new Date(req.body.fromDate);
     const toDate = new Date(req.body.toDate);
-    const fatture = await storicoFatture.find();
+    const fattureGenerali = await storicoFattureGenerali.find();
     let fattureArr = [];
-    for(const fattura of fatture){
+    for(const fattura of fattureGenerali){
       const dataFattura = new Date(fattura.data.split('/').reverse().join('-'));
       if(fromDate <= dataFattura && dataFattura <= toDate){
         fattureArr.push(fattura.nomeFile);
+        continue;
+      }
+      if( !req.body.fromDate || !req.body.toDate ){
+        fattureArr.push(fattura.nomeFile);
+      }
+    }
+    const fattureAgenda = await storicoFattureAgenda.find();
+    for(const fattura of fattureAgenda){
+      const dataFattura = new Date(fattura.data.split('/').reverse().join('-'));
+      if(fromDate <= dataFattura && dataFattura <= toDate){
+        fattureArr.push(fattura.nomeFile);
+        const filePath = path.join(__dirname, '../../fatture/elettroniche', fattura.nomeFile);
+        try {
+          fs.accessSync(filePath, fs.constants.F_OK);
+        } catch (err) {
+          if (err.code === 'ENOENT') {
+            await scaricaFatturaAPI(fattura.numero);
+          } else {
+            console.error(`Errore durante il controllo del file ${fattura.nomeFile}: `, err);
+          }
+        }
         continue;
       }
       if( !req.body.fromDate || !req.body.toDate ){

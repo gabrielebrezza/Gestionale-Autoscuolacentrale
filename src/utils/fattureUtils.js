@@ -431,8 +431,31 @@ async function creaFatturaCortesia(dati, iscrizione) {
 }
 
 
+const scaricaFatturaAPI = async (invoiceId) => {
+    const url = `https://agenda-autoscuolacentrale.com/invoice/${invoiceId}`;
+    const filePath = path.join('fatture', 'elettroniche', `IT06498290011_g00${invoiceId}.xml`);
+   
+    try {
+        const response = await axios.get(url, { 
+            headers: {
+                'Authorization': process.env.API_KEY_AGENDA
+            },
+            responseType: 'stream' 
+        });
+  
+        response.data.pipe(fs.createWriteStream(filePath))
+            .on('finish', () => {
+                console.log(`fattura ${invoiceId} scaricata con successo`);
+            })
+            .on('error', (err) => {
+                console.error(`Errore nello scaricamento della fattura ${invoiceId}:`, err.message);
+            });
+  
+    } catch (error) {
+        console.error(`Failed to download invoice ${invoiceId}:`, error.message);
+    }
+  };
 
 
-
-module.exports = {creaFatturaElettronica, creaFatturaCortesia};
+module.exports = {creaFatturaElettronica, creaFatturaCortesia, scaricaFatturaAPI};
 

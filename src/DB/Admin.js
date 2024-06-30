@@ -1,12 +1,4 @@
 const mongoose = require('mongoose');
-const connect = mongoose.connect(process.env.MONGODB_CONNECTION_URL);
-
-connect.then(() =>{
-    console.log('Admins Database connected successfully');
-})
-.catch(() =>{
-    console.log('Admins Database cannot be connected ');
-});
 
 const AdminSchema = new mongoose.Schema({
     email: {

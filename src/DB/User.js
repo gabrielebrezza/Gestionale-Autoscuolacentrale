@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
-const connect = mongoose.connect(process.env.MONGODB_CONNECTION_URL);
-
-connect.then(() =>{
-    console.log('Users Database connected successfully');
+mongoose.connect(process.env.MONGODB_CONNECTION_URL)
+.then(() =>{
+    console.log('Main Database connected successfully');
 })
 .catch(() =>{
-    console.log('Users Database cannot be connected ');
+    console.log('Main Database cannot be connected ');
 });
 
 const UserSchema = new mongoose.Schema({

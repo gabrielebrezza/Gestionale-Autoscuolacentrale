@@ -1,12 +1,5 @@
 const mongoose = require('mongoose');
-const connect = mongoose.connect(process.env.MONGODB_CONNECTION_URL);
 
-connect.then(() =>{
-    console.log('Codes Database connected successfully');
-})
-.catch(() =>{
-    console.log('Codes Database cannot be connected ');
-});
 
 const CodeSchema = new mongoose.Schema({
     cFiscale: {

@@ -1,12 +1,5 @@
 const mongoose = require('mongoose');
-const connect = mongoose.connect(process.env.MONGODB_CONNECTION_URL);
 
-connect.then(() =>{
-    console.log('StoricoFatture Database connected successfully');
-})
-.catch(() =>{
-    console.log('StoricoFatture Database cannot be connected ');
-});
 
 const StoricoFattureSchema = new mongoose.Schema({
     tipo: {
@@ -30,6 +23,6 @@ const StoricoFattureSchema = new mongoose.Schema({
         required: true
     }
 });
-const StoricoFatture = new mongoose.model('storicoFatture', StoricoFattureSchema);
+const storicoFattureGenerali = new mongoose.model('storicofattureGenerali', StoricoFattureSchema);
 
-module.exports = StoricoFatture;
+module.exports = storicoFattureGenerali;
