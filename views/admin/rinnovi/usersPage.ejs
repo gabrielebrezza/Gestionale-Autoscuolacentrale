@@ -214,9 +214,14 @@
                                         </span>
                                     </a>
                                 <% }else{ %>
-                                    <span class="material-symbols-outlined pagamenti">
-                                        receipt_long
-                                    </span>
+                                    <form action="/admin/rinnovi/downloadFattura" method="post">
+                                        <input type="hidden" name="numero" value="<%= user.fatture.numero %>">
+                                        <button type="submit" style="background: none; border: none; outline: none; cursor: pointer;">
+                                            <span class="material-symbols-outlined pagamenti">
+                                                receipt_long
+                                            </span>
+                                        </button>
+                                    </form>
                                 <% } %>
                                 
                             </td>

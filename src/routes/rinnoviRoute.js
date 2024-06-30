@@ -1,14 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const archiver = require('archiver');
 
 const router = express.Router();
 router.use(bodyParser.json({ limit: '50mb' }));
 
 //databases
 const rinnovi = require('../DB/Rinnovi');
+const storicoFattureGenerali = require('../DB/StoricoFattureGenerali');
 
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
@@ -176,6 +177,31 @@ router.post('/rinnovi/updateUser', authenticateJWT, async (req, res)=> {
     };
     await rinnovi.findOneAndUpdate({"_id": id}, userData);
     res.redirect(`/admin/rinnovi/userPage?id=${id}`);
+});
+
+router.post('/admin/rinnovi/downloadFattura', authenticateJWT, async (req, res)=> {
+    try {
+        const fattura = await storicoFattureGenerali.findOne({"tipo": 'rinnovo', "numero": req.body.numero});
+        if (fattura) {
+            const filePath = path.join(__dirname, '../../fatture', 'elettroniche', fattura.nomeFile);
+            if (fs.existsSync(filePath)) {
+                res.set('Content-Type', 'application/octet-stream');
+                res.set('Content-Disposition', `attachment; filename="${fattura.nomeFile}"`);
+        
+                const fileStream = fs.createReadStream(filePath);
+                fileStream.pipe(res);
+            } else {
+                console.warn(`Il file ${fattura.nomeFile} non esiste nella cartella fatture.`);
+                res.status(404).send('File not found');
+            }
+        } else {
+            console.warn(`Nessuna fattura trovata per il numero ${req.body.numero}.`);
+            res.status(404).send('Fattura non trovata');
+        }
+    } catch (error) {
+        console.error('Si è verificato un errore durante il download della fattura rinnovi:', error);
+    res.render('errorPage', {error: 'Si è verificato un errore durante il download della fattura'});
+    }
 });
 
 module.exports = router;

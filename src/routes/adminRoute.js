@@ -368,7 +368,7 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
       nazioneSedeCliente: 'IT',
       data: data,
       ImportoTotaleDocumento: Number(importo).toFixed(2),
-      descrizione1: 'Servizio generazione IUV',
+      descrizione1: 'Rinnovo patente',
       prezzoUnitario1: ((importo-27.80)/1.22).toFixed(2),
       prezzoTotale1: ((importo-27.80)/1.22).toFixed(2),
       aliquotaIVA: '22.00',
@@ -439,7 +439,7 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
         }
     });
   }else if(rinnovo){
-    await rinnovi.findOneAndUpdate({"_id": req.body.id}, {"fatture": {"data": dati.data, "importo": dati.importoPagamento, "emessa": true}});
+    await rinnovi.findOneAndUpdate({"_id": req.body.id}, {"fatture": {"data": dati.data, "importo": dati.importoPagamento, "emessa": true, "numero": Number(dati.progressivoInvio.replace('r00', ''))}});
   }
   if(iscrizione){
     await numeroFattura.updateOne({$inc: {"numeroIscrizioni": 1}});
