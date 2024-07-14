@@ -226,136 +226,183 @@ async function trovaProvincia(cap) {
 }
 
 const fetchBookings = async () => {
-    const now = new Date();
+    const GRAPHQL_URL = 'https://backend-test.rinnovopatenti.it/api/graphql';
+    const AUTH_EMAIL = 'rinnovopatentimarconi@gmail.com';
+    const AUTH_PASSWORD = 'Marconi@2024';
 
-    const pad = (num) => (num < 10 ? '0' + num : num);
-    const currentDateTime = `${now.getUTCFullYear()}-${pad(now.getUTCMonth() + 1)}-${pad(now.getUTCDate())}T${pad(now.getUTCHours()-1)}:00:00+02:00`;
-    const query = `
-    query MarconiBookings {
-        bookings(
-            where: {
-                visitInfo: { study: { name: { equals: "Rinnovopatenti Marconi" } } }
-                payment: { payed: { equals: true } }
-                createdAt: { gt: "${currentDateTime}" }
+    const authenticate = async () => {
+        const authQuery = `
+        mutation {
+            authenticateUserWithPassword(email: "${AUTH_EMAIL}", password: "${AUTH_PASSWORD}") {
+                ... on UserAuthenticationWithPasswordSuccess {
+                    sessionToken
+                }
+                ... on UserAuthenticationWithPasswordFailure {
+                    message
+                }
             }
-            orderBy: { id: desc }
-        ) {
-            id
-            code
-            totalCost
-            startDate
-            endDate
-            createdAt
-            updatedAt
-            enabled
-            payment {
-                id
-                payed
-            }
-            client {
-                name
-                surname
-                fiscalCode
-                email
-                phone
-                shippingAddress
-                shippingAddressCap
-                shippingAddressNumber
-                shippingAddressPlace
-                licenseNumber
-            }
-        }
-    }`;
+        }`;
 
-    const data = JSON.stringify({ query }); 
+        const authData = JSON.stringify({ query: authQuery });
 
-    const url = new URL(GRAPHQL_URL);
-    
-    const options = {
-      hostname: url.hostname,
-      path: url.pathname,
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(data),
-        'Authorization': `Bearer ${AUTH_TOKEN}`,
-      },
+        const authOptions = {
+            hostname: new URL(GRAPHQL_URL).hostname,
+            path: new URL(GRAPHQL_URL).pathname,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(authData),
+            },
+        };
+
+        return new Promise((resolve, reject) => {
+            const req = https.request(authOptions, (res) => {
+                let body = '';
+
+                res.on('data', (chunk) => {
+                    body += chunk;
+                });
+
+                res.on('end', () => {
+                    const response = JSON.parse(body);
+                    if (response.data.authenticateUserWithPassword.sessionToken) {
+                        resolve(response.data.authenticateUserWithPassword.sessionToken);
+                    } else {
+                        reject('Authentication failed: ' + response.data.authenticateUserWithPassword.message);
+                    }
+                });
+            });
+
+            req.on('error', (e) => {
+                reject(e);
+            });
+
+            req.write(authData);
+            req.end();
+        });
     };
 
-    const req = https.request(options,  (res) => {
-      let body = '';
+    try {
+        const AUTH_TOKEN = await authenticate();
+        const now = new Date();
 
-      res.on('data', (chunk) => {
-          body += chunk;
-      });
-
-      res.on('end', async () => {
-          const responseData = JSON.parse(body);
-          const bookings = responseData.data.bookings;
-          for(const utente of bookings){
-            const userExist = await rinnovi.findOne({"cf": utente.client.fiscalCode.trim()});
-            if(!utente.enabled || userExist) continue;
-
-            const spedizione = {
-              via: utente.client.shippingAddress.trim(),
-              nCivico: utente.client.shippingAddressNumber.trim(),
-              cap: utente.client.shippingAddressCap.trim(),
-              comune: utente.client.shippingAddressPlace.trim(),
-              provincia: await trovaProvincia(utente.client.shippingAddressCap)
+        const pad = (num) => (num < 10 ? '0' + num : num);
+        const currentDateTime = `${now.getUTCFullYear()}-${pad(now.getUTCMonth() + 1)}-${pad(now.getUTCDate())}T${pad(now.getUTCHours()-1)}:00:00+02:00`;
+        const query = `
+        query MarconiBookings {
+            bookings(
+                where: {
+                    visitInfo: { study: { name: { equals: "Rinnovopatenti Marconi" } } }
+                    payment: { payed: { equals: true } }
+                    createdAt: { gt: "${currentDateTime}" }
+                }
+                orderBy: { id: desc }
+            ) {
+                id
+                code
+                totalCost
+                startDate
+                endDate
+                createdAt
+                updatedAt
+                enabled
+                payment {
+                    id
+                    payed
+                }
+                client {
+                    name
+                    surname
+                    fiscalCode
+                    email
+                    phone
+                    shippingAddress
+                    shippingAddressCap
+                    shippingAddressNumber
+                    shippingAddressPlace
+                    licenseNumber
+                }
             }
-            const [data, ora] = utente.startDate.slice(0, -8).split('T');
-            const visita = {
-              data: data,
-              ora: ora
-            }
-            const contatti = {
-              email: utente.client.email,
-              tel: utente.client.phone
-            }
-            const saveUser = new rinnovi({
-              "nome": utente.client.name.trim(),
-              "cognome": utente.client.surname.trim(),
-              "cf": utente.client.fiscalCode.trim(),
-              "contatti": contatti,
-              "spedizione": spedizione,
-              "visita": visita,
-              "nPatente": utente.client.licenseNumber.trim(),
-              "protocollo": null,
-              "note": null
-            });
-            await saveUser.save()
-            .then(() => {
-                console.log(`Nuovo utente rinnovi salvato: ${saveUser.nome} ${saveUser.cognome}`);
-            })
-            .catch((error) => {
-                return console.error(`Errore durante il salvataggio del nuovo utente rinnovi: ${error}`);
-            });
-            const user = await rinnovi.findOne({"cf": utente.client.fiscalCode.trim()});
+        }`;
 
-            const dati = {
-              id: `${user._id}`,
-              importo: utente.totalCost
-            }
-            fetch(`${process.env.SERVER_URL}/createFattura`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(dati)
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
-          } 
-      });
-  });
+        const data = JSON.stringify({ query }); 
 
-    req.on('error', (error) => {
-        console.error('Errore:', error);
-    });
+        const url = new URL(GRAPHQL_URL);
+        
+        const options = {
+          hostname: url.hostname,
+          path: url.pathname,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(data),
+            'Authorization': `Bearer ${AUTH_TOKEN}`,
+          },
+        };
 
-    req.write(data);
-    req.end();
+        const req = https.request(options,  (res) => {
+          let body = '';
+
+          res.on('data', (chunk) => {
+              body += chunk;
+          });
+
+          res.on('end', async () => {
+              const responseData = JSON.parse(body);
+              const bookings = responseData.data.bookings;
+              for(const utente of bookings){
+                const userExist = await rinnovi.findOne({"cf": utente.client.fiscalCode.trim()});
+                if(!utente.enabled || userExist) continue;
+
+                const spedizione = {
+                  via: utente.client.shippingAddress.trim(),
+                  nCivico: utente.client.shippingAddressNumber.trim(),
+                  cap: utente.client.shippingAddressCap.trim(),
+                  comune: utente.client.shippingAddressPlace.trim(),
+                  provincia: await trovaProvincia(utente.client.shippingAddressCap)
+                }
+                const realDate = new Date(utente.startDate);
+                realDate.setHours(realDate.getHours() + 2);
+                const [data, ora] = realDate.toISOString().slice(0, -8).split('T');
+                const visita = {
+                  data: data,
+                  ora: ora
+                }
+                const contatti = {
+                  email: utente.client.email,
+                  tel: utente.client.phone
+                }
+                const saveUser = new rinnovi({
+                  "nome": utente.client.name.trim(),
+                  "cognome": utente.client.surname.trim(),
+                  "cf": utente.client.fiscalCode.trim(),
+                  "contatti": contatti,
+                  "spedizione": spedizione,
+                  "visita": visita,
+                  "nPatente": utente.client.licenseNumber.trim(),
+                  "protocollo": null,
+                  "note": null
+                });
+                await saveUser.save()
+                .then(() => {
+                    console.log(`Nuovo utente rinnovi salvato: ${saveUser.nome} ${saveUser.cognome}`);
+                })
+                .catch((error) => {
+                    return console.error(`Errore durante il salvataggio del nuovo utente rinnovi: ${error}`);
+                });
+              } 
+          });
+        });
+
+        req.on('error', (error) => {
+            console.error('Errore:', error);
+        });
+
+        req.write(data);
+        req.end();
+    } catch (error) {
+        console.error('Error:', error);
+    }
 };
 
 setInterval(fetchBookings, 600000);
