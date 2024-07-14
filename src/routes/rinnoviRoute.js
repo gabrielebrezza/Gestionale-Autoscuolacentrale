@@ -230,7 +230,6 @@ const fetchBookings = async () => {
 
     const pad = (num) => (num < 10 ? '0' + num : num);
     const currentDateTime = `${now.getUTCFullYear()}-${pad(now.getUTCMonth() + 1)}-${pad(now.getUTCDate())}T${pad(now.getUTCHours()-1)}:00:00+02:00`;
-    console.log(currentDateTime)
     const query = `
     query MarconiBookings {
         bookings(
@@ -293,9 +292,7 @@ const fetchBookings = async () => {
       res.on('end', async () => {
           const responseData = JSON.parse(body);
           const bookings = responseData.data.bookings;
-          console.log(bookings)
           for(const utente of bookings){
-            console.log(utente)
             const userExist = await rinnovi.findOne({"cf": utente.client.fiscalCode.trim()});
             if(!utente.enabled || userExist) continue;
 
