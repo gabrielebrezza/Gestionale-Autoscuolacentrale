@@ -345,7 +345,7 @@ router.get('/admin/emettiFattura', authenticateJWT, async (req, res)=> {
 });
 
 
-router.post('/createFattura', authenticateJWT, async (req, res) =>{
+router.post('/createFattura', async (req, res) =>{
   let dati;
   if(req.body.id){
     const user = await rinnovi.findOne({"_id": req.body.id});
@@ -657,5 +657,12 @@ router.post('/deleteCassaItem', authenticateJWT, async (req, res) => {
   }
   res.redirect('/admin/cassa');
 });
+
+
+
+
+
+
+
 
 module.exports = router;

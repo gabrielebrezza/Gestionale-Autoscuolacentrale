@@ -73,7 +73,7 @@
                 } %>
                 <input type="hidden" id="data" name="data" value="<%= dataFatturazione %>">
 
-                <label for="ImportoTotaleDocumento">ImportoTotaleDocumento</label>
+                <label for="ImportoTotaleDocumento">Importo Totale:</label>
                 <input type="text" id="ImportoTotaleDocumento" name="ImportoTotaleDocumento" value="<%= iscrizione ? Number(importo).toFixed(2) : '' %>">
             </fieldset>
 
@@ -86,20 +86,20 @@
             <fieldset>
                 <!-- linea 2 -->
                 <input type="hidden" id="descrizione" name="descrizione2" value="<%= iscrizione ? 'Costo Servizio' : 'anticipazioni conto cliente iva esclusa art.15 dpr 633/72' %>">
-                <label for="prezzoUnitario2">Prezzo Unitario:</label><br>
+                <label for="prezzoUnitario2">Anticipazioni Conto Cliente:</label><br>
                 <input type="text" id="prezzoUnitario2" name="prezzoUnitario2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>"><br><br>
                 <input type="hidden" id="prezzoTotale2" name="prezzoTotale2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
                 <input type="hidden" id="aliquotaIVA" name="aliquotaIVA2" value="<%= iscrizione ? '22.00' : '0.00' %>">
             </fieldset>
 
             <!-- dati riepilogo riga 1 -->
-            <input type="hidden" id="aliquotaIVARiepilogo1" name="aliquotaIVARiepilogo1" value="22.00">
+            <input type="hidden" id="aliquotaIVARiepilogo1" name="aliquotaIVARiepilogo1" value="<%= iscrizione ? '0.00' : '22.00' %>">
             <input type="hidden" id="imponibileImporto1" name="imponibileImporto1" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
             <input type="hidden" id="imposta1" name="imposta1" value="<%= iscrizione ? ((((importo-42.20)/1.22)*22)/100).toFixed(2) : '' %>">
             <input type="hidden" id="esigibilitaIVA1" name="esigibilitaIVA1" value="I">
             
             <!-- dati riepilogo riga 2 -->
-            <input type="hidden" id="aliquotaIVARiepilogo2" name="aliquotaIVARiepilogo2" value="0.00">
+            <input type="hidden" id="aliquotaIVARiepilogo2" name="aliquotaIVARiepilogo2" value="<%= iscrizione ? '22.00' : '0.00' %>">
             <input type="hidden" id="imponibileImporto2" name="imponibileImporto2" value="<%= iscrizione ? ((importo-42.20)/1.22).toFixed(2) : '' %>">
             <input type="hidden" id="imposta2" name="imposta2" value="0.00">
             <input type="hidden" id="RiferimentoNormativo2" name="RiferimentoNormativo2" value="Anticipazioni conto cliente art. 15 DPR 633/72">
