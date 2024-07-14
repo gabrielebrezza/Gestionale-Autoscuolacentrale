@@ -179,14 +179,14 @@ router.post('/rinnovi/updateUser', authenticateJWT, async (req, res)=> {
     await rinnovi.findOneAndUpdate({"_id": id}, userData);
     res.redirect(`/admin/rinnovi/userPage?id=${id}`);
 });
-
 router.post('/admin/rinnovi/downloadFattura', authenticateJWT, async (req, res)=> {
     try {
+        console.log(req.body.numero)
         const fattura = await storicoFattureGenerali.findOne({"tipo": 'rinnovo', "numero": req.body.numero});
         if (fattura) {
             const filePath = path.join(__dirname, '../../fatture', 'elettroniche', fattura.nomeFile);
             if (fs.existsSync(filePath)) {
-                res.set('Content-Type', 'application/octet-stream');
+                res.set('Content-Type', 'application/xml');
                 res.set('Content-Disposition', `attachment; filename="${fattura.nomeFile}"`);
         
                 const fileStream = fs.createReadStream(filePath);

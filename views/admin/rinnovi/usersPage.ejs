@@ -214,14 +214,11 @@
                                         </span>
                                     </a>
                                 <% }else{ %>
-                                    <form action="/admin/rinnovi/downloadFattura" method="post">
-                                        <input type="hidden" name="numero" value="<%= user.fatture.numero %>">
-                                        <button type="submit" style="background: none; border: none; outline: none; cursor: pointer;">
-                                            <span class="material-symbols-outlined pagamenti">
-                                                receipt_long
-                                            </span>
-                                        </button>
-                                    </form>
+                                    <button class="downloadFattura" data-number="<%= user.fatture.numero %>" type="button" style="background: none; border: none; outline: none; cursor: pointer;">
+                                        <span class="material-symbols-outlined pagamenti">
+                                            receipt_long
+                                        </span>
+                                    </button>                                   
                                 <% } %>
                                 
                             </td>
@@ -239,11 +236,51 @@
                 td.style.display = td.style.display != 'inline-flex' ? 'inline-flex' : 'none';
             });
         });
+
         actionUsersForm.addEventListener('submit',event => {
-            const confirmSubmission = confirm("Sei sicuro di voler effetuare l'azione sugli utenti selezionati?");
-            if (!confirmSubmission) {
-                event.preventDefault();
-            }
+            const confirmSubmission = confirm("Sei sicuro di voler effettuare l'azione sugli utenti selezionati?");
+            if (!confirmSubmission) event.preventDefault();
+        });
+
+
+        document.querySelectorAll('.downloadFattura').forEach(btn => {
+            btn.addEventListener('click', async (event) => {
+                try {
+                    const response = await fetch('/admin/rinnovi/downloadFattura', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ numero: btn.dataset.number })
+                    });
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const contentDisposition = response.headers.get('Content-Disposition');
+                        let fileName;
+
+                        if (contentDisposition && contentDisposition.indexOf('filename=') !== -1) {
+                            const matches = /filename="([^"]+)"/.exec(contentDisposition);
+                            if (matches && matches[1]) {
+                                fileName = matches[1];
+                            }
+                        }
+                    
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        a.remove();
+                    } else {
+                        throw new Error('Errore durante il download della fattura');
+                    }
+                } catch (error) {
+                    alert('Errore durante il download della fattura');
+                }
+            });
         });
     </script>
 
