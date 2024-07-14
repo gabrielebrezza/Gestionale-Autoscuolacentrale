@@ -229,7 +229,8 @@ const fetchBookings = async () => {
     const now = new Date();
 
     const pad = (num) => (num < 10 ? '0' + num : num);
-    const currentDateTime = `${now.getUTCFullYear()}-${pad(now.getUTCMonth() + 1)}-${pad(now.getUTCDate())}T${pad(now.getUTCHours())}:00:00+02:00`;
+    const currentDateTime = `${now.getUTCFullYear()}-${pad(now.getUTCMonth() + 1)}-${pad(now.getUTCDate())}T${pad(now.getUTCHours()-1)}:00:00+02:00`;
+    console.log(currentDateTime)
     const query = `
     query MarconiBookings {
         bookings(
