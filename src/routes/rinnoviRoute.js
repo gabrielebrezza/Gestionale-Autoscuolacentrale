@@ -210,7 +210,7 @@ router.post('/admin/rinnovi/downloadFattura', authenticateJWT, async (req, res)=
 
 
 const GRAPHQL_URL = 'https://backend-test.rinnovopatenti.it/api/graphql';
-const AUTH_TOKEN = 'Fe26.2**f59c2f1593553b63434d07d223a0fae2842f3136783b6ce62e64532213dc87bd*66vApM507Brq_MtNgN00gA*JCsCKvBa2Lm8smg6SiUNAJHYOXXjBmGEhrV3YxEA72n3uqcjdzSCxpa5jRl4hqBDQh2w02Q8OQC3DYHKRL5xsQ*1723470642875*1acb59221e19bded0a35f9b540708141952dee3f33e8081c913911966c93b80c*oDwbMkIDKyQkzVHREuwpKbli96a0hxBd8m-n0Rir-Pw';
+const AUTH_TOKEN = 'Fe26.2**85dadcd0c871f9ec5aed3873c74e348986d52d95ba29abca5d7d9cc458dfefa0*SbADdOqaFCvOHCvbsi4_9A*_A8GSuytEU2i_M71ACt6IR61IoCdBSlc819KYrpJiUKhwdzqTFaJg1eEzo25ZW7hCkppC6NNKsbSJfwlse3ztQ*1723577166723*884606065dc94bc17f0b0158447a18d2677e0b24eee640016e2499e12c8d4261*3K0B7ONIzawLIJXkzzyTgbobU-JJyVuqItr6P-9siM8';
 
 async function trovaProvincia(cap) {
   try {
@@ -268,7 +268,7 @@ const fetchBookings = async () => {
         }
     }`;
 
-    const data = JSON.stringify({ query });
+    const data = JSON.stringify({ query }); 
 
     const url = new URL(GRAPHQL_URL);
     
@@ -293,7 +293,9 @@ const fetchBookings = async () => {
       res.on('end', async () => {
           const responseData = JSON.parse(body);
           const bookings = responseData.data.bookings;
+          console.log(bookings)
           for(const utente of bookings){
+            console.log(utente)
             const userExist = await rinnovi.findOne({"cf": utente.client.fiscalCode.trim()});
             if(!utente.enabled || userExist) continue;
 
@@ -346,7 +348,7 @@ const fetchBookings = async () => {
             })
             .catch((error) => {
               console.error('Error:', error);
-            }); 
+            });
           } 
       });
   });
@@ -359,9 +361,9 @@ const fetchBookings = async () => {
     req.end();
 };
 
-setInterval(fetchBookings, 3600000);
+setInterval(fetchBookings, 600000);
 
-fetchBookings();
+setTimeout(fetchBookings, 5000);
 
 
 module.exports = router;
