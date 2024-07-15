@@ -10,6 +10,7 @@ router.use(bodyParser.json({ limit: '50mb' }));
 
 //databases
 const rinnovi = require('../DB/Rinnovi');
+const SyncDate = require('../DB/SyncDate');
 const storicoFattureGenerali = require('../DB/StoricoFattureGenerali');
 
 //functions
@@ -288,18 +289,18 @@ const fetchBookings = async () => {
 
     try {
         const AUTH_TOKEN = await authenticate();
-        const now = new Date();
 
-        const pad = (num) => (num < 10 ? '0' + num : num);
-        const currentDateTime = `${now.getUTCFullYear()}-${pad(now.getUTCMonth() + 1)}-${pad(now.getUTCDate())}T${pad(now.getUTCHours()-1)}:00:00+02:00`;
-        console.log(currentDateTime)
+        const currentDateTime = new Date();
+        const lastSync = await SyncDate.findOne()
+        await SyncDate.updateOne({"data": currentDateTime.toISOString()})
+        
         const query = `
         query MarconiBookings {
             bookings(
                 where: {
                     visitInfo: { study: { name: { equals: "Rinnovopatenti Marconi" } } }
                     payment: { payed: { equals: true } }
-                    createdAt: { gt: "${currentDateTime}" }
+                    createdAt: { gt: "${lastSync.data}" }
                 }
                 orderBy: { id: desc }
             ) {
