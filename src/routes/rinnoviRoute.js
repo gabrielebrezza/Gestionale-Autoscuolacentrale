@@ -231,55 +231,59 @@ const fetchBookings = async () => {
     const AUTH_PASSWORD = 'Marconi@2024';
 
     const authenticate = async () => {
-        const authQuery = `
-        mutation {
-            authenticateUserWithPassword(email: "${AUTH_EMAIL}", password: "${AUTH_PASSWORD}") {
-                ... on UserAuthenticationWithPasswordSuccess {
-                    sessionToken
-                }
-                ... on UserAuthenticationWithPasswordFailure {
-                    message
-                }
-            }
-        }`;
-
-        const authData = JSON.stringify({ query: authQuery });
-
-        const authOptions = {
-            hostname: new URL(GRAPHQL_URL).hostname,
-            path: new URL(GRAPHQL_URL).pathname,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': Buffer.byteLength(authData),
-            },
-        };
-
-        return new Promise((resolve, reject) => {
-            const req = https.request(authOptions, (res) => {
-                let body = '';
-
-                res.on('data', (chunk) => {
-                    body += chunk;
-                });
-
-                res.on('end', () => {
-                    const response = JSON.parse(body);
-                    if (response.data.authenticateUserWithPassword.sessionToken) {
-                        resolve(response.data.authenticateUserWithPassword.sessionToken);
-                    } else {
-                        reject('Authentication failed: ' + response.data.authenticateUserWithPassword.message);
+        try {
+            const authQuery = `
+            mutation {
+                authenticateUserWithPassword(email: "${AUTH_EMAIL}", password: "${AUTH_PASSWORD}") {
+                    ... on UserAuthenticationWithPasswordSuccess {
+                        sessionToken
                     }
+                    ... on UserAuthenticationWithPasswordFailure {
+                        message
+                    }
+                }
+            }`;
+
+            const authData = JSON.stringify({ query: authQuery });
+
+            const authOptions = {
+                hostname: new URL(GRAPHQL_URL).hostname,
+                path: new URL(GRAPHQL_URL).pathname,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(authData),
+                },
+            };
+
+            return new Promise((resolve, reject) => {
+                const req = https.request(authOptions, (res) => {
+                    let body = '';
+
+                    res.on('data', (chunk) => {
+                        body += chunk;
+                    });
+
+                    res.on('end', () => {
+                        const response = JSON.parse(body);
+                        if (response.data.authenticateUserWithPassword.sessionToken) {
+                            resolve(response.data.authenticateUserWithPassword.sessionToken);
+                        } else {
+                            reject('Authentication failed: ' + response.data.authenticateUserWithPassword.message);
+                        }
+                    });
                 });
-            });
 
-            req.on('error', (e) => {
-                reject(e);
-            });
+                req.on('error', (e) => {
+                    reject(e);
+                });
 
-            req.write(authData);
-            req.end();
-        });
+                req.write(authData);
+                req.end();
+            });
+        } catch (error) {
+            console.error(`si è verificato un errore nell'autenticazione dell'API ${error}`)
+        }
     };
 
     try {
@@ -288,6 +292,7 @@ const fetchBookings = async () => {
 
         const pad = (num) => (num < 10 ? '0' + num : num);
         const currentDateTime = `${now.getUTCFullYear()}-${pad(now.getUTCMonth() + 1)}-${pad(now.getUTCDate())}T${pad(now.getUTCHours()-1)}:00:00+02:00`;
+        console.log(currentDateTime)
         const query = `
         query MarconiBookings {
             bookings(
@@ -349,6 +354,7 @@ const fetchBookings = async () => {
 
           res.on('end', async () => {
               const responseData = JSON.parse(body);
+              if (!responseData.data.bookings || Object.keys(responseData.data.bookings).length == 0) return;
               const bookings = responseData.data.bookings;
               for(const utente of bookings){
                 const userExist = await rinnovi.findOne({"cf": utente.client.fiscalCode.trim()});
@@ -401,7 +407,7 @@ const fetchBookings = async () => {
         req.write(data);
         req.end();
     } catch (error) {
-        console.error('Error:', error);
+        console.error(`Errore durante il recupero dei dati dall'API: ${error}`);
     }
 };
 
