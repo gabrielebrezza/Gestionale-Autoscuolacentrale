@@ -255,7 +255,7 @@ const fetchBookings = async () => {
                     'Content-Length': Buffer.byteLength(authData),
                 },
             };
-
+            console.log(authOptions)
             return new Promise((resolve, reject) => {
                 const req = https.request(authOptions, (res) => {
                     let body = '';
