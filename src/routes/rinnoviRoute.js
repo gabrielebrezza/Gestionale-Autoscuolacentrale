@@ -211,7 +211,6 @@ router.post('/admin/rinnovi/downloadFattura', authenticateJWT, async (req, res)=
 
 
 const GRAPHQL_URL = 'https://backend.rinnovopatenti.it';
-const AUTH_TOKEN = 'Fe26.2**85dadcd0c871f9ec5aed3873c74e348986d52d95ba29abca5d7d9cc458dfefa0*SbADdOqaFCvOHCvbsi4_9A*_A8GSuytEU2i_M71ACt6IR61IoCdBSlc819KYrpJiUKhwdzqTFaJg1eEzo25ZW7hCkppC6NNKsbSJfwlse3ztQ*1723577166723*884606065dc94bc17f0b0158447a18d2677e0b24eee640016e2499e12c8d4261*3K0B7ONIzawLIJXkzzyTgbobU-JJyVuqItr6P-9siM8';
 
 async function trovaProvincia(cap) {
   try {
@@ -289,7 +288,7 @@ const fetchBookings = async () => {
 
     try {
         const AUTH_TOKEN = await authenticate();
-
+        console.log(AUTH_TOKEN)
         const currentDateTime = new Date();
         const lastSync = await SyncDate.findOne()
         await SyncDate.updateOne({"data": currentDateTime.toISOString()})
@@ -334,7 +333,7 @@ const fetchBookings = async () => {
         const data = JSON.stringify({ query }); 
 
         const url = new URL(GRAPHQL_URL);
-        
+        console.log(url)
         const options = {
           hostname: url.hostname,
           path: url.pathname,
