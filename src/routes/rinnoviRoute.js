@@ -210,8 +210,6 @@ router.post('/admin/rinnovi/downloadFattura', authenticateJWT, async (req, res)=
 
 
 
-const GRAPHQL_URL = 'https://backend.rinnovopatenti.it';
-
 async function trovaProvincia(cap) {
   try {
       const response = await axios.get('https://raw.githubusercontent.com/scgoeswild/comuni-localita-cap-italia/main/files/comuni-localita-cap-italia.json');
@@ -226,7 +224,7 @@ async function trovaProvincia(cap) {
 }
 
 const fetchBookings = async () => {
-    const GRAPHQL_URL = 'https://backend.rinnovopatenti.it';
+    const GRAPHQL_URL = 'https://backend.rinnovopatenti.it/api/graphql';
     const AUTH_EMAIL = 'rinnovopatentimarconi@gmail.com';
     const AUTH_PASSWORD = 'Marconi@2024';
 
@@ -255,7 +253,7 @@ const fetchBookings = async () => {
                     'Content-Length': Buffer.byteLength(authData),
                 },
             };
-            console.log(authOptions)
+            
             return new Promise((resolve, reject) => {
                 const req = https.request(authOptions, (res) => {
                     let body = '';
@@ -265,7 +263,6 @@ const fetchBookings = async () => {
                     });
 
                     res.on('end', () => {
-                        console.log(body)
                         const response = JSON.parse(body);
                         if (response.data.authenticateUserWithPassword.sessionToken) {
                             resolve(response.data.authenticateUserWithPassword.sessionToken);
@@ -289,7 +286,7 @@ const fetchBookings = async () => {
 
     try {
         const AUTH_TOKEN = await authenticate();
-        console.log(AUTH_TOKEN)
+        
         const currentDateTime = new Date();
         const lastSync = await SyncDate.findOne()
         await SyncDate.updateOne({"data": currentDateTime.toISOString()})
@@ -334,7 +331,6 @@ const fetchBookings = async () => {
         const data = JSON.stringify({ query }); 
 
         const url = new URL(GRAPHQL_URL);
-        console.log(url)
         const options = {
           hostname: url.hostname,
           path: url.pathname,
