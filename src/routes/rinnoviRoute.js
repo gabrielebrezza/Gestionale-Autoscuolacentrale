@@ -265,6 +265,7 @@ const fetchBookings = async () => {
                     });
 
                     res.on('end', () => {
+                        console.log(body)
                         const response = JSON.parse(body);
                         if (response.data.authenticateUserWithPassword.sessionToken) {
                             resolve(response.data.authenticateUserWithPassword.sessionToken);
