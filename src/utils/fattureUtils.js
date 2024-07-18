@@ -190,7 +190,7 @@ async function creaFatturaElettronica(dati, iscrizione, rinnovo) {
                     .ele('Descrizione').txt(dati.descrizione1).up()
                     .ele('PrezzoUnitario').txt(dati.prezzoUnitario1).up()
                     .ele('PrezzoTotale').txt(dati.prezzoTotale1).up()
-                    .ele('AliquotaIVA').txt(dati.aliquotaIVA1).up()
+                    .ele('AliquotaIVA').txt(dati.aliquotaIVA).up()
                     .ele('Natura').txt('N1').up()
                 .up()
                   .ele('DettaglioLinee')
