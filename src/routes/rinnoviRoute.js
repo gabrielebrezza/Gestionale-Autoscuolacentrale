@@ -227,10 +227,10 @@ async function trovaProvincia(cap) {
 }
 
 const fetchBookings = async () => {
+    if(process.env.SERVER_URL == 'http://localhost') return;
     const GRAPHQL_URL = 'https://backend-test.rinnovopatenti.it/api/graphql';
     const AUTH_EMAIL = 'rinnovopatentimarconi@gmail.com';
     const AUTH_PASSWORD = 'Marconi@2024';
-
     const authenticate = async () => {
         try {
             const authQuery = `
