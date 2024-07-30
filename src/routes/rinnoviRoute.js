@@ -421,25 +421,25 @@ async function fetchDataAndSave(cf, cognome, nPatente) {
     let browser;
     try {
         browser = await puppeteer.launch({ 
-            headless: true,
+            headless: false,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
         const credenziali = await Credentials.findOne();
         const page = await browser.newPage();
         await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
         await page.waitForSelector('.formSso2');
+        await new Promise(resolve => setTimeout(resolve, 2000));
         await page.type('input[name="loginView.beanUtente.userName"]', credenziali.user);
         await page.type('input[name="loginView.beanUtente.password"]', credenziali.password);
         await page.click('input[name="action:Login_executeLogin"]');
-        await page.waitForNavigation()
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
-        await page.waitForNavigation()
+        await new Promise(resolve => setTimeout(resolve, 2000));
         // Inserisci il PIN
         await page.type('input[name="loginView.pin"]', credenziali.pin);
         await page.click('input[name="action:Pin_executePinValidation"]');
         // Vai alla pagina di raccolta dati
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiesta/ReadAcqRinnAgenzia_initAcqRinnAgenzia.action');
-        await page.waitForSelector('#ReadAcqRinnAgenzia_initAcqRinnAgenzia');
+        await new Promise(resolve => setTimeout(resolve, 4000));
         if( nPatente && cognome ){
             await page.type('input[name="richiestaView.richiestaRinnAgenziaFrom.patente"]', nPatente.toUpperCase());
             await page.type('input[name="richiestaView.cognome"]', cognome.toUpperCase());
@@ -448,7 +448,7 @@ async function fetchDataAndSave(cf, cognome, nPatente) {
             await page.type('input[name="richiestaView.richiestaRinnAgenziaFrom.theAnagrafica.codiceFiscale"]', cf.toUpperCase());
         }
       await page.click('input[name="action:ReadAcqRinnAgenzia_pagingAcqRinnAgenzia"]');
-      await page.waitForSelector('#noTastoInvio');
+      await new Promise(resolve => setTimeout(resolve, 5000));
       
       // Estrai i dati dai risultati
       const formData = await page.evaluate(() => {
@@ -467,6 +467,7 @@ async function fetchDataAndSave(cf, cognome, nPatente) {
         } catch (error) {
           console.error('Errore durante l\'estrazione dei dati:', error);
         }
+        console.log(data)
         return data;
       });
       return formData;
@@ -482,9 +483,9 @@ async function fetchDataAndSave(cf, cognome, nPatente) {
   }
   
   router.post('/admin/rinnovi/ricerca/portaleAutomobilista', authenticateJWT, async (req, res) => {
-    const { cf, cognome, nPatente } = req.body;
+    const { cFiscale, cognome, nPatente } = req.body;
     try {
-      const formData = await fetchDataAndSave(cf, cognome, nPatente);
+      const formData = await fetchDataAndSave(cFiscale, cognome, nPatente);
     const spedizione = {
         via: `${formData.toponimo.toLowerCase()} ${formData.indirizzo.toLowerCase()}`,
         nCivico: formData.numeroCivico.toLowerCase(),
