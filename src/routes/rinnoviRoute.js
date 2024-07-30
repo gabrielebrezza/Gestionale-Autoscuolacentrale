@@ -432,7 +432,7 @@ async function fetchDataAndSave(cf, cognome, nPatente) {
         await page.type('input[name="loginView.beanUtente.userName"]', 'AGTO060901');
         await page.type('input[name="loginView.beanUtente.password"]', 'TONIKA7*');
         await page.click('input[name="action:Login_executeLogin"]');
-        await page.waitForSelector('#login-user');
+        await page.waitForNavigation()
         console.log('login fatto')
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
         console.log('metto il pin')
