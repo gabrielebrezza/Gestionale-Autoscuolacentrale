@@ -17,11 +17,11 @@ const RinnoviSchema = new mongoose.Schema({
     contatti: {
         email: {
             type: String,
-            required: true
+            required: false
         },
         tel: {
             type: String,
-            required: true
+            required: false
         }
     },
     spedizione: {

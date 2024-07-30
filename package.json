@@ -26,6 +26,7 @@
     "paypal-rest-sdk": "^1.8.1",
     "pdf-lib": "^1.17.1",
     "pdfkit": "^0.15.0",
+    "puppeteer": "^22.14.0",
     "sharp": "^0.33.3",
     "stripe": "^15.4.0",
     "tls": "^0.0.1",
