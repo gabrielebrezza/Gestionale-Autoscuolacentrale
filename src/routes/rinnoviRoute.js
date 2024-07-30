@@ -12,7 +12,7 @@ router.use(bodyParser.json({ limit: '50mb' }));
 const rinnovi = require('../DB/Rinnovi');
 const SyncDate = require('../DB/SyncDate');
 const storicoFattureGenerali = require('../DB/StoricoFattureGenerali');
-
+const Credentials = require('../DB/Credentials');
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
@@ -424,17 +424,18 @@ async function fetchDataAndSave(cf, cognome, nPatente) {
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
+        const credenziali = await Credentials.findOne();
         const page = await browser.newPage();
         await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
         await page.waitForSelector('.formSso2');
-        await page.type('input[name="loginView.beanUtente.userName"]', 'AGTO060901');
-        await page.type('input[name="loginView.beanUtente.password"]', 'TONIKA7*');
+        await page.type('input[name="loginView.beanUtente.userName"]', credenziali.user);
+        await page.type('input[name="loginView.beanUtente.password"]', credenziali.password);
         await page.click('input[name="action:Login_executeLogin"]');
         await page.waitForNavigation()
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
         await page.waitForNavigation()
         // Inserisci il PIN
-        await page.type('input[name="loginView.pin"]', '13000578');
+        await page.type('input[name="loginView.pin"]', credenziali.pin);
         await page.click('input[name="action:Pin_executePinValidation"]');
         // Vai alla pagina di raccolta dati
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiesta/ReadAcqRinnAgenzia_initAcqRinnAgenzia.action');
@@ -510,7 +511,15 @@ async function fetchDataAndSave(cf, cognome, nPatente) {
     }
   });
 
+router.get('/admin/rinnovi/credenzialiPortale', authenticateJWT, async(req, res)=>{
+    const credenziali = await Credentials.findOne();
+    res.render('admin/rinnovi/credenziali', { user: credenziali.user, password: credenziali.password, pin: credenziali.pin});
+});
 
-
+router.post('/admin/rinnovi/updateCredentials', authenticateJWT, async(req, res)=>{
+    const { username, password, pin} = req.body
+    await Credentials.updateOne({"user": username, "password": password, "pin": pin});
+    res.redirect('/admin/rinnovi/credenzialiPortale');
+});
 
 module.exports = router;

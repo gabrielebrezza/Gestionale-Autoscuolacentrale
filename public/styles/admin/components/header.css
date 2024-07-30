@@ -79,6 +79,7 @@ body{
 }
 #navBar ul li details{
     position: relative;
+    z-index: 3;
 }
 #navBar ul li details summary{
     list-style: none;

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credenziali portaleAutomobilista</title>
+    <style>
+        main{
+            margin-top: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        #credentialsForm{
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 25%;
+            background: #5681a9;
+            color: #f1f1f1;
+            padding: 25px;
+            border-radius: 15px;
+        }
+        #credentialsForm h2{
+            text-align: center;
+        }
+        #credentialsForm input{
+            border: none;
+            outline: none;
+            padding: 10px;
+        }
+        .field{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #credentialsForm button{
+            text-align: center;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 25px;
+            background: #71a1cb;
+            color: #f1f1f1;
+            transition: .5s;
+            border-radius: 5px;
+        }
+        #credentialsForm button:hover{
+            text-align: center;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 25px;
+            background: #f1f1f1;
+            color: #71a1cb;
+            border-radius: 0;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../components/header.ejs') %>
+    <main>
+        
+        <form id="credentialsForm" action="/admin/rinnovi/updateCredentials" method="POST">
+            <h2>Credenziali Portale del Automobilista</h2>
+            <label for="username">UserName</label>
+            <input type="text" name="username" id="username" value="<%= user %>">
+            <label for="password">Password:</label>
+            <input type="text" name="password" id="password" value="<%= password %>">
+            <label for="pin">Pin:</label>
+            <input type="text" name="pin" id="pin" value="<%= pin %>">
+            <div class="field">
+                <button type="submit">Aggiorna</button>
+            </div>
+            
+        </form>
+    </main>
+    
+</body>
+</html>
