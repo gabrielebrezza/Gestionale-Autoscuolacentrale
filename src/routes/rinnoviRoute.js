@@ -425,20 +425,26 @@ async function fetchDataAndSave(cf, cognome, nPatente) {
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
         const page = await browser.newPage();
+        console.log('ci siamo pt1')
         await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
+        console.log('sono sul sito')
         await page.waitForSelector('.formSso2');
         await page.type('input[name="loginView.beanUtente.userName"]', 'AGTO060901');
         await page.type('input[name="loginView.beanUtente.password"]', 'TONIKA7*');
         await page.click('input[name="action:Login_executeLogin"]');
         await page.waitForSelector('#login-user');
+        console.log('login fatto')
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
+        console.log('metto il pin')
         await page.waitForNavigation()
         // Inserisci il PIN
         await page.type('input[name="loginView.pin"]', '13000578');
         await page.click('input[name="action:Pin_executePinValidation"]');
         // Vai alla pagina di raccolta dati
+        console.log('pin messo')
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiesta/ReadAcqRinnAgenzia_initAcqRinnAgenzia.action');
         await page.waitForSelector('#ReadAcqRinnAgenzia_initAcqRinnAgenzia');
+        console.log('cerco ', nPatente, ' ', cognome)
         if( nPatente && cognome ){
             await page.type('input[name="richiestaView.richiestaRinnAgenziaFrom.patente"]', nPatente.toUpperCase());
             await page.type('input[name="richiestaView.cognome"]', cognome.toUpperCase());
@@ -447,7 +453,7 @@ async function fetchDataAndSave(cf, cognome, nPatente) {
             await page.type('input[name="richiestaView.richiestaRinnAgenziaFrom.theAnagrafica.codiceFiscale"]', cf.toUpperCase());
         }
       await page.click('input[name="action:ReadAcqRinnAgenzia_pagingAcqRinnAgenzia"]');
-
+      console.log('trovato')
       await page.waitForSelector('#noTastoInvio');
       
       // Estrai i dati dai risultati
