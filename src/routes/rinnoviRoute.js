@@ -426,7 +426,7 @@ router.get('/admin/rinnovi/scadenziario', authenticateJWT, async (req, res) => {
 
 
 
-
+const puppeteer = require('puppeteer');
 
 async function searchExpirationPortale(cf) {
     let browser;
