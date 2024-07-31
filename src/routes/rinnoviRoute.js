@@ -422,7 +422,7 @@ router.get('/admin/rinnovi/scadenziario', authenticateJWT, async (req, res) => {
 });
 
 router.post('/admin/rinnovi/ricerca/scadenzaPatente', authenticateJWT, async (req, res) => {
-    const { nome, cognome, cFiscale } = req.body;
+    const { cFiscale } = req.body;
     try {
         const dati = await searchExpirationPortale(cFiscale);
         const spedizione = {
@@ -434,8 +434,8 @@ router.post('/admin/rinnovi/ricerca/scadenzaPatente', authenticateJWT, async (re
         };
 
         const saveUser = new Scadenziario({
-            "nome": nome.trim().toLowerCase(),
-            "cognome": cognome.trim().toLowerCase(),
+            "nome": dati.nome.trim().toLowerCase(),
+            "cognome": dati.cognome.trim().toLowerCase(),
             "cf": cFiscale.trim().toLowerCase(),
             "spedizione": spedizione,
             "nPatente": dati.numeroPatente.trim(),
