@@ -442,7 +442,11 @@ async function searchExpirationPortale(cf) {
         await new Promise(resolve => setTimeout(resolve, 2000));
         await page.type('input[name="loginView.beanUtente.userName"]', credenziali.user);
         await page.type('input[name="loginView.beanUtente.password"]', credenziali.password);
-        await page.click('input[name="action:Login_executeLogin"]');
+        await Promise.all([
+            page.waitForNavigation({ waitUntil: 'networkidle0' }), // Aspetta che la rete sia inattiva
+            page.click('input[name="action:Login_executeLogin"]')
+          ]);
+          
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
         await new Promise(resolve => setTimeout(resolve, 2000));
 
