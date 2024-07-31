@@ -79,18 +79,18 @@ async function searchUserPortale(cf, cognome, nPatente) {
         const page = await browser.newPage();
         await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
         await page.waitForSelector('.formSso2');
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 3000));
         await page.type('input[name="loginView.beanUtente.userName"]', credenziali.user);
         await page.type('input[name="loginView.beanUtente.password"]', credenziali.password);
         await page.click('input[name="action:Login_executeLogin"]');
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 3000));
         // Inserisci il PIN
         await page.type('input[name="loginView.pin"]', credenziali.pin);
         await page.click('input[name="action:Pin_executePinValidation"]');
         // Vai alla pagina di raccolta dati
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiestaCertificatoMedico/ReadAcqCertificatoPrimaFase_initAcqCertificatoPrimaFase.action');
-        await new Promise(resolve => setTimeout(resolve, 4000));
+        await new Promise(resolve => setTimeout(resolve, 5000));
 
         await page.type('input[name="richiestaCertificatoMedicoView.richiestaCertificatoMedicoFrom.codFis"]', cf.toUpperCase());
         await page.click('input[name="action:ReadAcqCertificatoPrimaFase_pagingAcqCertMedPrimaFase"]');
