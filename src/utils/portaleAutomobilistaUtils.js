@@ -23,7 +23,11 @@ async function searchUserPortale(cf, cognome, nPatente) {
         await new Promise(resolve => setTimeout(resolve, 2000));
         // Inserisci il PIN
         await page.type('input[name="loginView.pin"]', credenziali.pin);
-        await page.click('input[name="action:Pin_executePinValidation"]');
+
+        await Promise.all([
+            page.waitForNavigation({ waitUntil: 'networkidle0' }),
+            page.click('input[name="action:Pin_executePinValidation"]')
+        ]);
         // Vai alla pagina di raccolta dati
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiesta/ReadAcqRinnAgenzia_initAcqRinnAgenzia.action');
         await new Promise(resolve => setTimeout(resolve, 4000));
@@ -34,7 +38,10 @@ async function searchUserPortale(cf, cognome, nPatente) {
             await page.type('input[name="richiestaView.richiestaRinnAgenziaFrom.patente"]', nPatente.toUpperCase());
             await page.type('input[name="richiestaView.richiestaRinnAgenziaFrom.theAnagrafica.codiceFiscale"]', cf.toUpperCase());
         }
-      await page.click('input[name="action:ReadAcqRinnAgenzia_pagingAcqRinnAgenzia"]');
+        await Promise.all([
+            page.waitForNavigation({ waitUntil: 'networkidle0' }),
+            page.click('input[name="action:ReadAcqRinnAgenzia_pagingAcqRinnAgenzia"]')
+        ]);
       await new Promise(resolve => setTimeout(resolve, 5000));
       
       // Estrai i dati dai risultati
@@ -103,7 +110,11 @@ async function searchUserPortale(cf, cognome, nPatente) {
         await new Promise(resolve => setTimeout(resolve, 4000));
 
         await page.type('input[name="richiestaCertificatoMedicoView.richiestaCertificatoMedicoFrom.codFis"]', cf.toUpperCase());
-        await page.click('input[name="action:ReadAcqCertificatoPrimaFase_pagingAcqCertMedPrimaFase"]');
+        
+        await Promise.all([
+            page.waitForNavigation({ waitUntil: 'networkidle0' }),
+            page.click('input[name="action:ReadAcqCertificatoPrimaFase_pagingAcqCertMedPrimaFase"]')
+        ]);
         await new Promise(resolve => setTimeout(resolve, 5000));
       
       // Estrai i dati dai risultati
@@ -128,7 +139,11 @@ async function searchUserPortale(cf, cognome, nPatente) {
         await new Promise(resolve => setTimeout(resolve, 4000));
         await page.type('input[name="permessoProvvisorioGuidaView.permessoProvvisorioGuidaFrom.numeroPatenteCompleto"]', dati.numeroPatente);
         await page.type('input[name="permessoProvvisorioGuidaView.permessoProvvisorioGuidaFrom.codiceFiscale"]', cf.toUpperCase());
-        await page.click('input[name="action:ReadAcqPermessoProvvisorio_pagingAcqPermessoProvvisorio"]');
+        
+        await Promise.all([
+            page.waitForNavigation({ waitUntil: 'networkidle0' }),
+            page.click('input[name="action:ReadAcqPermessoProvvisorio_pagingAcqPermessoProvvisorio"]')
+        ]);
         await new Promise(resolve => setTimeout(resolve, 5000));
       
         // Estrai i dati dai risultati
