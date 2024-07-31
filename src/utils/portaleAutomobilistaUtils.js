@@ -71,10 +71,8 @@ async function searchUserPortale(cf, cognome, nPatente) {
   async function searchExpirationPortale(cf) {
     let browser;
     try {
-        browser = await puppeteer.launch({ 
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
-        });
+        browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'], dumpio: true });
+
         const credenziali = await Credentials.findOne();
         const page = await browser.newPage();
         await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
@@ -84,7 +82,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
         await page.type('input[name="loginView.beanUtente.password"]', credenziali.password);
         await page.click('input[name="action:Login_executeLogin"]');
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
-        await new Promise(resolve => setTimeout(resolve, 15000));
+        await new Promise(resolve => setTimeout(resolve, 5000));
         // Inserisci il PIN
         const elementExists = await page.evaluate(() => !!document.querySelector('input[name="loginView.pin"]'));
 console.log("Elemento esiste: ", elementExists);
