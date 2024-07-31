@@ -84,7 +84,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
         await page.type('input[name="loginView.beanUtente.password"]', credenziali.password);
         await page.click('input[name="action:Login_executeLogin"]');
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise(resolve => setTimeout(resolve, 15000));
         // Inserisci il PIN
         const elementExists = await page.evaluate(() => !!document.querySelector('input[name="loginView.pin"]'));
 console.log("Elemento esiste: ", elementExists);
