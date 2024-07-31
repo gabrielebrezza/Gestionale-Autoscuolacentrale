@@ -121,8 +121,8 @@ async function searchUserPortale(cf, cognome, nPatente) {
         let dati = await page.evaluate(() => {
             let datiUtente = {};
             try {
-              datiUtente.nome = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_desNom');
-                datiUtente.cognome = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_desCog');
+                datiUtente.nome = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_desNom').value;
+                datiUtente.cognome = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_desCog').value;
                 datiUtente.numeroPatente = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_thePatente_numeroPatenteCompleto').value.trim();
                 const selectedProvincia = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_theComuneResidenza_theProvincia_selectRowId');
                 datiUtente.provincia = selectedProvincia.options[selectedProvincia.selectedIndex].text.toLowerCase().trim();
