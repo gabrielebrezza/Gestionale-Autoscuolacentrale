@@ -12,18 +12,18 @@ async function searchUserPortale(cf, cognome, nPatente) {
         const page = await browser.newPage();
         await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
         await page.waitForSelector('.formSso2');
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         await page.type('input[name="loginView.beanUtente.userName"]', credenziali.user);
         await page.type('input[name="loginView.beanUtente.password"]', credenziali.password);
         await page.click('input[name="action:Login_executeLogin"]');
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         // Inserisci il PIN
         await page.type('input[name="loginView.pin"]', credenziali.pin);
         await page.click('input[name="action:Pin_executePinValidation"]');
         // Vai alla pagina di raccolta dati
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiesta/ReadAcqRinnAgenzia_initAcqRinnAgenzia.action');
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise(resolve => setTimeout(resolve, 4000));
         if( nPatente && cognome ){
             await page.type('input[name="richiestaView.richiestaRinnAgenziaFrom.patente"]', nPatente.toUpperCase());
             await page.type('input[name="richiestaView.cognome"]', cognome.toUpperCase());
@@ -71,28 +71,28 @@ async function searchUserPortale(cf, cognome, nPatente) {
   async function searchExpirationPortale(cf) {
     let browser;
     try {
-        browser = await puppeteer.launch();
-
+        browser = await puppeteer.launch({ 
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
         const credenziali = await Credentials.findOne();
         const page = await browser.newPage();
         await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
         await page.waitForSelector('.formSso2');
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
         await page.type('input[name="loginView.beanUtente.userName"]', credenziali.user);
         await page.type('input[name="loginView.beanUtente.password"]', credenziali.password);
         await page.click('input[name="action:Login_executeLogin"]');
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await page.waitForSelector('input[name="loginView.pin"]', { timeout: 30000 });
+
         // Inserisci il PIN
-        const pageContent = await page.content();
-        console.log(pageContent.includes('name="loginView.pin"'));
-        const elementExists = await page.evaluate(() => !!document.querySelector('input[name="loginView.pin"]'));
-console.log("Elemento esiste: ", elementExists);
         await page.type('input[name="loginView.pin"]', credenziali.pin);
         await page.click('input[name="action:Pin_executePinValidation"]');
         // Vai alla pagina di raccolta dati
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiestaCertificatoMedico/ReadAcqCertificatoPrimaFase_initAcqCertificatoPrimaFase.action');
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise(resolve => setTimeout(resolve, 4000));
 
         await page.type('input[name="richiestaCertificatoMedicoView.richiestaCertificatoMedicoFrom.codFis"]', cf.toUpperCase());
         await page.click('input[name="action:ReadAcqCertificatoPrimaFase_pagingAcqCertMedPrimaFase"]');
