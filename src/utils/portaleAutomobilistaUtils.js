@@ -85,7 +85,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
         await new Promise(resolve => setTimeout(resolve, 5000));
         // Inserisci il PIN
         const pageContent = await page.content();
-        console.log(pageContent);
+        console.log(pageContent.includes('name="loginView.pin"'));
         const elementExists = await page.evaluate(() => !!document.querySelector('input[name="loginView.pin"]'));
 console.log("Elemento esiste: ", elementExists);
         await page.type('input[name="loginView.pin"]', credenziali.pin);
