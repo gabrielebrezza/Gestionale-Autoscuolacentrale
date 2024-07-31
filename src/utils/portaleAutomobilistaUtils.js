@@ -79,12 +79,12 @@ async function searchUserPortale(cf, cognome, nPatente) {
         const page = await browser.newPage();
         await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
         await page.waitForSelector('.formSso2');
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 5000));
         await page.type('input[name="loginView.beanUtente.userName"]', credenziali.user);
         await page.type('input[name="loginView.beanUtente.password"]', credenziali.password);
         await page.click('input[name="action:Login_executeLogin"]');
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 5000));
         // Inserisci il PIN
         await page.type('input[name="loginView.pin"]', credenziali.pin);
         await page.click('input[name="action:Pin_executePinValidation"]');
