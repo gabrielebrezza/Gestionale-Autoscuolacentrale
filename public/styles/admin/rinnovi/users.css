@@ -17,7 +17,6 @@ span{
     flex-wrap: wrap;
     background: #5681a9;
     transition: .75s;
-    
 }
 #closeFilterBtn{
     position: absolute;
@@ -28,7 +27,6 @@ span{
     font-size: 2.5rem;
     cursor: pointer;
 }
-
 #filterRinnovi .field{
     display: flex;
     gap: 10px;
@@ -217,4 +215,11 @@ span{
 #searchDataForm .field:has(button:hover) span{
     scale: 1.4;
     color: green;
+}
+
+
+#actionUsersForm{
+    /* display: block; */
+    width: 100%;
+    overflow-x: auto;
 }

@@ -13,9 +13,11 @@ const rinnovi = require('../DB/Rinnovi');
 const SyncDate = require('../DB/SyncDate');
 const storicoFattureGenerali = require('../DB/StoricoFattureGenerali');
 const Credentials = require('../DB/Credentials');
+const Scadenziario = require('../DB/Scadenziario');
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
+const {searchUserPortale, searchExpirationPortale} = require('../utils/portaleAutomobilistaUtils.js');
 
 router.get('/admin/rinnovi', authenticateJWT, async (req, res) =>{
     const users = await rinnovi.find({});
@@ -284,6 +286,7 @@ const fetchBookings = async () => {
     };
 
     try {
+        
         const AUTH_TOKEN = await authenticate();
         if(AUTH_TOKEN.includes('html')) return;
         const currentDateTime = new Date();
@@ -412,105 +415,71 @@ setInterval(fetchBookings, 600000);
 setTimeout(fetchBookings, 5000);
 
 
- 
- 
 
-const puppeteer = require('puppeteer');
-
-async function fetchDataAndSave(cf, cognome, nPatente) {
-    let browser;
-    try {
-        browser = await puppeteer.launch({ 
-            headless: false,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
-        });
-        const credenziali = await Credentials.findOne();
-        const page = await browser.newPage();
-        await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
-        await page.waitForSelector('.formSso2');
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        await page.type('input[name="loginView.beanUtente.userName"]', credenziali.user);
-        await page.type('input[name="loginView.beanUtente.password"]', credenziali.password);
-        await page.click('input[name="action:Login_executeLogin"]');
-        await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        // Inserisci il PIN
-        await page.type('input[name="loginView.pin"]', credenziali.pin);
-        await page.click('input[name="action:Pin_executePinValidation"]');
-        // Vai alla pagina di raccolta dati
-        await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiesta/ReadAcqRinnAgenzia_initAcqRinnAgenzia.action');
-        await new Promise(resolve => setTimeout(resolve, 4000));
-        if( nPatente && cognome ){
-            await page.type('input[name="richiestaView.richiestaRinnAgenziaFrom.patente"]', nPatente.toUpperCase());
-            await page.type('input[name="richiestaView.cognome"]', cognome.toUpperCase());
-        }else if(nPatente && cf){
-            await page.type('input[name="richiestaView.richiestaRinnAgenziaFrom.patente"]', nPatente.toUpperCase());
-            await page.type('input[name="richiestaView.richiestaRinnAgenziaFrom.theAnagrafica.codiceFiscale"]', cf.toUpperCase());
-        }
-      await page.click('input[name="action:ReadAcqRinnAgenzia_pagingAcqRinnAgenzia"]');
-      await new Promise(resolve => setTimeout(resolve, 5000));
-      
-      // Estrai i dati dai risultati
-      const formData = await page.evaluate(() => {
-        const data = {};
-        try {
-          data.cognome = document.getElementById('noTastoInvio_richiestaView_cognome').value;
-          data.nome = document.getElementById('noTastoInvio_richiestaView_nome').value;
-          data.codiceFiscale = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_codiceFiscale').value;
-          data.numeroPatente = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_thePatentePosseduta_numeroPatenteCompleto').value;
-          data.provinciaResidenza = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_theComune_theProvincia_descrizione').value;
-          data.comune = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_theComune_descrizioneComune').value;
-          data.toponimo = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_toponimo').value;
-          data.indirizzo = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_indirizzo').value;
-          data.numeroCivico = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_numeroCivico').value;
-          data.cap = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_cap').value;
-        } catch (error) {
-          console.error('Errore durante l\'estrazione dei dati:', error);
-        }
-        console.log(data)
-        return data;
-      });
-      return formData;
-      
-    } catch (error) {
-      console.error('Errore durante l\'operazione Puppeteer:', error);
-      throw error;
-    } finally {
-      if (browser) {
-        await browser.close();
-      }
-    }
-  }
+router.get('/admin/rinnovi/scadenziario', authenticateJWT, async (req, res) => {
+    const scadenziario = await Scadenziario.find();
+    res.render('admin/rinnovi/scadenziario/usersPage', {scadenziario});
+});
   
-  router.post('/admin/rinnovi/ricerca/portaleAutomobilista', authenticateJWT, async (req, res) => {
+
+router.post('/admin/rinnovi/ricerca/scadenzaPatente', authenticateJWT, async (req, res) => {
+    const { nome, cognome, cFiscale } = req.body;
+    try {
+        const dati = await searchExpirationPortale(cFiscale);
+        const spedizione = {
+            via: `${dati.toponimo.toLowerCase()} ${dati.indirizzo.toLowerCase()}`,
+            nCivico: dati.numeroCivico.toLowerCase(),
+            cap: dati.cap.toLowerCase(),
+            comune: dati.comune.toLowerCase(),
+            provincia: dati.provincia.toLowerCase()
+        };
+
+        const saveUser = new Scadenziario({
+            "nome": nome.trim().toLowerCase(),
+            "cognome": cognome.trim().toLowerCase(),
+            "cf": cFiscale.trim().toLowerCase(),
+            "spedizione": spedizione,
+            "nPatente": dati.numeroPatente.trim(),
+            "expPatente": dati.expPatente
+        });
+
+        await saveUser.save();
+        res.redirect(`/admin/rinnovi/scadenziario`);
+    } catch (error) {
+        console.error('Errore durante la richiesta POST:', error);
+        res.render('errorPage', {error: 'Errore durante il collegamento al portale' });
+    }
+});
+
+router.post('/admin/rinnovi/ricerca/portaleAutomobilista', authenticateJWT, async (req, res) => {
     const { cFiscale, cognome, nPatente } = req.body;
     try {
-      const formData = await fetchDataAndSave(cFiscale, cognome, nPatente);
-    const spedizione = {
-        via: `${formData.toponimo.toLowerCase()} ${formData.indirizzo.toLowerCase()}`,
-        nCivico: formData.numeroCivico.toLowerCase(),
-        cap: formData.cap.toLowerCase(),
-        comune: formData.comune.toLowerCase(),
-        provincia: formData.provinciaResidenza.toLowerCase()
-      };
+        const formData = await searchUserPortale(cFiscale, cognome, nPatente);
+        const spedizione = {
+            via: `${formData.toponimo.toLowerCase()} ${formData.indirizzo.toLowerCase()}`,
+            nCivico: formData.numeroCivico.toLowerCase(),
+            cap: formData.cap.toLowerCase(),
+            comune: formData.comune.toLowerCase(),
+            provincia: formData.provinciaResidenza.toLowerCase()
+        };
 
-      const saveUser = new rinnovi({
-        "nome": formData.nome.trim().toLowerCase(),
-        "cognome": formData.cognome.trim().toLowerCase(),
-        "cf": formData.codiceFiscale.trim().toLowerCase(),
-        "spedizione": spedizione,
-        "nPatente": formData.numeroPatente.trim(),
-      });
+        const saveUser = new rinnovi({
+            "nome": formData.nome.trim().toLowerCase(),
+            "cognome": formData.cognome.trim().toLowerCase(),
+            "cf": formData.codiceFiscale.trim().toLowerCase(),
+            "spedizione": spedizione,
+            "nPatente": formData.numeroPatente.trim(),
+        });
 
-      await saveUser.save();
-      const user = await rinnovi.findOne({"nPatente": formData.numeroPatente.trim()});
-      console.log(`Nuovo utente rinnovi salvato: ${formData.nome.trim().toLowerCase()} ${formData.cognome.trim().toLowerCase()}`);
-      res.redirect(`/admin/rinnovi/userPage?id=${encodeURIComponent(`${user._id}`)}`);
+        await saveUser.save();
+        const user = await rinnovi.findOne({"nPatente": formData.numeroPatente.trim()});
+        console.log(`Nuovo utente rinnovi salvato: ${formData.nome.trim().toLowerCase()} ${formData.cognome.trim().toLowerCase()}`);
+        res.redirect(`/admin/rinnovi/userPage?id=${encodeURIComponent(`${user._id}`)}`);
     } catch (error) {
-      console.error('Errore durante la richiesta POST:', error);
-      res.status(500).send({ message: 'Errore durante l\'aggiornamento dei dati' });
+        console.error('Errore durante la richiesta POST:', error);
+        res.render('errorPage', {error: 'Errore durante il collegamento al portale' });
     }
-  });
+});
 
 router.get('/admin/rinnovi/credenzialiPortale', authenticateJWT, async(req, res)=>{
     const credenziali = await Credentials.findOne();

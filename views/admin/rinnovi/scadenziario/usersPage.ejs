@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scadenziario</title>
+    <style>
+        main{
+            margin-top: 200px;
+        }
+        table{
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            background: #f1f1f1;
+            border: none;
+        }
+        th, td{
+            border-block: 1px solid #ccc;
+            padding: 10px 15px;
+        }
+        th{
+            background: #71a1cb;
+            color: #f1f1f1;
+            border: none;
+        }
+        .table-title{
+            background: #5681a9;
+            border: none;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        #searchExpirationBtn{
+            outline: none;
+            border: none;
+            background: none;
+            color: #f1f1f1;
+            cursor: pointer;
+        }
+        #searchExpirationBtn span{
+            font-size: 2.5rem;
+        }
+        .searchExpField input{
+            outline: none;
+            border: none;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../../components/header.ejs') %>
+    <main>
+        <table>
+            <thead>
+                <tr>
+                    <th class="table-title" colspan="10">Cerca Utenti</th>
+                </tr>
+                <form id="searchExpiration" action="/admin/rinnovi/ricerca/scadenzaPatente" method="POST">
+                    <tr>
+                        <th class="searchExpField" colspan="3">
+                            <label for="nome">Nome:</label>
+                            <input type="text" name="nome" id="nome" required>
+                        </th>
+                        <th class="searchExpField" colspan="3">
+                            <label for="cognome">Cognome:</label>
+                            <input type="text" name="cognome" id="cognome" required>
+                        </th>
+                        <th class="searchExpField" colspan="3">
+                            <label for="cFiscale">Codice Fiscale:</label>
+                            <input type="text" name="cFiscale" id="cFiscale" required>
+                        </th>
+                        <th>
+                            <button id="searchExpirationBtn" type="submit">
+                                <span class="material-symbols-outlined">
+                                    search
+                                </span>
+                            </button>
+                        </th>
+                    </tr>
+                </form>
+                <tr>
+                    <th class="table-title" colspan="10">Scadenziario</th>
+                </tr>
+                <tr>
+                    <th>Nome</th>
+                    <th>Cognome</th>
+                    <th>Codice Fiscale</th>
+                    <th>Via</th>
+                    <th>Civico</th>
+                    <th>Cap</th>
+                    <th>Comune</th>
+                    <th>Provincia</th>
+                    <th>Numero Patente</th>
+                    <th>Scadenza</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(const utente of scadenziario){ %>
+                    <tr>
+                        <td><%= utente.nome %></td>
+                        <td><%= utente.cognome %></td>
+                        <td><%= utente.cf %></td>
+                        <td><%= utente.spedizione.via %></td>
+                        <td><%= utente.spedizione.nCivico %></td>
+                        <td><%= utente.spedizione.cap %></td>
+                        <td><%= utente.spedizione.comune %></td>
+                        <td><%= utente.spedizione.provincia %></td>
+                        <td><%= utente.nPatente %></td>
+                        <td><%= utente.expPatente %></td>
+                    </tr>
+                <% } %>
+            </tbody>
+            
+        </table>
+    </main>
+    
+    
+</body>
+</html>
