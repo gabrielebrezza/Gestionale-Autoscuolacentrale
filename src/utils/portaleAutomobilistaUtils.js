@@ -71,7 +71,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
   async function searchExpirationPortale(cf) {
     let browser;
     try {
-        browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'], dumpio: true });
+        browser = await puppeteer.launch();
 
         const credenziali = await Credentials.findOne();
         const page = await browser.newPage();
