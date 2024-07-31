@@ -432,7 +432,6 @@ router.post('/admin/rinnovi/ricerca/scadenzaPatente', authenticateJWT, async (re
             comune: dati.comune.toLowerCase(),
             provincia: dati.provincia.toLowerCase()
         };
-        console.log(dati)
         const saveUser = new Scadenziario({
             "nome": dati.nome.trim().toLowerCase(),
             "cognome": dati.cognome.trim().toLowerCase(),
