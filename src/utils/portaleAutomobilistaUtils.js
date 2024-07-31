@@ -81,7 +81,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
         const page = await browser.newPage();
         await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
         await page.waitForSelector('.formSso2');
-        console.log('faccio il login')
+
         await new Promise(resolve => setTimeout(resolve, 2000));
         await page.type('input[name="loginView.beanUtente.userName"]', credenziali.user);
         await page.type('input[name="loginView.beanUtente.password"]', credenziali.password);
@@ -89,15 +89,16 @@ async function searchUserPortale(cf, cognome, nPatente) {
             page.waitForNavigation({ waitUntil: 'networkidle0' }), // Aspetta che la rete sia inattiva
             page.click('input[name="action:Login_executeLogin"]')
         ]);
-        console.log('login fatto')
+
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
         await new Promise(resolve => setTimeout(resolve, 2000));
-        console.log('metto il pin')
         // Inserisci il PIN
         await page.type('input[name="loginView.pin"]', credenziali.pin);
-        await page.click('input[name="action:Pin_executePinValidation"]');
+        await Promise.all([
+            page.waitForNavigation({ waitUntil: 'networkidle0' }),
+            page.click('input[name="action:Pin_executePinValidation"]')
+        ]);
         // Vai alla pagina di raccolta dati
-        console.log('pin messo')
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiestaCertificatoMedico/ReadAcqCertificatoPrimaFase_initAcqCertificatoPrimaFase.action');
         await new Promise(resolve => setTimeout(resolve, 4000));
 
