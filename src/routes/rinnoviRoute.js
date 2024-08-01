@@ -14,6 +14,7 @@ const SyncDate = require('../DB/SyncDate');
 const storicoFattureGenerali = require('../DB/StoricoFattureGenerali');
 const Credentials = require('../DB/Credentials');
 const Scadenziario = require('../DB/Scadenziario');
+const Duplicati = require('../DB/Duplicati');
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
@@ -131,6 +132,7 @@ router.post('/uploadUserImage', authenticateJWT, async (req, res) => {
         console.error(`si è verificato un errore ${err}`);
     }
 });
+
 router.delete('/deleteUserImage', authenticateJWT, async (req, res) => {
     const { id, location } = req.body;
     const filePath = path.join('privateImages', location , `${id}.jpeg`);
@@ -510,17 +512,51 @@ router.post('/admin/rinnovi/updateCredentials', authenticateJWT, async (req, res
 
 
 
-const Duplicati = require('../DB/Duplicati');
 
+
+router.get('/admin/duplicati', authenticateJWT, async (req, res)=>{
+    const users = await Duplicati.find();
+    res.render('admin/duplicati/usersPage', {users});
+});
+
+router.post('/duplicati/deleteUsers', authenticateJWT, async (req, res)=> {
+    const {action} = req.body;
+    const ids = (Object.keys(req.body)
+        .filter(key => key.startsWith('user')))
+        .map(key => req.body[key]);
+    try {
+        if(action == 'archive'){
+            for (const id of ids) {
+                await Duplicati.findOneAndUpdate({"_id": id}, {"archiviato": true});
+                console.log(`utente duplicati ${id} archiviato`);
+            }
+        }else if(action == 'unarchive'){
+            for (const id of ids) {
+                await Duplicati.findOneAndUpdate({"_id": id}, {"archiviato": false});
+                console.log(`utente duplicati ${id} disarchiviato`);
+            }
+        }else{
+            for (const id of ids) {
+                await Duplicati.deleteOne({"_id": id});
+                console.log(`utente duplicati ${id} eliminato definitivamente`);
+            }
+        }
+        return res.redirect('/admin/duplicati');
+    } catch (error) {
+        console.error(`errore durante l'eliminazione degli utenti duplicati: ${error}`);
+        return res.render('errorPage', {error: `errore durante l'eliminazione dell'utente`});
+    }
+});
 
 
 router.get('/admin/duplicati/addUser', authenticateJWT, async (req, res)=>{
     res.render('admin/duplicati/addUser')
 });
 
+
 router.post('/admin/duplicati/saveUser', authenticateJWT, async (req, res)=>{
     const dati = req.body;
-    
+    const imageData = dati.imageData;
     try {
         const cleanData = (data) => {
             for (let key in data) {
@@ -532,13 +568,22 @@ router.post('/admin/duplicati/saveUser', authenticateJWT, async (req, res)=>{
             }
         };
         cleanData(dati);
-        console.log(dati)
         const saveUser = new Duplicati(dati);
         await saveUser.save();
-        res.redirect('/admin/duplicati');
+        const user = await Duplicati.findOne({"cf": dati.cf});
+        const base64Data = imageData.replace(/^data:image\/jpeg;base64,/, "").replace(/\s/g, '');
+        const filePath = path.join('privateImages', 'immaginiDuplicati', `${user._id}.jpeg`);
+        fs.writeFile(filePath, base64Data, 'base64', (err) => {
+            if (err) {
+                console.error(`Errore nel salvataggio dell'immagine: ${err}`);
+                return res.status(500).json({ message: 'Errore nel salvataggio dell\'immagine' });
+            }
+            res.redirect('/admin/duplicati/addUser');
+        });
     } catch (error) {
         console.log('errore nel salvataggio utente duplicati: ', error);
         res.render('errorPage', {error: 'errore nel salvataggio utente'});
     }
 });
+
 module.exports = router;

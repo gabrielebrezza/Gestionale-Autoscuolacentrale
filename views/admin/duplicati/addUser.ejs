@@ -60,17 +60,17 @@
             <h1>Modulo di Duplicato</h1>
             <div class="fieldDuplicato">
                 <label for="nome">Nome:</label>
-                <input type="text" id="nome" name="nome" required>
+                <input type="text" id="nome" name="nome" >
             </div>
             
             <div class="fieldDuplicato">
                 <label for="cognome">Cognome:</label>
-                <input type="text" id="cognome" name="cognome" required>
+                <input type="text" id="cognome" name="cognome" >
             </div>
 
             <div class="fieldDuplicato">
                 <label for="sesso">Sesso:</label>
-                <select id="sesso" name="sesso" required>
+                <select id="sesso" name="sesso" >
                     <option value="">Seleziona</option>
                     <option value="M">Maschio</option>
                     <option value="F">Femmina</option>
@@ -80,72 +80,72 @@
 
             <div class="fieldDuplicato">
                 <label for="cf">Codice Fiscale:</label>
-                <input type="text" id="cf" name="cf" required>
+                <input type="text" id="cf" name="cf" >
             </div>
 
             <div class="fieldDuplicato">
                 <label for="nazioneNascita">Nazione di Nascita:</label>
-                <input type="text" id="nazioneNascita" name="nascita[nazione]" required>
+                <input type="text" id="nazioneNascita" name="nascita[nazione]" >
             </div>
 
             <div class="fieldDuplicato">
                 <label for="comuneNascita">Città di Nascita:</label>
-                <input type="text" id="comuneNascita" name="nascita[comune]" required>
+                <input type="text" id="comuneNascita" name="nascita[comune]" >
             </div>
 
             <div class="fieldDuplicato">
                 <label for="provinciaNascita">Provincia di Nascita:</label>
-                <input type="text" id="provinciaNascita" name="nascita[provincia]" required>
+                <input type="text" id="provinciaNascita" name="nascita[provincia]" >
             </div>
 
             <div class="fieldDuplicato">
                 <label for="dataNascita">Data di Nascita:</label>
-                <input type="date" id="dataNascita" name="nascita[data]" required>
+                <input type="date" id="dataNascita" name="nascita[data]" >
             </div>
 
             <div class="fieldDuplicato">
                 <label for="nazionalita">Nazionalità:</label>
-                <input type="text" id="nazionalita" name="nazionalita" required>
+                <input type="text" id="nazionalita" name="nazionalita" >
             </div>
 
             <div class="fieldDuplicato">
                 <label for="residenzaComune">Comune di Residenza:</label>
-                <input type="text" id="residenzaComune" name="residenza[comune]" required>
+                <input type="text" id="residenzaComune" name="residenza[comune]" >
             </div>
 
             <div class="fieldDuplicato">
                 <label for="viaResidenza">Via di Residenza:</label>
-                <input type="text" id="viaResidenza" name="residenza[via]" required>
+                <input type="text" id="viaResidenza" name="residenza[via]" >
             </div>
 
             <div class="fieldDuplicato">
                 <label for="nCivicoResidenza">Numero Civico:</label>
-                <input type="text" id="nCivicoResidenza" name="residenza[nCivico]" required>
+                <input type="text" id="nCivicoResidenza" name="residenza[nCivico]" >
             </div>
 
             <div class="fieldDuplicato">
                 <label for="capResidenza">CAP:</label>
-                <input type="text" id="capResidenza" name="residenza[cap]" required>
+                <input type="text" id="capResidenza" name="residenza[cap]" >
             </div>
 
             <div class="fieldDuplicato">
                 <label for="provinciaResidenza">Provincia di Residenza:</label>
-                <input type="text" id="provinciaResidenza" name="residenza[provincia]" required>
+                <input type="text" id="provinciaResidenza" name="residenza[provincia]" >
             </div>
 
             <div class="fieldDuplicato">
                 <label for="email">eMail:</label>
-                <input type="email" id="email" name="contatti[email]" required>
+                <input type="email" id="email" name="contatti[email]" >
             </div>
 
             <div class="fieldDuplicato">
                 <label for="telefono">Telefono:</label>
-                <input type="tel" id="telefono" name="contatti[tel]" required>
+                <input type="tel" id="telefono" name="contatti[tel]" >
             </div>
 
             <div class="fieldDuplicato">
                 <label for="nPatente">Numero Patente:</label>
-                <input type="text" id="nPatente" name="nPatente" required>
+                <input type="text" id="nPatente" name="nPatente" >
             </div>
 
             <div class="fieldDuplicato">
@@ -197,12 +197,77 @@
             </div>
 
             <div class="fieldDuplicato">
-                <label for="foto">Foto, formato fototessera:</label>
-                <input type="file" id="foto" name="foto" accept="image/*">
+                <div class="FileUploadfield">
+                    <label for="inputProfileFile" style="cursor: pointer;">Carica un Immagine</label>
+                    <input type="file" id="inputProfileFile" accept="image/*" style="display: none;">
+                    <input type="hidden" id="hiddenImageData" name="imageData">
+
+                </div>
+                <div>
+                    <img id="profilePic">
+                </div>
             </div>
 
             <button type="submit">Salva</button>
         </form>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const profilePic = document.getElementById('profilePic');
+            const inputProfileFile = document.getElementById('inputProfileFile');
+            const hiddenImageData = document.getElementById('hiddenImageData');
+            const form = document.getElementById('addDuplicatoForm');
+        
+            inputProfileFile.addEventListener('change', () => {
+                profilePic.src = URL.createObjectURL(inputProfileFile.files[0]);
+            });
+        
+            form.addEventListener('submit', event => {
+                event.preventDefault();
+        
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 260;
+                canvas.height = 315;
+        
+                const img = new Image();
+                img.src = profilePic.src;
+        
+                img.onload = function() {
+                    const aspectRatio = img.width / img.height;
+                    const canvasAspectRatio = canvas.width / canvas.height;
+        
+                    let srcX, srcY, srcWidth, srcHeight;
+                    if (aspectRatio > canvasAspectRatio) {
+                        // Immagine più larga del canvas
+                        srcHeight = img.height;
+                        srcWidth = img.height * canvasAspectRatio;
+                        srcX = (img.width - srcWidth) / 2;
+                        srcY = 0;
+                    } else {
+                        // Immagine più alta del canvas
+                        srcWidth = img.width;
+                        srcHeight = img.width / canvasAspectRatio;
+                        srcX = 0;
+                        srcY = (img.height - srcHeight) / 2;
+                    }
+        
+                    ctx.drawImage(img, srcX, srcY, srcWidth, srcHeight, 0, 0, canvas.width, canvas.height);
+        
+                    const dataUrl = canvas.toDataURL('image/jpeg');
+                    hiddenImageData.value = dataUrl;
+        
+                    // Ora che hiddenImageData è stato aggiornato, invia il modulo
+                    form.submit();
+                };
+        
+                // Gestione del caso in cui non ci sia un'immagine valida
+                img.onerror = function() {
+                    alert('Immagine non valida');
+                };
+            });
+        });
+        </script>
 </body>
 </html>

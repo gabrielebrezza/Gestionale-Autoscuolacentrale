@@ -16,65 +16,65 @@ const DuplicatiSchema = new mongoose.Schema({
     },
     sesso: {
         type: String,
-        required: true
+        required: false
     },
     nascita: {
         nazione: {
             type: String,
-            required: true
+            required: false
         },
         comune: {
             type: String,
-            required: true
+            required: false
         },
         provincia: {
             type: String,
-            required: true
+            required: false
         },
         data: {
             type: String,
-            required: true
+            required: false
         }
     },
     nazionalita: {
         type: String,
-        required: true
+        required: false
     },
     residenza: {
         via: {
             type: String,
-            required: true
+            required: false
         },
         nCivico: {
             type: String,
-            required: true
+            required: false
         },
         cap: {
             type: String,
-            required: true
+            required: false
         },
         comune: {
             type: String,
-            required: true
+            required: false
         },
         provincia: {
             type: String,
-            required: true
+            required: false
         }
     },
     contatti: {
         email: {
             type: String,
-            required: true
+            required: false
         },
         tel: {
             type: String,
-            required: true
+            required: false
         }
     },
     nPatente: {
         type: String,
-        required: true
+        required: false
     },
     motivo: {
         type: String,
@@ -107,6 +107,24 @@ const DuplicatiSchema = new mongoose.Schema({
     note: {
         type: String,
         required: false
+    },
+    fatture: {
+        data:{
+            type: String,
+            required: false
+        },
+        importo:{
+            type: Number,
+            required: false
+        },
+        emessa:{
+            type: Boolean,
+            required: false
+        },
+        numero: {
+            type: Number,
+            required: false
+        }
     }
 });
 const Duplicati = new mongoose.model('Duplicati', DuplicatiSchema);

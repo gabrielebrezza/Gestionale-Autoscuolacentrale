@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duplicati</title>
+
+    <link rel="stylesheet" href="/styles/admin/users.css">
+</head>
+<body>
+    <%- include('../components/header.ejs') %>
+    <main>
+        <table>
+            <form action="/duplicati/deleteUsers" id="actionUsersForm" method="POST">
+                <thead>
+                    <tr>
+                        <th>
+                            <span id="selectUsers" class="material-symbols-outlined">
+                                checklist
+                            </span>
+                            <button type="submit" class="elimina theadBtn action" name="action" value="elimina">
+                                <span class="material-symbols-outlined">
+                                    delete_forever
+                                </span>
+                            </button>
+                            <button type="submit" class="archivia theadBtn action" name="action" value="archive">
+                                <span class="material-symbols-outlined">
+                                    archive
+                                </span>
+                            </button>
+                        </th>
+                        <th>Nome</th>
+                        <th>Cognome</th>
+                        <th>Email</th>
+                        <th>Telefono</th>
+                        <th>Fatture</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <% let enumArchiviati = 1 %>
+                    <% let enumUtenti = 1 %>
+                    <% users.forEach(function(user, index) { %>
+                            <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %> row" data-archiviato="<%= !!user.archiviato %>">
+                                <td>
+                                    <div class="cellContent">
+                                        <input class="action" type="checkbox" name="user<%= index %>" value="<%= user._id %>">
+                                        <div class="numero">
+                                            <%= user.archiviato ? enumArchiviati++ : enumUtenti++ %>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><a href="<%=`duplicati/userPage?id=${encodeURIComponent(user._id)}`%>"><%= user.nome %></a></td>
+                                <td><%= user.cognome %></td>
+                                <td><%= user.contatti.email %></td>
+                                <td><%= user.contatti.tel %></td>
+                                <td class="buttonCell">
+                                    <% if (!user.fatture.importo) { %>
+                                        <a class="pagamenti" href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>">
+                                            <span class="material-symbols-outlined">
+                                                euro_symbol
+                                            </span>
+                                        </a>
+                                    <% }else{ %>
+                                        <button class="downloadFattura" data-number="<%= user.fatture.numero %>" type="button" style="background: none; border: none; outline: none; cursor: pointer;">
+                                            <span class="material-symbols-outlined pagamenti">
+                                                receipt_long
+                                            </span>
+                                        </button>                                   
+                                    <% } %>
+                                    
+                                </td>
+                            </tr>
+                    <% }); %>
+                </tbody>
+            </form>
+        </table>
+    </main>
+    
+    <script>
+        const selectUsersBtn = document.getElementById('selectUsers');
+        const actionUsersTd = document.querySelectorAll('.action');
+        const actionUsersForm = document.getElementById('actionUsersForm');
+        selectUsersBtn.addEventListener('click', () => {
+            actionUsersTd.forEach((td) => {
+                td.style.display = td.style.display != 'inline-flex' ? 'inline-flex' : 'none';
+            });
+        });
+
+        actionUsersForm.addEventListener('submit',event => {
+            const confirmSubmission = confirm("Sei sicuro di voler effettuare l'azione sugli utenti selezionati?");
+            if (!confirmSubmission) event.preventDefault();
+        });
+
+
+        document.querySelectorAll('.downloadFattura').forEach(btn => {
+            btn.addEventListener('click', async (event) => {
+                try {
+                    const response = await fetch('/admin/rinnovi/downloadFattura', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ numero: btn.dataset.number })
+                    });
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const contentDisposition = response.headers.get('Content-Disposition');
+                        let fileName;
+
+                        if (contentDisposition && contentDisposition.indexOf('filename=') !== -1) {
+                            const matches = /filename="([^"]+)"/.exec(contentDisposition);
+                            if (matches && matches[1]) {
+                                fileName = matches[1];
+                            }
+                        }
+                    
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        a.remove();
+                    } else {
+                        throw new Error('Errore durante il download della fattura');
+                    }
+                } catch (error) {
+                    alert('Errore durante il download della fattura');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
