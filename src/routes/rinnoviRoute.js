@@ -421,6 +421,22 @@ router.get('/admin/rinnovi/scadenziario', authenticateJWT, async (req, res) => {
     res.render('admin/rinnovi/scadenziario/usersPage', {scadenziario});
 });
 
+router.post('/admin/rinnovi/scadenziario/deleteUsers', authenticateJWT, async (req, res)=> {
+    const ids = (Object.keys(req.body)
+        .filter(key => key.startsWith('user')))
+        .map(key => req.body[key]);
+    try {
+        for (const id of ids) {
+            await Scadenziario.deleteOne({"_id": id});
+            console.log(`utente scadenziario ${id} eliminato definitivamente`);
+        }
+        return res.redirect('/admin/rinnovi/scadenziario');
+    } catch (error) {
+        console.error(`errore durante l'eliminazione degli utenti rinnovi: ${error}`);
+        return res.render('errorPage', {error: `errore durante l'eliminazione degli alievi`});
+    }
+});
+
 router.post('/admin/rinnovi/ricerca/scadenzaPatente', authenticateJWT, async (req, res) => {
     const { cFiscale } = req.body;
     try {

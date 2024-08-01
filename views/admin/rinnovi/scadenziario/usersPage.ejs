@@ -48,35 +48,74 @@
             border: none;
             padding: 5px;
         }
+        .theadBtn{
+            background: #0000;
+            outline: none;
+            border: none;
+            cursor: pointer;
+        }
+        #selectUsers{
+            cursor: pointer;
+        }
+        .deleteBtn{
+            color: red;
+            font-size: 2.5rem;
+        }
+        .cellContent{
+            display: inline-flex;
+            gap: 10px;
+        }
+        .action{
+            display: none;
+        }
+        .material-symbols-outlined{
+            user-select: none;
+        }
     </style>
 </head>
 <body>
     <%- include('../../components/header.ejs') %>
     <main>
         <table>
-            <thead>
-                <tr>
-                    <th class="table-title" colspan="10">Cerca Utenti</th>
-                </tr>
-                <form id="searchExpiration" action="/admin/rinnovi/ricerca/scadenzaPatente" method="POST">
+                <thead>
                     <tr>
-                        <th class="searchExpField" colspan="5">
-                            <label for="cFiscale">Codice Fiscale:</label>
-                            <input type="text" name="cFiscale" id="cFiscale" required>
-                        </th>
-                        <th class="searchExpField" colspan="5">
-                            <button id="searchExpirationBtn" type="submit">
-                                <span class="material-symbols-outlined">
-                                    search
+                        <th class="table-title" colspan="11">Cerca Utenti</th>
+                    </tr>
+                    <form id="searchExpiration" action="/admin/rinnovi/ricerca/scadenzaPatente" method="POST">
+                        <tr>
+                            <th class="searchExpField" colspan="6">
+                                <label for="cFiscale">Codice Fiscale:</label>
+                                <input type="text" name="cFiscale" id="cFiscale" required>
+                            </th>
+                            <th class="searchExpField" colspan="5">
+                                <button id="searchExpirationBtn" type="submit">
+                                    <span class="material-symbols-outlined">
+                                        search
+                                    </span>
+                                </button>
+                            </th>
+                        </tr>
+                    </form>
+                </thead>
+            <form action="/admin/rinnovi/scadenziario/deleteUsers" method="POST">
+                <thead>
+                <tr>
+                    <th class="table-title" colspan="11">Scadenziario</th>
+                </tr>
+                
+                <tr>
+                    <th>
+                        <div class="cellContent">
+                            <span id="selectUsers" class="material-symbols-outlined">
+                                checklist
+                            </span>
+                            <button type="submit" class="elimina theadBtn action">
+                                <span class="material-symbols-outlined deleteBtn">
+                                    delete_forever
                                 </span>
                             </button>
-                        </th>
-                    </tr>
-                </form>
-                <tr>
-                    <th class="table-title" colspan="10">Scadenziario</th>
-                </tr>
-                <tr>
+                        </div>
+                    </th>
                     <th>Nome</th>
                     <th>Cognome</th>
                     <th>Codice Fiscale</th>
@@ -90,8 +129,17 @@
                 </tr>
             </thead>
             <tbody>
+                <% let enumUtenti = 1 %>
                 <% for(const utente of scadenziario){ %>
                     <tr>
+                        <td>
+                            <div class="cellContent">
+                                <input class="action" type="checkbox" name="user<%= enumUtenti %>" value="<%= utente._id %>">
+                                <div class="numero">
+                                    <%= enumUtenti++ %>
+                                </div>
+                            </div>
+                        </td>
                         <td><%= utente.nome %></td>
                         <td><%= utente.cognome %></td>
                         <td><%= utente.cf %></td>
@@ -105,10 +153,18 @@
                     </tr>
                 <% } %>
             </tbody>
-            
+        </form>
         </table>
     </main>
     
-    
+    <script>
+        const selectUsers = document.getElementById('selectUsers');
+        const actionBtns = document.querySelectorAll('.action');
+        selectUsers.addEventListener('click', () => {
+            for(const btn of actionBtns){
+                btn.style.display = btn.style.display == 'block' ? 'none' : 'block';
+            }
+        });
+    </script>
 </body>
 </html>
