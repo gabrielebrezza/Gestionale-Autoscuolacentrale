@@ -25,9 +25,25 @@
                 </div>
             </details>
         </li>
+        <li>
+            <details>
+                <summary><a>Duplicati</a></summary>
+                <div class="headerField">
+                    <a href="/admin/duplicati">Utenti</a>
+                    <a href="/admin/duplicati/addUser">Nuovo Utente</a>
+                </div>
+            </details>
+        </li>
+        <li>
+            <details>
+                <summary><a>Fatture</a></summary>
+                <div class="headerField">
+                    <a href="/admin/storicoFatture">Storico Fatture</a>
+                    <a href="/admin/emettiFattura">Genera Fattura Medico</a>
+                </div>
+            </details>
+        </li>
         <li><a href="/admin/approveUsers">Approva Admin</a></li>
-        <li><a href="/admin/storicoFatture">Storico Fatture</a></li>
-        <li><a href="/admin/emettiFattura">Genera Fattura Medico</a></li>
         <li><a id="genCode">Genera Codice</a></li>
         <li id="logOutList">
             <form action="/logout" method="POST">
@@ -42,3 +58,18 @@
     </ul>
 </nav>
 <%- include('codesGenerator.ejs') %>
+
+
+<script>
+    document.querySelectorAll('details').forEach(details => {
+        details.addEventListener('toggle', event => {
+            if (details.open) {
+                document.querySelectorAll('details').forEach(otherDetails => {
+                    if (otherDetails !== details) {
+                        otherDetails.removeAttribute('open');
+                    }
+                });
+            }
+        });
+    });
+</script>

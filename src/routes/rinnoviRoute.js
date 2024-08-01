@@ -500,10 +500,45 @@ router.get('/admin/rinnovi/credenzialiPortale', authenticateJWT, async(req, res)
     res.render('admin/rinnovi/credenziali', { user: credenziali.user, password: credenziali.password, pin: credenziali.pin});
 });
 
-router.post('/admin/rinnovi/updateCredentials', authenticateJWT, async(req, res)=>{
+router.post('/admin/rinnovi/updateCredentials', authenticateJWT, async (req, res)=>{
     const { username, password, pin} = req.body
     await Credentials.updateOne({"user": username, "password": password, "pin": pin});
     res.redirect('/admin/rinnovi/credenzialiPortale');
 });
 
+
+
+
+
+const Duplicati = require('../DB/Duplicati');
+
+
+
+router.get('/admin/duplicati/addUser', authenticateJWT, async (req, res)=>{
+    res.render('admin/duplicati/addUser')
+});
+
+router.post('/admin/duplicati/saveUser', authenticateJWT, async (req, res)=>{
+    const dati = req.body;
+    
+    try {
+        const cleanData = (data) => {
+            for (let key in data) {
+                if (typeof data[key] === 'string') {
+                    data[key] = data[key].trim().toLowerCase();
+                } else if (typeof data[key] === 'object' && data[key] !== null) {
+                    cleanData(data[key]);
+                }
+            }
+        };
+        cleanData(dati);
+        console.log(dati)
+        const saveUser = new Duplicati(dati);
+        await saveUser.save();
+        res.redirect('/admin/duplicati');
+    } catch (error) {
+        console.log('errore nel salvataggio utente duplicati: ', error);
+        res.render('errorPage', {error: 'errore nel salvataggio utente'});
+    }
+});
 module.exports = router;

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duplicati</title>
+    <style>
+        main{
+            margin-top: 200px;
+            display: grid;
+            place-items: center;
+        }
+        #addDuplicatoForm{
+            background: #5681a9;
+            color: #f1f1f1;
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 450px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .fieldDuplicato{
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            max-width: 350px;
+            width: 100%;
+        }
+        .fieldDuplicato > :where(input, select, textarea) {
+            padding: 8px;
+            width: 100%;
+            border: none;
+            outline: none;
+        }
+        #addDuplicatoForm button{
+            padding: 10px 20px;
+            background: #71a1cb;
+            color: #f1f1f1;
+            outline: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: .5s;
+        }
+        #addDuplicatoForm button:hover{
+            background: #f1f1f1;
+            color: #71a1cb;
+        }
+    </style>
+</head>
+<body>
+    <%- include('../components/header.ejs') %>
+    <main>
+        
+        <form id="addDuplicatoForm" action="/admin/duplicati/saveUser" method="POST">
+            <h1>Modulo di Duplicato</h1>
+            <div class="fieldDuplicato">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            
+            <div class="fieldDuplicato">
+                <label for="cognome">Cognome:</label>
+                <input type="text" id="cognome" name="cognome" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="sesso">Sesso:</label>
+                <select id="sesso" name="sesso" required>
+                    <option value="">Seleziona</option>
+                    <option value="M">Maschio</option>
+                    <option value="F">Femmina</option>
+                    <option value="Altro">Altro</option>
+                </select>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="cf">Codice Fiscale:</label>
+                <input type="text" id="cf" name="cf" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="nazioneNascita">Nazione di Nascita:</label>
+                <input type="text" id="nazioneNascita" name="nascita[nazione]" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="comuneNascita">Città di Nascita:</label>
+                <input type="text" id="comuneNascita" name="nascita[comune]" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="provinciaNascita">Provincia di Nascita:</label>
+                <input type="text" id="provinciaNascita" name="nascita[provincia]" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="dataNascita">Data di Nascita:</label>
+                <input type="date" id="dataNascita" name="nascita[data]" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="nazionalita">Nazionalità:</label>
+                <input type="text" id="nazionalita" name="nazionalita" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="residenzaComune">Comune di Residenza:</label>
+                <input type="text" id="residenzaComune" name="residenza[comune]" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="viaResidenza">Via di Residenza:</label>
+                <input type="text" id="viaResidenza" name="residenza[via]" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="nCivicoResidenza">Numero Civico:</label>
+                <input type="text" id="nCivicoResidenza" name="residenza[nCivico]" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="capResidenza">CAP:</label>
+                <input type="text" id="capResidenza" name="residenza[cap]" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="provinciaResidenza">Provincia di Residenza:</label>
+                <input type="text" id="provinciaResidenza" name="residenza[provincia]" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="email">eMail:</label>
+                <input type="email" id="email" name="contatti[email]" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="telefono">Telefono:</label>
+                <input type="tel" id="telefono" name="contatti[tel]" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="nPatente">Numero Patente:</label>
+                <input type="text" id="nPatente" name="nPatente" required>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="motivo">Motivo del Duplicato:</label>
+                <select id="motivo" name="motivo">
+                    <option value="">Seleziona</option>
+                    <option value="smarrimento">Smarrimento</option>
+                    <option value="deterioramento">Deterioramento</option>
+                    <option value="furto">Furto</option>
+                    <option value="conversione">Conversione</option>
+                    <option value="riclassificazione">Riclassificazione</option>
+                    <option value="internazionale">Patente Internazionale</option>
+                </select>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="accontoPagato">Acconto Pagato:</label>
+                <input type="number" id="accontoPagato" name="accontoPagato">
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="metodoPagamentoAcconto">Metodo di Pagamento per Acconto:</label>
+                <input type="text" id="metodoPagamentoAcconto" name="metodoPagamentoAcconto">
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="saldoPagato">Saldo Pagato:</label>
+                <input type="number" id="saldoPagato" name="saldoPagato">
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="metodoPagamentoSaldo">Metodo di Pagamento per Saldo:</label>
+                <input type="text" id="metodoPagamentoSaldo" name="metodoPagamentoSaldo">
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="tipoDocumento">Tipo di Documento:</label>
+                <input type="text" id="tipoDocumento" name="tipoDocumento">
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="nDocumento">Numero Documento:</label>
+                <input type="text" id="nDocumento" name="nDocumento">
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="note">Note:</label>
+                <textarea id="note" name="note"></textarea>
+            </div>
+
+            <div class="fieldDuplicato">
+                <label for="foto">Foto, formato fototessera:</label>
+                <input type="file" id="foto" name="foto" accept="image/*">
+            </div>
+
+            <button type="submit">Salva</button>
+        </form>
+    </main>
+</body>
+</html>
