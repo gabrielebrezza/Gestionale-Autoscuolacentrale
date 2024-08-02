@@ -549,6 +549,35 @@ router.post('/duplicati/deleteUsers', authenticateJWT, async (req, res)=> {
 });
 
 
+router.get('/admin/duplicati/userPage', authenticateJWT, async (req, res)=>{
+    const user = await Duplicati.findOne({"_id": req.query.id});
+    res.render('admin/duplicati/userPage', {user});
+});
+
+
+
+router.post('/admin/duplicati/updateUser', authenticateJWT, async (req, res)=>{
+    const dati = req.body;
+    try {
+        const cleanData = (data) => {
+            for (let key in data) {
+                if (typeof data[key] === 'string') {
+                    data[key] = data[key].trim().toLowerCase();
+                } else if (typeof data[key] === 'object' && data[key] !== null) {
+                    cleanData(data[key]);
+                }
+            }
+        };
+        cleanData(dati);
+        const user = await Duplicati.findOneAndUpdate({"_id": dati.id}, dati);
+        res.redirect(`/admin/duplicati/userPage?id=${encodeURIComponent(`${dati.id}`)}`);
+    } catch (error) {
+        console.error(`Si è verificato un errore nell'aggiornamento dell'utente duplicati: ${error}`);
+        res.render('errorPage', {error: 'errore nell\'aggiornamento utente'})
+    }
+    
+});
+
 router.get('/admin/duplicati/addUser', authenticateJWT, async (req, res)=>{
     res.render('admin/duplicati/addUser')
 });

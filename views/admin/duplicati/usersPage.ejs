@@ -6,14 +6,97 @@
     <title>Duplicati</title>
 
     <link rel="stylesheet" href="/styles/admin/users.css">
+    <style>
+        thead th > *:where(input, select){
+            padding: 5px;
+            border: none;
+            outline: none;
+        }
+        thead th input[type="checkbox"]{
+            cursor: pointer;
+        }
+        .archiviato{
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <%- include('../components/header.ejs') %>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    const motivationFilter = document.getElementById('motivationFilter');
+    const surnameFilter = document.getElementById('surnameFilter');
+    const archivedFilter = document.getElementById('archivedFilter');
+    const archiveBtn = document.querySelector('.archivia')
+    const archiveBtnSpan = document.querySelector('.archivia span')
+    const tableBody = document.getElementById('usersTableBody');
+    const rows = tableBody.getElementsByTagName('tr');
+
+    function filterTable() {
+        const motivo = motivationFilter.value.toLowerCase();
+        const cognome = surnameFilter.value.toLowerCase();
+        const archiviato = archivedFilter.checked;
+        let enumeration = 1;
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const numTd = row.getElementsByTagName('td')[0].textContent.toLowerCase();
+            const cognomeTd = row.getElementsByTagName('td')[2].textContent.toLowerCase();
+            const motivoTd = row.getElementsByTagName('td')[5].textContent.toLowerCase();
+            const isArchiviato = row.dataset.archiviato == 'true';
+            if (
+                (cognome === '' || cognomeTd.startsWith(cognome)) &&
+                (motivo === '' || motivoTd.includes(motivo) || motivo == 'all') &&
+                ((archiviato && isArchiviato) || (!archiviato && !isArchiviato))
+            ) {
+                row.getElementsByTagName('td')[0].querySelector('.numero').innerText = enumeration++;
+                row.style.display = 'table-row';
+            } else {
+                row.style.display = 'none';
+            }
+            if(archiviato){
+                archiveBtn.value = 'unarchive';
+                archiveBtnSpan.style.color = 'green';
+                archiveBtnSpan.innerText = 'unarchive'
+            }else{
+                archiveBtn.value = 'archive';
+                archiveBtnSpan.style.color = 'orange';
+                archiveBtnSpan.innerText = 'archive'
+            }
+        }
+    }
+
+    motivationFilter.addEventListener('input', filterTable);
+    surnameFilter.addEventListener('input', filterTable);
+    archivedFilter.addEventListener('input', filterTable);
+});
+    </script>
     <main>
         <table>
             <form action="/duplicati/deleteUsers" id="actionUsersForm" method="POST">
                 <thead>
-                    <tr>
+                    <tr style="border-top: 1px solid #f1f1f1;">
+                        <th colspan="3" style="border: none;">
+                            <label for="motivationFilter">Motivo:</label>
+                            <select id="motivationFilter">
+                                <option value="all">Tutti</option>
+                                <option value="smarrimento">Smarrimento</option>
+                                <option value="deterioramento">Deterioramento</option>
+                                <option value="furto">Furto</option>
+                                <option value="conversione">Conversione</option>
+                                <option value="riclassificazione">Riclassificazione</option>
+                                <option value="patente internazionale">Patente Internazionale</option>
+                            </select>
+                        </th>
+                        <th colspan="2" style="border: none;">
+                            <label for="surnameFilter">Cognome:</label>
+                            <input type="text" id="surnameFilter">
+                        </th>
+                        <th colspan="2" style="border: none;">
+                            <label for="archivedFilter">Archiviato:</label>
+                            <input type="checkbox" id="archivedFilter">
+                        </th>
+                    </tr>
+                    <tr  >
                         <th>
                             <span id="selectUsers" class="material-symbols-outlined">
                                 checklist
@@ -33,6 +116,7 @@
                         <th>Cognome</th>
                         <th>Email</th>
                         <th>Telefono</th>
+                        <th>Motivo</th>
                         <th>Fatture</th>
                     </tr>
                 </thead>
@@ -53,6 +137,7 @@
                                 <td><%= user.cognome %></td>
                                 <td><%= user.contatti.email %></td>
                                 <td><%= user.contatti.tel %></td>
+                                <td><%= user.motivo %></td>
                                 <td class="buttonCell">
                                     <% if (!user.fatture.importo) { %>
                                         <a class="pagamenti" href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>">

@@ -125,6 +125,10 @@ const DuplicatiSchema = new mongoose.Schema({
             type: Number,
             required: false
         }
+    },
+    archiviato: {
+        type: Boolean,
+        required: false
     }
 });
 const Duplicati = new mongoose.model('Duplicati', DuplicatiSchema);
