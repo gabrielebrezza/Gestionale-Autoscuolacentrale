@@ -13,6 +13,10 @@ const NumeroFatturaSchema = new mongoose.Schema({
     numeroRinnovi: {
         type: Number,
         required: true
+    },
+    numeroDuplicati: {
+        type: Number,
+        required: true
     }
 });
 const NumeroFattura = new mongoose.model('numeroFattura', NumeroFatturaSchema);

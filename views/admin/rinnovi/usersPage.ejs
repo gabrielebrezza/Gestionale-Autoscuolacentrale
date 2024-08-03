@@ -311,16 +311,23 @@
         const archived = filterArchived.checked;
         for(const row of rows){
             const isArchived = row.dataset.archiviato == 'true';
-            console.log(Boolean('false'));
             const nomeTd = row.getElementsByTagName('td')[1].textContent.toLocaleLowerCase();
             const cognomeTd = row.getElementsByTagName('td')[2].textContent.toLocaleLowerCase();
             const emailTd = row.getElementsByTagName('td')[3].textContent.toLocaleLowerCase();
             const telTd = row.getElementsByTagName('td')[4].textContent.toLocaleLowerCase();
-            let [dataTd, oraTd] = row.getElementsByTagName('td')[5].textContent.split(' ');
-            dataTd = dataTd.split('/').reverse().join('-');
-            oraTd = oraTd.split(':')[0]*60 + +oraTd.split(':')[1];
-            const dataCompresa = fromDate <= new Date(dataTd) && new Date(dataTd) <= toDate;
-            const oraCompresa = fromHour <= oraTd && oraTd <= toHour;
+            const dataOraTd = row.getElementsByTagName('td')[5].textContent.toLocaleLowerCase();
+            let dataTd, oraTd, dataCompresa, oraCompresa;
+            if(dataOraTd != 'mancante'){
+                [dataTd, oraTd] = dataOraTd.split(' ');
+                dataTd = dataTd.split('/').reverse().join('-');
+                oraTd = oraTd.split(':')[0]*60 + +oraTd.split(':')[1];
+                dataCompresa = fromDate <= new Date(dataTd) && new Date(dataTd) <= toDate;
+                oraCompresa = fromHour <= oraTd && oraTd <= toHour;
+            }else{
+                dataCompresa = true;
+                oraCompresa = true;
+            }
+
             if(
                 (nome === '' || nomeTd.includes(nome)) &&
                 (cognome === '' || cognomeTd.includes(cognome)) &&

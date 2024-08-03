@@ -4,7 +4,7 @@ const PDFDocument = require('pdfkit');
 const { create } = require('xmlbuilder2');
 const axios = require('axios');
 
-async function creaFatturaElettronica(dati, iscrizione, rinnovo) {
+async function creaFatturaElettronica(dati, iscrizione, rinnovo, duplicato) {
     return new Promise(async (resolve, reject) => {
         try{
             let xml;
@@ -115,7 +115,7 @@ async function creaFatturaElettronica(dati, iscrizione, rinnovo) {
                 .up()
             .up()
                 .up();
-        }else if(rinnovo){
+        }else if(rinnovo || duplicato){
             xml = create({ version: '1.0', encoding: 'UTF-8' })
         .ele('p:FatturaElettronica')
         .att('xmlns:ds', 'http://www.w3.org/2000/09/xmldsig#')

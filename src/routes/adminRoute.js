@@ -19,6 +19,7 @@ const numeroFattura = require('../DB/NumeroFattura');
 const storicoFattureGenerali = require('../DB/StoricoFattureGenerali');
 const storicoFattureAgenda = require('../DB/storicoFattureAgenda');
 const rinnovi = require('../DB/Rinnovi');
+const Duplicati = require('../DB/Duplicati');
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
 const {creaFatturaElettronica, creaFatturaCortesia, scaricaFatturaAPI} = require('../utils/fattureUtils.js');
@@ -276,7 +277,7 @@ router.post('/createCode', async (req, res) => {
 
 });
 
-router.post('/stampa', async (req, res)=> {
+router.post('/stampa', authenticateJWT, async (req, res)=> {
   const { id, modulo } = req.body;
   
   const filePath = path.resolve(__dirname, '../../certificati', `${modulo}` , `${modulo}_${id}.pdf`);
@@ -345,30 +346,35 @@ router.get('/admin/emettiFattura', authenticateJWT, async (req, res)=> {
 });
 
 
-router.post('/createFattura', async (req, res) =>{
-  let dati;
+router.post('/createFattura', authenticateJWT, async (req, res) =>{
+  let dati, duplicato, id;
   if(req.body.id){
-    const user = await rinnovi.findOne({"_id": req.body.id});
+    id = req.body.id.replace(/"/g, '');
+    let user = await rinnovi.findOne({"_id": id});
+    if(!user){
+      user = await Duplicati.findOne({"_id": id});
+      duplicato = true;
+    }
     const today = new Date();
     const DD = String(today.getDate()).padStart(2, '0'); 
     const MM = String(today.getMonth() + 1).padStart(2, '0'); 
     const YYYY = today.getFullYear(); 
     const data = `${YYYY}-${MM}-${DD}`;
-    const importo = req.body.importo;
+    const importo = Number(req.body.importo.replace(/"/g, ''));
     dati = {
       codiceDestinatario: '0000000',
       nomeCliente: user.nome,
       cognomeCliente: user.cognome,
       codiceFiscaleCliente: user.cf,
       emailCliente: user.contatti.email,
-      indirizzoSedeCliente: `${user.spedizione.via} ${user.spedizione.nCivico}`,
-      capSedeCliente: user.spedizione.cap,
-      comuneSedeCliente: user.spedizione.comune,
-      provinciaSedeCliente: user.spedizione.provincia,
+      indirizzoSedeCliente: !duplicato ? `${user.spedizione.via} ${user.spedizione.nCivico}`: `${user.residenza.via} ${user.residenza.nCivico}`,
+      capSedeCliente: user.residenza.cap,
+      comuneSedeCliente: user.residenza.comune,
+      provinciaSedeCliente: user.residenza.provincia,
       nazioneSedeCliente: 'IT',
       data: data,
       ImportoTotaleDocumento: Number(importo).toFixed(2),
-      descrizione1: 'Rinnovo patente',
+      descrizione1: !duplicato ? 'Rinnovo patente' : 'Duplicato Patente',
       prezzoUnitario1: ((importo-27.80)/1.22).toFixed(2),
       prezzoTotale1: ((importo-27.80)/1.22).toFixed(2),
       aliquotaIVA1: '0.00',
@@ -391,7 +397,7 @@ router.post('/createFattura', async (req, res) =>{
   }else{
     dati = req.body;
   }
-  const rinnovo = req.body.id ? true : false;
+  const rinnovo = req.body.id ? (!duplicato ? true : false) : false;
   const iscrizione = req.body.iscrizione == 'true';
   if(iscrizione){
     const {numeroIscrizioni} = await numeroFattura.findOne();
@@ -401,20 +407,25 @@ router.post('/createFattura', async (req, res) =>{
     const {numeroRinnovi} = await numeroFattura.findOne();
     dati.progressivoInvio = `r00${numeroRinnovi}`;
     dati.numeroDocumento = `r00${numeroRinnovi}`;
+  }else if(duplicato){
+    const {numeroDuplicati} = await numeroFattura.findOne();
+    dati.progressivoInvio = `d00${numeroDuplicati}`;
+    dati.numeroDocumento = `d00${numeroDuplicati}`;
   }else{
     const {numeroGeneriche} = await numeroFattura.findOne();
     dati.progressivoInvio = `m00${numeroGeneriche}`;
     dati.numeroDocumento = `m00${numeroGeneriche}`;
   }
+
   try {
-    const result = await creaFatturaElettronica(dati, iscrizione, rinnovo);
+    const result = await creaFatturaElettronica(dati, iscrizione, rinnovo, duplicato);
     console.log(result);
   } catch (error) {
     console.error('Errore nell\'emissione della fattura elettronica: ', error);
     return res.render('errorPage', { error: 'errore nell\'emissione della fattura elettronica' });
   }
   try {
-    const result = await creaFatturaCortesia(dati, iscrizione, rinnovo);
+    const result = await creaFatturaCortesia(dati, iscrizione);
     console.log(result);
   } catch (error) {
     console.error(error);
@@ -439,12 +450,16 @@ router.post('/createFattura', async (req, res) =>{
         }
     });
   }else if(rinnovo){
-    await rinnovi.findOneAndUpdate({"_id": req.body.id}, {"fatture": {"data": dati.data, "importo": dati.importoPagamento, "emessa": true, "numero": Number(dati.progressivoInvio.replace('r00', ''))}});
+    await rinnovi.findOneAndUpdate({"_id": id}, {"fatture": {"data": dati.data, "importo": dati.importoPagamento, "emessa": true, "numero": Number(dati.progressivoInvio.replace('r00', ''))}});
+  }else if(duplicato){
+    await Duplicati.findOneAndUpdate({"_id": id}, {"fatture": {"data": dati.data, "importo": dati.importoPagamento, "emessa": true}});
   }
   if(iscrizione){
     await numeroFattura.updateOne({$inc: {"numeroIscrizioni": 1}});
   }else if(rinnovo){
     await numeroFattura.updateOne({$inc: {"numeroRinnovi": 1}});
+  }else if(duplicato){
+    await numeroFattura.updateOne({$inc: {"numeroDuplicati": 1}});
   }else{
     await numeroFattura.updateOne({$inc: {"numeroGeneriche": 1}});
   }
@@ -455,7 +470,7 @@ router.post('/createFattura', async (req, res) =>{
   const dataFatturazione = `${DD}/${MM}/${YYYY}`;
   try{
     const nuovaFattura = new storicoFattureGenerali({
-      tipo: iscrizione ? 'iscrizione' : rinnovo ? 'rinnovo' : 'generica',
+      tipo: iscrizione ? 'iscrizione' : (rinnovo ? 'rinnovo' : (duplicato ? 'duplicato' : 'generica')),
       numero: parseInt(dati.progressivoInvio.replace(/\D/g, ''), 10),
       importo: dati.importoPagamento,
       data: dataFatturazione,
@@ -484,7 +499,7 @@ router.post('/createFattura', async (req, res) =>{
     console.log('errore: ', error);
   }
 
-  if(!iscrizione && !rinnovo){
+  if(!iscrizione && !rinnovo && !duplicato){
     if(req.body.saveCustomerData == 'save'){
       try{
         const nuovoCliente = new ClientiGenerici({
@@ -512,6 +527,9 @@ router.post('/createFattura', async (req, res) =>{
   }
   if(rinnovo){
     return res.redirect(`/admin/rinnovi`);
+  }
+  if(duplicato){
+    return res.redirect(`/admin/duplicati`);
   }
   res.redirect(`/admin`);
 });
@@ -607,6 +625,9 @@ router.post('/downloadFatture', authenticateJWT, async (req, res) => {
       }
       if(tipo == 'm'){
         fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('m'));
+      }
+      if(tipo == 'd'){
+        fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('d'));
       }
     }
 

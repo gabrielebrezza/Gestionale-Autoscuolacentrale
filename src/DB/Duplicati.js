@@ -76,6 +76,10 @@ const DuplicatiSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    patenteRichiesta: {
+        type: String,
+        required: false
+    },
     motivo: {
         type: String,
         required: false
@@ -119,10 +123,6 @@ const DuplicatiSchema = new mongoose.Schema({
         },
         emessa:{
             type: Boolean,
-            required: false
-        },
-        numero: {
-            type: Number,
             required: false
         }
     },

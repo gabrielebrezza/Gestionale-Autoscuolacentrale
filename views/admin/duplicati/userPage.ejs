@@ -228,7 +228,18 @@
 <body>
     <%- include('../components/header.ejs') %>
     <section class="documentSection">
-        
+        <div class="certificatiActions">
+            <form class="printForm" action="/stampa" method="POST"> 
+                <label for="printTT2112">TT2112:</label>
+                <input type="hidden" name="id" value="<%= user._id %>"> 
+                <input type="hidden" name="modulo" value="tt2112"> 
+                <button id="printTT2112" type="submit" title="Stampa TT2112">
+                    <span class="material-symbols-outlined">
+                        print
+                    </span>
+                </button>
+            </form>
+        </div>
         <div class="imageForms">
             <form class="imageForm" id="profileImageForm">
                 <h2>Foto Tessera</h2>
@@ -259,16 +270,6 @@
         </div>
         <script src="/scripts/utils/saveProfileImage.js"></script>
         <script src="/scripts/utils/deleteUserImage.js"></script>
-        <% if (!user.fatture.importo) { %>
-            <div class="pay">
-                <form action="/createFattura" method="POST">
-                    <input type="hidden" name="id" value="<%= user._id %>">
-                    <label for="importo">Importo:</label>
-                    <input type="number" name="importo" id="importo" value="<%= user.fatture.importo %>">
-                    <button type="submit">Pagato</button>
-                </form>
-            </div>
-        <% } %>
     </section>
     <form id="updateUserForm" action="/admin/duplicati/updateUser" method="POST">
         <table>
@@ -367,6 +368,11 @@
                 <tr>
                     <td>Numero Patente:</td>
                     <td><input type="text" id="nPatente" name="nPatente" value="<%= user.nPatente %>"></td>
+                </tr>
+
+                <tr>
+                    <td>Categoria Patente:</td>
+                    <td><input type="text" id="patenteRichiesta" name="patenteRichiesta" value="<%= user.patenteRichiesta %>"></td>
                 </tr>
 
                 <tr>
