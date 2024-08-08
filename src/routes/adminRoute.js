@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const fsp = require('fs').promises;
 const fs = require('fs');
 const path = require('path');

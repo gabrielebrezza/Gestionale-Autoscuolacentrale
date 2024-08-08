@@ -1,7 +1,6 @@
 const express = require('express');
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const paypal = require('paypal-rest-sdk');
-const bodyParser = require('body-parser');
 
 //functions
 const setPayment = require('../utils/paymentsUtils.js');
