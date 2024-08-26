@@ -23,7 +23,7 @@ const Duplicati = require('../DB/Duplicati');
 const sendEmail = require('../utils/emailsUtils.js');
 const {creaFatturaElettronica, creaFatturaCortesia, scaricaFatturaAPI} = require('../utils/fattureUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
-const {compilaTt2112, compilaCertResidenza} = require('../utils/compileUtils');
+const {compilaTt2112, compilaCertResidenza, compilaVmRinnovo} = require('../utils/compileUtils');
 
 router.use(cookieParser());
 
@@ -290,10 +290,23 @@ router.post('/stampa', authenticateJWT, async (req, res)=> {
         }
       });
   } catch (err) {
-      if(modulo == 'residenza'){
-        await compilaCertResidenza(id);
-      }else{
-        await compilaTt2112(id);
+      switch(modulo){
+        case 'residenza' : {
+          await compilaCertResidenza(id);
+          break;
+        }
+        case 'tt2112' : {
+          await compilaTt2112(id);
+          break;
+        }
+        case 'vmRinnovo' : {
+          await compilaVmRinnovo(id);
+          break;
+        }
+        default: {
+          return res.render('errorPage', {error: `si è verificato un'errore`});
+          break;
+        }
       }
       res.setHeader('Content-Type', 'application/pdf');
       res.sendFile(filePath, { 
@@ -677,12 +690,5 @@ router.post('/deleteCassaItem', authenticateJWT, async (req, res) => {
   }
   res.redirect('/admin/cassa');
 });
-
-
-
-
-
-
-
 
 module.exports = router;

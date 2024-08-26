@@ -150,7 +150,7 @@ router.post('/approveAdmin', authenticateJWT, async (req, res) =>{
 });
 router.post('/disapproveAdmin', authenticateJWT, async (req, res) =>{
     await admins.deleteOne({"email": req.body.email});
-    res.redirect('/admin/approveUsers')
+    res.redirect('/admin/approveUsers');
 });
 
 module.exports = router;

@@ -178,7 +178,7 @@ router.post('/rinnovi/updateUser', authenticateJWT, async (req, res)=> {
             ora: oraVisita
         },
         protocollo: dati.nProtocollo,
-        numeroPatente: dati.nPatente,
+        nPatente: dati.nPatente,
         note: dati.note
     };
     await rinnovi.findOneAndUpdate({"_id": id}, userData);

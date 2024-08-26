@@ -225,7 +225,18 @@
 <body>
     <%- include('../components/header.ejs') %>
     <section class="documentSection">
-        
+        <div class="certificatiActions">
+            <form class="printForm" action="/stampa" method="POST">
+                <input type="hidden" name="id" value="<%= user._id %>"> 
+                <input type="hidden" name="modulo" value="vmRinnovo"> 
+                <label for="printVMRinnovo">VM Rinnovo:</label>
+                <button id="printVMRinnovo" type="submit" title="Stampa VM Rinnovo">
+                    <span class="material-symbols-outlined">
+                        print
+                    </span>
+                </button>
+            </form>
+        </div>
         <div class="imageForms">
             <form class="imageForm" id="firmaImageForm">
                 <h2>Firma</h2>

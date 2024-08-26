@@ -4,6 +4,7 @@ const { PDFDocument, rgb } = require('pdf-lib');
 
 const utenti = require('../DB/User');
 const Duplicati = require('../DB/Duplicati');
+const rinnovi = require('../DB/Rinnovi');
 
 async function compilaTt2112(id) {
     try {
@@ -136,4 +137,107 @@ async function compilaTt2112(id) {
 
 
 
-module.exports = {compilaTt2112, compilaCertResidenza}
+
+
+
+  async function compilaVmRinnovo(id) {
+    return new Promise(async (resolve, reject) => {
+      try {
+          const data = await rinnovi.findOne({"_id": id});
+  
+          const existingPdfBytes = await fs.readFile('./public/download/vmRinnovo.pdf');
+  
+          const pdfDoc = await PDFDocument.load(existingPdfBytes);
+  
+          const pages = pdfDoc.getPages();
+          const firstPage = pages[0];
+          const intestazionePosition = { x: 65, y: 800, lineHeight: 10};
+          const numProtocolloPosition = { x: 65, y: 737 };
+          const codAgenziaPosition = { x: 453, y: 737 };
+          const nomeCognomePosition = { x: 130, y: 610 };
+          // const luogoNascitaPosition = { x: 105, y: 587 };
+          // const provinciaNascitaPosition = { x: 360, y: 587 };
+          // const dataNascitaPosition = { x: 430, y: 587 };
+          const tipoDocumentoPosition = { x: 200, y: 570 };
+          const provinciaResidenzaPosition = { x: 400, y: 570 };
+          let nProtocollo = '';
+          data.protocollo.split('').forEach(letter => nProtocollo+= `${letter} `);
+          const intestazione = `CF: ${data.cf} \nIndirizzo Di Spedizione: \n${data.spedizione.via} ${data.spedizione.nCivico} \n${data.spedizione.cap} (${data.spedizione.provincia})`
+
+          intestazione.split('\n').forEach((linea) => {
+            firstPage.drawText(linea, {
+              x: intestazionePosition.x,
+              y: intestazionePosition.y,
+              size: 8,
+              color: rgb(0, 0, 0),
+            });
+            intestazionePosition.y -= intestazionePosition.lineHeight;
+          });
+
+          firstPage.drawText(nProtocollo, {
+            x: numProtocolloPosition.x,
+            y: numProtocolloPosition.y,
+            size: 25,
+            color: rgb(0, 0, 0),
+          });
+
+          firstPage.drawText(`0 0 1 3`, {
+            x: codAgenziaPosition.x,
+            y: codAgenziaPosition.y,
+            size: 25,
+            color: rgb(0, 0, 0),
+          });
+
+          firstPage.drawText(`${data.cognome} ${data.nome}`, {
+            x: nomeCognomePosition.x,
+            y: nomeCognomePosition.y,
+            size: 12,
+            color: rgb(0, 0, 0),
+          });
+          // firstPage.drawText(data.nascita.comune, {
+          //   x: luogoNascitaPosition.x,
+          //   y: luogoNascitaPosition.y,
+          //   size: 12,
+          //   color: rgb(0, 0, 0),
+          // });
+          // firstPage.drawText(data.nascita.provincia, {
+          //   x: provinciaNascitaPosition.x,
+          //   y: provinciaNascitaPosition.y,
+          //   size: 12,
+          //   color: rgb(0, 0, 0),
+          // });
+          // firstPage.drawText(data.nascita.data, {
+          //   x: dataNascitaPosition.x,
+          //   y: dataNascitaPosition.y,
+          //   size: 12,
+          //   color: rgb(0, 0, 0),
+          // });
+          firstPage.drawText('patente', {
+            x: tipoDocumentoPosition.x,
+            y: tipoDocumentoPosition.y,
+            size: 12,
+            color: rgb(0, 0, 0),
+          });
+          firstPage.drawText(data.nPatente, {
+            x: provinciaResidenzaPosition.x,
+            y: provinciaResidenzaPosition.y,
+            size: 12,
+            color: rgb(0, 0, 0),
+          });
+          // firstPage.drawText(`${data.residenza.via} ${data.residenza.nCivico}`, {
+          //   x: indirizzoPosition.x,
+          //   y: indirizzoPosition.y,
+          //   size: 12,
+          //   color: rgb(0, 0, 0),
+          // });
+        
+          const pdfBytes = await pdfDoc.save();
+          await fs.writeFile(`./certificati/vmRinnovo/vmRinnovo_${id}.pdf`, pdfBytes);
+          resolve(`autocertificazione di residenza salvata con successo`);
+        }catch (error) {
+          reject(error);
+      }
+    });
+  }
+
+module.exports = {compilaTt2112, compilaCertResidenza, compilaVmRinnovo}
