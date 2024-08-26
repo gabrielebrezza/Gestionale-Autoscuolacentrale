@@ -290,6 +290,7 @@ router.post('/stampa', authenticateJWT, async (req, res)=> {
         }
       });
   } catch (err) {
+    try {
       switch(modulo){
         case 'residenza' : {
           await compilaCertResidenza(id);
@@ -300,7 +301,7 @@ router.post('/stampa', authenticateJWT, async (req, res)=> {
           break;
         }
         case 'vmRinnovo' : {
-          await compilaVmRinnovo(id);
+            await compilaVmRinnovo(id);
           break;
         }
         default: {
@@ -308,6 +309,11 @@ router.post('/stampa', authenticateJWT, async (req, res)=> {
           break;
         }
       }
+    } catch (err) {
+      console.error(`errore nella compilazione del modulo ${modulo}, errore: ${err}`)
+      return res.render('errorPage', {error: `si è verificato un errore nella compilazione del modulo. errore: ${err}`});
+    }
+      
       res.setHeader('Content-Type', 'application/pdf');
       res.sendFile(filePath, { 
         headers: {

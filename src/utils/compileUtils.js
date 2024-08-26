@@ -144,7 +144,12 @@ async function compilaTt2112(id) {
     return new Promise(async (resolve, reject) => {
       try {
           const data = await rinnovi.findOne({"_id": id});
-  
+          if(!data.protocollo){
+            return reject('Protocollo undefined');
+          }
+          if(!data.nPatente){
+            return reject('Numero Patente undefined');
+          }
           const existingPdfBytes = await fs.readFile('./public/download/vmRinnovo.pdf');
   
           const pdfDoc = await PDFDocument.load(existingPdfBytes);
@@ -174,7 +179,7 @@ async function compilaTt2112(id) {
             intestazionePosition.y -= intestazionePosition.lineHeight;
           });
 
-          firstPage.drawText(nProtocollo, {
+          firstPage.drawText(nProtocollo.toUpperCase(), {
             x: numProtocolloPosition.x,
             y: numProtocolloPosition.y,
             size: 25,
@@ -218,25 +223,19 @@ async function compilaTt2112(id) {
             size: 12,
             color: rgb(0, 0, 0),
           });
-          firstPage.drawText(data.nPatente, {
+          firstPage.drawText(data.nPatente.toUpperCase(), {
             x: provinciaResidenzaPosition.x,
             y: provinciaResidenzaPosition.y,
             size: 12,
             color: rgb(0, 0, 0),
           });
-          // firstPage.drawText(`${data.residenza.via} ${data.residenza.nCivico}`, {
-          //   x: indirizzoPosition.x,
-          //   y: indirizzoPosition.y,
-          //   size: 12,
-          //   color: rgb(0, 0, 0),
-          // });
         
           const pdfBytes = await pdfDoc.save();
           await fs.writeFile(`./certificati/vmRinnovo/vmRinnovo_${id}.pdf`, pdfBytes);
           resolve(`autocertificazione di residenza salvata con successo`);
         }catch (error) {
           reject(error);
-      }
+        }
     });
   }
 
