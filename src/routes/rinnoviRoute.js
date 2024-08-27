@@ -286,7 +286,7 @@ const fetchBookings = async () => {
             console.error(`si è verificato un errore nell'autenticazione dell'API ${error}`)
         }
     };
-
+    console.log('ci siamo');
     try {
         
         const AUTH_TOKEN = await authenticate();
@@ -355,6 +355,7 @@ const fetchBookings = async () => {
 
           res.on('end', async () => {
               const responseData = JSON.parse(body);
+              console.log(body);
               if (!responseData.data.bookings || Object.keys(responseData.data.bookings).length == 0) return;
               const bookings = responseData.data.bookings;
               for(const utente of bookings){
