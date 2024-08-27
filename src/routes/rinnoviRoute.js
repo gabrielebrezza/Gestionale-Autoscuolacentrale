@@ -358,6 +358,7 @@ const fetchBookings = async () => {
               const responseData = JSON.parse(body);
               if (!responseData.data.bookings || Object.keys(responseData.data.bookings).length == 0) return;
               const bookings = responseData.data.bookings;
+              console.log(bookings)
               for(const utente of bookings){
                 const userExist = await rinnovi.findOne({"cf": utente.client.fiscalCode.trim()});
                 if(!utente.enabled || userExist) continue;
