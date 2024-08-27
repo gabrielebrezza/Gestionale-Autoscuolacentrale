@@ -144,9 +144,6 @@ async function compilaTt2112(id) {
     return new Promise(async (resolve, reject) => {
       try {
           const data = await rinnovi.findOne({"_id": id});
-          if(!data.protocollo){
-            return reject('Protocollo undefined');
-          }
           if(!data.nPatente){
             return reject('Numero Patente undefined');
           }
@@ -166,7 +163,10 @@ async function compilaTt2112(id) {
           const tipoDocumentoPosition = { x: 200, y: 570 };
           const provinciaResidenzaPosition = { x: 400, y: 570 };
           let nProtocollo = '';
-          data.protocollo.split('').forEach(letter => nProtocollo+= `${letter} `);
+          if(data.protocollo){
+            data.protocollo.split('').forEach(letter => nProtocollo+= `${letter} `);
+          }
+          
           const intestazione = `CF: ${data.cf} \nIndirizzo Di Spedizione: \n${data.spedizione.via} ${data.spedizione.nCivico} \n${data.spedizione.cap} (${data.spedizione.provincia})`
 
           intestazione.split('\n').forEach((linea) => {
