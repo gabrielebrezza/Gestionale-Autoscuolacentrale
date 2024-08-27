@@ -167,7 +167,7 @@ async function compilaTt2112(id) {
             data.protocollo.split('').forEach(letter => nProtocollo+= `${letter} `);
           }
           
-          const intestazione = `CF: ${data.cf} \nIndirizzo Di Spedizione: \n${data.spedizione.via} ${data.spedizione.nCivico} \n${data.spedizione.cap} (${data.spedizione.provincia})`
+          const intestazione = `CF: ${data.cf} \nIndirizzo Di Spedizione: \n${data.spedizione.via} ${data.spedizione.nCivico} \n${data.spedizione.cap} ${data.spedizione.comune} (${data.spedizione.provincia})`
 
           intestazione.split('\n').forEach((linea) => {
             firstPage.drawText(linea, {
