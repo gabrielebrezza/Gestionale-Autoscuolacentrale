@@ -217,11 +217,12 @@ router.post('/admin/rinnovi/downloadFattura', authenticateJWT, async (req, res)=
 
 async function trovaProvincia(cap) {
     try {
+        console.log('sto cercando provincia')
       const data = await fsp.readFile('./comuni.json', 'utf8');
       const comuni = JSON.parse(data);
   
       const comune = comuni.find(item => item.cap.includes(cap));
-  
+      console.log('provincia trovata: ' , comune.sigla)
       return comune ? comune.sigla : ' ';
     } catch (error) {
       console.error('Errore nel caricamento del file:', error);
