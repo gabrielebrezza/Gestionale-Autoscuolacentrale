@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const fsp = require('fs').promises;
 const path = require('path');
 const https = require('https');
 const axios = require('axios');
@@ -215,19 +216,20 @@ router.post('/admin/rinnovi/downloadFattura', authenticateJWT, async (req, res)=
 
 
 async function trovaProvincia(cap) {
-  try {
-      const response = await axios.get('https://raw.githubusercontent.com/scgoeswild/comuni-localita-cap-italia/main/files/comuni-localita-cap-italia.json');
-      const dataset = response.data["Sheet 1 - comuni-localita-cap-i"];
-      
-      const record = dataset.find(item => item.CAP === cap);
-      return record ? record.Provincia : ' ';
-  } catch (error) {
-      console.error('Errore nel recupero del dataset:', error);
+    try {
+      const data = await fsp.readFile('./comuni.json', 'utf8');
+      const comuni = JSON.parse(data);
+  
+      const comune = comuni.find(item => item.cap.includes(cap));
+  
+      return comune ? comune.sigla : ' ';
+    } catch (error) {
+      console.error('Errore nel caricamento del file:', error);
       return ' ';
+    }
   }
-}
-
 const fetchBookings = async () => {
+    if(process.env.SERVER_URL == 'http://localhost') return;
     const GRAPHQL_URL = 'https://backend.rinnovopatenti.it/api/graphql';
     const AUTH_EMAIL = 'rinnovopatentimarconi@gmail.com';
     const AUTH_PASSWORD = 'Marconi@2024';
