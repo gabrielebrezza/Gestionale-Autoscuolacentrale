@@ -291,7 +291,7 @@ const fetchBookings = async () => {
         
         const AUTH_TOKEN = await authenticate();
         if(AUTH_TOKEN.includes('html')) return;
-        const currentDateTime = new Date();
+        const currentDateTime = new Date(Date.now() - 10 * 60 * 60 * 1000);
         const lastSync = await SyncDate.findOne()
         await SyncDate.updateOne({"data": currentDateTime.toISOString()})
         
