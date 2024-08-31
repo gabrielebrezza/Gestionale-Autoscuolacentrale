@@ -62,6 +62,52 @@ router.post('/stripeHooks', express.raw({type: 'application/json'}), async (req,
           }
     });
   });
+
+
+
+
+  router.get('/satispay-callback', async (req, res) => {
+
+
+    console.log('arrivo dalla richiesta get')
+    const paymentId = req.body.payment_id; 
+    const status = req.body.status;
+    const reason = req.body.reason;
+
+    console.log( req.query.payment_id, req.query.status, req.query.reason)
+
+    if(status == 'cancelled' || req.query.status == 'cancelled'){
+      return;
+    }
+    console.log(`Ricevuto pagamento con ID: ${paymentId}`);
+    console.log(`Stato del pagamento: ${status}`);
+    // const {id, patente, email} = JSON.parse(payment.transactions[0].custom);
+    // await setPayment(id, patente, price, email);
+    res.status(200).send('Callback ricevuta con successo');
+});
+
+router.get('/satispay-callback', async (req, res) => {
+
+
+  console.log('arrivo dalla richiesta get')
+  const paymentId = req.body.payment_id; 
+  const status = req.body.status;
+  const reason = req.body.reason;
+
+  console.log( req.query.payment_id, req.query.status, req.query.reason)
+
+  if(status == 'cancelled' || req.query.status == 'cancelled'){
+    return;
+  }
+  console.log(`Ricevuto pagamento con ID: ${paymentId}`);
+  console.log(`Stato del pagamento: ${status}`);
+  // const {id, patente, email} = JSON.parse(payment.transactions[0].custom);
+  // await setPayment(id, patente, price, email);
+  res.status(200).send('Callback ricevuta con successo');
+});
+
+
+
   router.get('/successPayment', async (req, res) =>{ res.render('payments/paymentSuccess', {text: 'Grazie per esserti iscritto da noi!!', id: req.query.id})});
   router.get('/cancelPayment', async (req, res) => res.render('payments/cancelPayment', {text: 'Ci spiace che tu abbia deciso di non iscriverti da noi.'}));
 

@@ -1,11 +1,13 @@
     const paymentMethod = document.getElementById('paymentMethod');
     const payPal = document.getElementById('payPal');
+    const satispay = document.getElementById('satisPay');
     const codeBtn = document.getElementById('codeBtn');
     const codeContainer = document.getElementById('codeContainer');
     const codeInput = document.getElementById('code');
     const stripe = document.getElementById('stripe');
     payPal.addEventListener('click', () => paymentMethod.value = 'payPal');
     stripe.addEventListener('click', () => paymentMethod.value = 'stripe');
+    satispay.addEventListener('click', () => paymentMethod.value = 'satispay');
     codeBtn.addEventListener('click', event => {
         event.preventDefault();
         codeContainer.style.display = 'flex';
