@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scadenziario</title>
+    <link rel="stylesheet" href="/styles/admin/components/header.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
         main{
             margin-top: 200px;
@@ -74,7 +76,10 @@
     </style>
 </head>
 <body>
-    <%- include('../../components/header.ejs') %>
+    <% if (role == 'admin') { %>
+        <%- include('../../components/header.ejs') %>
+    <% } %>
+    
     <main>
         <table>
                 <thead>

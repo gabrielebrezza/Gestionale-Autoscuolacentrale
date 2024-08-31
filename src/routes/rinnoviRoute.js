@@ -10,6 +10,7 @@ const router = express.Router();
 router.use(bodyParser.json({ limit: '50mb' }));
 
 //databases
+const admins = require('../DB/Admin');
 const rinnovi = require('../DB/Rinnovi');
 const SyncDate = require('../DB/SyncDate');
 const storicoFattureGenerali = require('../DB/StoricoFattureGenerali');
@@ -419,8 +420,9 @@ setTimeout(fetchBookings, 5000);
 
 
 router.get('/admin/rinnovi/scadenziario', authenticateJWT, async (req, res) => {
+    const { role } = await admins.findOne({"email": req.user.email});
     const scadenziario = await Scadenziario.find();
-    res.render('admin/rinnovi/scadenziario/usersPage', {scadenziario});
+    res.render('admin/rinnovi/scadenziario/usersPage', {scadenziario, role});
 });
 
 router.post('/admin/rinnovi/scadenziario/deleteUsers', authenticateJWT, async (req, res)=> {

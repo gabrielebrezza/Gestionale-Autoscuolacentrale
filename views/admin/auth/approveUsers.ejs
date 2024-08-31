@@ -12,22 +12,26 @@
         <div id="adminsList" class="approval-list">
             <%if(needApprovalAdmins != '') { %>
                 <div id="cards">
-                    <% needApprovalAdmins.forEach(function(item) { %>
+                    <% needApprovalAdmins.forEach(function(admin) { %>
                         <div class="user-card">
                             <div class="user-card-header">
-                                <h3>istruttore: <%= item.nome %> <%= item.cognome %></h3>
+                                <h3>Utente: <%= admin.nome %> <%= admin.cognome %></h3>
                             </div>
                             <ul class="user-info">
-                                <li><strong>Email:</strong> <%= item.email %></li> 
+                                <li><strong>Email:</strong> <%= admin.email %></li> 
                             </ul>
-                            <div class="buttons">
-                                <form action="/approveAdmin" method="POST">
-                                    <input type="hidden" name="email" value="<%= item.email %>">
-                                    <button type="submit" class="approve-button">Approva</button>
-                                </form>
-                                <form action="/disapproveAdmin" method="POST">
-                                    <input type="hidden" name="email" value="<%= item.email %>">
-                                    <button type="submit" class="disapprove-button">Disapprova</button>
+                            <div class="formField">
+                                <form action="/admin/approvation" method="post">
+                                    <input type="hidden" name="id" value="<%= admin._id %>">
+                                    <label for="role">Ruolo:</label>
+                                    <select name="role" id="role">
+                                        <option value="admin">Admin</option>
+                                        <option value="worker">Addetto scadenziario</option>
+                                    </select>
+                                    <div class="buttons">
+                                        <input type="submit" class="approve-button" name="approve" value="Approva">
+                                        <input type="submit" class="disapprove-button" name="disapprove" value="Disapprova">
+                                    </div>
                                 </form>
                             </div>
                         </div>

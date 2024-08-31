@@ -39,12 +39,12 @@ h1{
 form{
   padding-inline: 10px;
 }
-.buttons{
+.formField{
   display: flex;
   justify-content: center;
-  flex-direction: row;
+  flex-direction: column;
 }
-button {
+input[type="submit"] {
   font-size: 1rem;
   padding: 16px 24px;
   color: #fff;
@@ -68,4 +68,8 @@ button {
 
 .approval-list {
   margin-bottom: 20px;
+}
+
+.buttons{
+  margin-top: 15px;
 }

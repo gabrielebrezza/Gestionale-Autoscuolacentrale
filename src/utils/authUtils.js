@@ -24,6 +24,10 @@ async function authenticateJWT(req, res, next) {
             if (!approvedAdmin) {
                 return res.redirect(`/waitingApprovation?email=${email}`);
             }
+            const ispathEnabled = req.path != '/admin/rinnovi/scadenziario/deleteUsers' && req.path != '/admin/rinnovi/ricerca/scadenzaPatente' && req.path != '/admin/rinnovi/scadenziario';
+            if (ispathEnabled && approvedAdmin.role == 'worker') {
+                return res.redirect('/admin/rinnovi/scadenziario');
+            }
         } catch (error) {
             console.error('Errore durante il recupero dello stato di approvazione dell\'utente:', error);
             return res.render('errorPage', { error: 'Errore durante il recupero dello stato di approvazione dell\'utente' });
