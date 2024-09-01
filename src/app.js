@@ -82,7 +82,7 @@ async function createSatispayPayment(prezzo, id, patente, email) {
         amount_unit: prezzo * 100,
         currency: 'EUR',
         callback_url: `${process.env.SERVER_URL}/satispay-callback?payment_id={uuid}`,
-        redirect_url: `${process.env.SERVER_URL}/successPayment?id=${id}`,
+        redirect_url: `${process.env.SERVER_URL}/satispay/successPayment?id=${id}&pat=${patente}`,
         metadata: {
             id: id,
             patente: patente,
