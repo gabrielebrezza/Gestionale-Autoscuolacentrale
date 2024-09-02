@@ -123,7 +123,6 @@ async function createSatispayPayment(prezzo, id, patente, email) {
         });
         const { redirect_url } = response.data;
         const payment_id = response.data.id;
-        console.log(payment_id)
         return { payment_id, redirect_url };
     } catch (error) {
         console.error('Error creating payment:', error.response ? error.response.data : error.message);
