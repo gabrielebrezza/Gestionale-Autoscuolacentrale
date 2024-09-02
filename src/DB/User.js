@@ -163,6 +163,10 @@ const UserSchema = new mongoose.Schema({
             },
         }
     ],
+    paymentId: {
+        type: String,
+        required: false
+    },
     note: {
         type: String,
         required: false

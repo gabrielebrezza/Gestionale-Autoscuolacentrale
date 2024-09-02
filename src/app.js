@@ -3,10 +3,6 @@ require('dotenv').config();
 const express = require('express');
 const stripe = require('stripe')(process.env.STRIPE_PRIVATE_KEY);
 const paypal = require('paypal-rest-sdk');
-const crypto = require('crypto');
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
 const jwt = require('jsonwebtoken');
 
 const utenti = require('./DB/User');
@@ -18,7 +14,7 @@ const app = express();
 
 //utils
 const sendEmail = require('./utils/emailsUtils');
-const setPayment = require('./utils/paymentsUtils.js');
+const {setPayment, createSatispayPayment} = require('./utils/paymentsUtils.js');
 //routes
 const paymentsRoute = require('./routes/paymentsRoute');
 const adminRoute = require('./routes/adminRoute');
@@ -59,67 +55,7 @@ paypal.configure({
 
 
 
-const privateKeyPath = 'src/keys/satispay/private.pem';
-const publicKeyId = process.env.SATISPAY_KEYID;
-const apiUrl = 'https://authservices.satispay.com/g_business/v1/payments';
 
-function generateDigest(body) {
-    const hash = crypto.createHash('sha256');
-    hash.update(body);
-    return `SHA-256=${hash.digest('base64')}`;
-}
-
-function signString(stringToSign) {
-    const privateKey = fs.readFileSync(privateKeyPath, 'utf8');
-    const signer = crypto.createSign('RSA-SHA256');
-    signer.update(stringToSign);
-    return signer.sign(privateKey, 'base64');
-}
-
-async function createSatispayPayment(prezzo, id, patente, email) {
-    const payload = {
-        flow: 'MATCH_CODE',
-        amount_unit: prezzo * 100,
-        currency: 'EUR',
-        callback_url: `${process.env.SERVER_URL}/satispay-callback?payment_id={uuid}`,
-        redirect_url: `${process.env.SERVER_URL}/satispay/successPayment?id=${id}&pat=${patente}`,
-        metadata: {
-            id: id,
-            patente: patente,
-            email: email
-        }
-    };
-
-    const body = JSON.stringify(payload);
-    const date = new Date().toUTCString();
-    const requestTarget = `(request-target): post /g_business/v1/payments`;
-    const host = 'host: authservices.satispay.com';
-    const digest = generateDigest(body);
-
-    // Creazione della stringa da firmare
-    const stringToSign = `${requestTarget}\n${host}\ndate: ${date}\ndigest: ${digest}`;
-
-    // Firma della stringa
-    const signature = signString(stringToSign);
-
-    // Preparazione dell'intestazione di autorizzazione
-    const authorizationHeader = `Signature keyId="${publicKeyId}", algorithm="rsa-sha256", headers="(request-target) host date digest", signature="${signature}"`;
-
-    try {
-        const response = await axios.post(apiUrl, body, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Host': 'authservices.satispay.com',
-                'Date': date,
-                'Digest': digest,
-                'Authorization': authorizationHeader
-            }
-        });
-        return response.data.redirect_url;
-    } catch (error) {
-        console.error('Error creating payment:', error.response ? error.response.data : error.message);
-    }
-}
 
 app.get('/', async (req, res) =>{
     res.render('getData');
@@ -402,7 +338,9 @@ app.post('/payment', async (req, res) =>{
       res.status(500).json({error: error.message});
     }
   }else if(paymentMethod == 'satispay'){
-    return res.redirect(await createSatispayPayment(prezzo, id, tipoPatente, email));
+    const { payment_id, redirect_url } = await createSatispayPayment(prezzo, id, tipoPatente, email);
+    const usersss = await utenti.findOneAndUpdate({"_id": id}, { "paymentId": payment_id });
+    return res.redirect(redirect_url);
   }else if(paymentMethod == 'code'){
     const code = req.body.code; 
     const codeExist = await codes.findOne({"cFiscale": cFiscale, "code": code, "email": email, "importo": prezzo});
