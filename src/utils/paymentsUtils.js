@@ -69,9 +69,6 @@ async function setPayment(id, patente, price, email) {
 }
 
 
-
-const privateKeyPath = 'src/keys/satispay/private.pem';
-
 function generateDigest(body) {
     const hash = crypto.createHash('sha256');
     hash.update(body);
@@ -79,7 +76,7 @@ function generateDigest(body) {
 }
 
 function signString(stringToSign) {
-    const privateKey = fs.readFileSync(privateKeyPath, 'utf8');
+    const privateKey = fs.readFileSync('src/keys/satispay/private.pem', 'utf8');
     const signer = crypto.createSign('RSA-SHA256');
     signer.update(stringToSign);
     return signer.sign(privateKey, 'base64');

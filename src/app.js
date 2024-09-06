@@ -42,30 +42,16 @@ paypal.configure({
   client_secret: process.env.PAYPAL_CLIENT_SECRET
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 app.get('/', async (req, res) =>{
     res.render('getData');
 });
 
 app.post('/payment', async (req, res) =>{
+  try {
     const luogoNascita = req.body.luogoNascita.split(',');
     const residenza = req.body.residenza.split(',');
     if(luogoNascita.length < 3){
-      return res.render('errorPage', { error: `Dato mancante all'interno dell'indirizzo di nascita` });
+      return res.render('errorPage', { error: `Dato mancante all'interno del luogo di nascita` });
     }
     if(residenza.length < 5){
       return res.render('errorPage', { error: `Dato mancante all'interno dell'indirizzo di residenza` });
@@ -257,8 +243,9 @@ app.post('/payment', async (req, res) =>{
     prezzo = prices.prezzoIscrizioniSuccessive;
   }
   const user = await utenti.findOne({"cFiscale": cFiscale});
-  
+  console.log(user._id)
   const id = `${user._id}`;
+  console.log(id)
   if(paymentMethod == 'stripe'){
     try {
       const session = await stripe.checkout.sessions.create({
@@ -339,7 +326,7 @@ app.post('/payment', async (req, res) =>{
     }
   }else if(paymentMethod == 'satispay'){
     const { payment_id, redirect_url } = await createSatispayPayment(prezzo, id, tipoPatente, email);
-    const usersss = await utenti.findOneAndUpdate({"_id": id}, { "paymentId": payment_id });
+    await utenti.findOneAndUpdate({"_id": id}, { "paymentId": payment_id });
     return res.redirect(redirect_url);
   }else if(paymentMethod == 'code'){
     const code = req.body.code; 
@@ -356,6 +343,11 @@ app.post('/payment', async (req, res) =>{
     await codes.deleteOne({"cFiscale": cFiscale, "code": code, "email": email, "importo": prezzo});
     res.redirect(`/successPayment?cf=${encodeURIComponent(cFiscale)}`);
   }
+  } catch (error) {
+    console.error(`Si è verificato un errore durante l'iscrizione: ${error}`);
+    return res.render('errorPage', {error: 'Si è verificato un errore durante l\'iscrizione'})
+  }
+
 });
 
 app.use((req, res, next) => {
