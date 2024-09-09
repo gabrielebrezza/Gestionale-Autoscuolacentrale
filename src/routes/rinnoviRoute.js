@@ -21,6 +21,7 @@ const Duplicati = require('../DB/Duplicati');
 const sendEmail = require('../utils/emailsUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
 const {searchUserPortale, searchExpirationPortale} = require('../utils/portaleAutomobilistaUtils.js');
+const { trovaProvincia } = require('../utils/genericUtils.js');
 
 router.get('/admin/rinnovi', authenticateJWT, async (req, res) =>{
     const users = await rinnovi.find({});
@@ -212,23 +213,6 @@ router.post('/admin/rinnovi/downloadFattura', authenticateJWT, async (req, res)=
     }
 });
 
-
-
-
-
-async function trovaProvincia(cap) {
-    try {
-      const data = await fsp.readFile('./comuni.json', 'utf8');
-      const comuni = JSON.parse(data);
-  
-      const comune = comuni.find(item => item.cap.includes(cap));
-      console.log(comune.sigla)
-      return comune ? comune.sigla : ' ';
-    } catch (error) {
-      console.error('Errore nel caricamento del file:', error);
-      return ' ';
-    }
-}
 const fetchBookings = async () => {
     if(process.env.SERVER_URL == 'http://localhost') return;
     const GRAPHQL_URL = 'https://backend.rinnovopatenti.it/api/graphql';
@@ -381,6 +365,17 @@ const fetchBookings = async () => {
                   email: utente.client.email,
                   tel: utente.client.phone
                 }
+                console.log({
+                    "nome": utente.client.name.trim(),
+                    "cognome": utente.client.surname.trim(),
+                    "cf": utente.client.fiscalCode.trim(),
+                    "contatti": contatti,
+                    "spedizione": spedizione,
+                    "visita": visita,
+                    "nPatente": utente.client.licenseNumber.trim(),
+                    "protocollo": null,
+                    "note": null
+                  })
                 const saveUser = new rinnovi({
                   "nome": utente.client.name.trim(),
                   "cognome": utente.client.surname.trim(),
@@ -449,9 +444,9 @@ router.post('/admin/rinnovi/ricerca/scadenzaPatente', authenticateJWT, async (re
         const spedizione = {
             via: `${dati.toponimo.toLowerCase()} ${dati.indirizzo.toLowerCase()}`,
             nCivico: dati.numeroCivico.toLowerCase(),
-            cap: dati.cap.toLowerCase(),
+            cap: dati.cap,
             comune: dati.comune.toLowerCase(),
-            provincia: dati.provincia.toLowerCase()
+            provincia: trovaProvincia(dati.cap.trim())
         };
         const saveUser = new Scadenziario({
             "nome": dati.nome.trim().toLowerCase(),
@@ -465,7 +460,7 @@ router.post('/admin/rinnovi/ricerca/scadenzaPatente', authenticateJWT, async (re
         await saveUser.save();
         res.redirect(`/admin/rinnovi/scadenziario`);
     } catch (error) {
-        console.error('Errore durante la richiesta POST:', error);
+        console.error('Errore durante la richiesta POST scadenziario:', error);
         res.render('errorPage', {error: 'Errore durante il collegamento al portale' });
     }
 });
@@ -495,7 +490,7 @@ router.post('/admin/rinnovi/ricerca/portaleAutomobilista', authenticateJWT, asyn
         console.log(`Nuovo utente rinnovi salvato: ${formData.nome.trim().toLowerCase()} ${formData.cognome.trim().toLowerCase()}`);
         res.redirect(`/admin/rinnovi/userPage?id=${encodeURIComponent(`${user._id}`)}`);
     } catch (error) {
-        console.error('Errore durante la richiesta POST:', error);
+        console.error('Errore durante la richiesta POST portale automobilista rinnovi:', error);
         res.render('errorPage', {error: 'Errore durante il collegamento al portale' });
     }
 });

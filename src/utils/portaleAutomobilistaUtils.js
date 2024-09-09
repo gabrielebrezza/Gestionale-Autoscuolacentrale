@@ -170,8 +170,4 @@ async function searchUserPortale(cf, cognome, nPatente) {
     }
   }
   
-
-
-
-
 module.exports = {searchUserPortale, searchExpirationPortale};
