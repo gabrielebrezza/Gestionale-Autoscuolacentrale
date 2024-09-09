@@ -222,12 +222,13 @@ async function trovaProvincia(cap) {
       const comuni = JSON.parse(data);
   
       const comune = comuni.find(item => item.cap.includes(cap));
+      console.log(comune.sigla)
       return comune ? comune.sigla : ' ';
     } catch (error) {
       console.error('Errore nel caricamento del file:', error);
       return ' ';
     }
-  }
+}
 const fetchBookings = async () => {
     if(process.env.SERVER_URL == 'http://localhost') return;
     const GRAPHQL_URL = 'https://backend.rinnovopatenti.it/api/graphql';
