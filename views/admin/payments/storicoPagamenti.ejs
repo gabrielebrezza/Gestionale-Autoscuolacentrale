@@ -21,22 +21,27 @@
                         <tr>
                             <td><%= pagamento.data %></td>
                             <td><%= pagamento.importo %>€</td>
-                            <% 
-                                const services = ['Paypal', 'Stripe', 'Satispay', 'Codice'];
-                                const cleanedUrl = pagamento.paymentUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0].toLowerCase();
-                                let paymentMethod;
-                                for(const service of services){
-                                    if(cleanedUrl.includes(service.toLowerCase())){
-                                        paymentMethod = service;
-                                        break;
-                                    }
-                                }
-                              %>
+                            
                             <td>
-                                <% if (paymentMethod != 'Codice') { %>
-                                    <a href="<%= pagamento.paymentUrl %>"><%= paymentMethod %></a>
+                                <% if (pagamento.paymentUrl) { %>
+                                    <% 
+                                        const services = ['Paypal', 'Stripe', 'Satispay', 'Codice'];
+                                        const cleanedUrl = pagamento.paymentUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0].toLowerCase();
+                                        let paymentMethod;
+                                        for(const service of services){
+                                            if(cleanedUrl.includes(service.toLowerCase())){
+                                                paymentMethod = service;
+                                                break;
+                                            }
+                                        }
+                                    %>
+                                    <% if (paymentMethod != 'Codice') { %>
+                                        <a href="<%= pagamento.paymentUrl %>"><%= paymentMethod %></a>
+                                    <% }else{ %>
+                                        <%= paymentMethod %>
+                                    <% } %>
                                 <% }else{ %>
-                                    <%= paymentMethod %>
+                                    La traccia dei pagamenti è tenuta dall'11/09/2024
                                 <% } %>
                             </td>
                         </tr>

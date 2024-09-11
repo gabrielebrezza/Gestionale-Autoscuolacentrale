@@ -44,10 +44,6 @@ router.post('/stripeHooks', express.raw({type: 'application/json'}), async (req,
               throw error
           }else{
             try{
-              console.log(payment.transactions[0])
-              console.log(payment.transactions[0].related_resources[0])
-              console.log(payment.transactions[0].related_resources[0].sale)
-              console.log(payment.transactions[0].related_resources[0].sale.id)
               const transactionId = payment.transactions[0].related_resources[0].sale.id;
               const {id, patente, email} = JSON.parse(payment.transactions[0].custom);
               const paymentUrl = `https://paypal.com/activity/payment/${transactionId}`;
@@ -71,7 +67,7 @@ router.get('/satispay/successPayment', async (req, res) =>{
     if(!metadata || !amount_unit){
       return res.render('errorPage', {error: 'si è verificato un errore durante il pagamento'});
     }
-    const paymentUrl = `https://dashboard.satispay.com/dashboard/transactions/${user.paymentId}`
+    const paymentUrl = `https://dashboard.satispay.com/dashboard/transactions/${user.paymentId}`;
     await setPayment(id, paymentUrl, metadata.patente, amount_unit/100, metadata.email);
     return res.redirect(`/successPayment?id=${encodeURIComponent(id)}`);
 } catch (error) {
