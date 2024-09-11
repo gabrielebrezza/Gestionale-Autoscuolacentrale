@@ -17,6 +17,24 @@
                         <h5 class="card-title">Fattura <%= i++ %></h5>
                         <p class="card-text">Data: <%= fattura.data %></p>
                         <p class="card-text">Importo: <%= fattura.importo %>€</p>
+                                                    <% 
+                                const services = ['Paypal', 'Stripe', 'Satispay', 'Codice'];
+                                const cleanedUrl = pagamento.paymentUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0].toLowerCase();
+                                let paymentMethod;
+                                for(const service of services){
+                                    if(cleanedUrl.includes(service.toLowerCase())){
+                                        paymentMethod = service;
+                                        break;
+                                    }
+                                }
+                              %>
+                        <p class="card-text">
+                            <% if (paymentMethod != 'Codice') { %>
+                                <a href="<%= pagamento.paymentUrl %>"><%= paymentMethod %></a>
+                            <% }else{ %>
+                                <%= paymentMethod %>
+                            <% } %>
+                        </p>
                         <% let dataEncoded = encodeURIComponent(fattura.data); %>
                         <% let link = `/admin/emettiFattura?cf=${encodeURIComponent(cf)}&data=${dataEncoded}&importo=${encodeURIComponent(fattura.importo)}` %>
                         <a href="<%= link %>" class="btn btn-primary">Emetti Fattura</a>

@@ -24,7 +24,8 @@ router.post('/stripeHooks', express.raw({type: 'application/json'}), async (req,
         const session = event.data.object;
         const price = session.amount_total/100;
         const {id, patente, email} = session.metadata;
-        await setPayment(id, patente, price, email);
+        const paymentUrl = `https://dashboard.stripe.com/payments/${session.payment_intent}`
+        await setPayment(id, paymentUrl, patente, price, email);
     }
     res.json({success: true});
   })
@@ -33,30 +34,24 @@ router.post('/stripeHooks', express.raw({type: 'application/json'}), async (req,
   
       const payerId = req.query.PayerID;
       const paymentId = req.query.paymentId; 
-      const price = req.query.price;
       if(!paymentId || !payerId){
         return res.render('errorPage' ,{error: 'non hai effettuato nessun pagamento'});
       }
-      const execute_payment_json = {
-          payer_id: payerId,
-          transactions: [
-              {
-                  amount: {
-                      currency: "EUR",
-                      total: price
-                  }
-              }
-          ]
-      };
   
-      paypal.payment.execute(paymentId, execute_payment_json, async (error, payment) => {
+      paypal.payment.execute(paymentId, {payer_id: payerId}, async (error, payment) => {
           if(error){
               console.error(error.response);
               throw error
           }else{
             try{
+              console.log(payment.transactions[0])
+              console.log(payment.transactions[0].related_resources[0])
+              console.log(payment.transactions[0].related_resources[0].sale)
+              console.log(payment.transactions[0].related_resources[0].sale.id)
+              const transactionId = payment.transactions[0].related_resources[0].sale.id;
               const {id, patente, email} = JSON.parse(payment.transactions[0].custom);
-              await setPayment(id, patente, price, email);
+              const paymentUrl = `https://paypal.com/activity/payment/${transactionId}`;
+              await setPayment(id, paymentUrl, patente, payment.transactions[0].amount.total, email);
               return res.redirect(`/successPayment?id=${encodeURIComponent(id)}`);
             }catch(error){
               return res.status(500).json({error: error.message});
@@ -76,7 +71,8 @@ router.get('/satispay/successPayment', async (req, res) =>{
     if(!metadata || !amount_unit){
       return res.render('errorPage', {error: 'si è verificato un errore durante il pagamento'});
     }
-    await setPayment(id, metadata.patente, amount_unit/100, metadata.email);
+    const paymentUrl = `https://dashboard.satispay.com/dashboard/transactions/${user.paymentId}`
+    await setPayment(id, paymentUrl, metadata.patente, amount_unit/100, metadata.email);
     return res.redirect(`/successPayment?id=${encodeURIComponent(id)}`);
 } catch (error) {
     console.error('Error checking payment status:', error);

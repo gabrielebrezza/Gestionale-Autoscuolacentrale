@@ -9,11 +9,11 @@ const utenti = require('../DB/User');
 const sendEmail = require('../utils/emailsUtils.js');
 const {compilaTt2112, compilaCertResidenza} = require('../utils/compileUtils');
 
-async function setPayment(id, patente, price, email) {
+async function setPayment(userId, paymentUrl, patente, price, email) {
     try {
         await utenti.findOneAndUpdate(
           {
-            "_id": id,
+            "_id": userId,
             "patente": {
               $elemMatch: {
                 "tipo": patente,
@@ -33,27 +33,27 @@ async function setPayment(id, patente, price, email) {
         const YYYY = today.getFullYear(); 
         const dataFatturazione = `${DD}/${MM}/${YYYY}`;
         await utenti.findOneAndUpdate(
-            {"_id": id},
+            {"_id": userId},
             {
                 $addToSet: {
-                    "fatture": {"data": dataFatturazione, "importo": price, "emessa": false},
+                    "fatture": {"data": dataFatturazione, "importo": price, "paymentUrl": paymentUrl, "emessa": false},
                 }
             },
             {new: true}
         );
         try {
-          await compilaTt2112(id);
+          await compilaTt2112(userId);
         }catch (error) {
           console.error(error.message);
         }
         try {
-          await compilaCertResidenza(id);
+          await compilaCertResidenza(userId);
         }catch (error) {
           console.error(error.message);
         }
         const fileNames = [
-          `certificati/tt2112/tt2112_${id}.pdf`,
-          `certificati/residenza/residenza_${id}.pdf`
+          `certificati/tt2112/tt2112_${userId}.pdf`,
+          `certificati/residenza/residenza_${userId}.pdf`
         ];
         try{
           const result = await sendEmail(email, 'Iscrizione effettuata con successo', `Grazie per esserti iscritto alla patente ${patente}. Ti chiediamo gentilmente in caso tu non l'avessi ancora fatto di inviarci la scansione della tua firma e della fototessera che apparirà sulla patente`, fileNames );
@@ -61,10 +61,9 @@ async function setPayment(id, patente, price, email) {
         }catch (error){
           console.error('Errore durante l\'invio dell\'email:', error);
         }
-        console.log(`l'utente ${id} ha completato il pagamento con successo per la patente ${patente}`);
+        console.log(`l'utente ${userId} ha completato il pagamento con successo per la patente ${patente}`);
     } catch (error) {
         console.error('Errore durante il recupero dei dati dell\'utente:', error);
-        return res.status(500).json({ message: 'Errore del server' });
     }
 }
 

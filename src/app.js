@@ -243,9 +243,7 @@ app.post('/payment', async (req, res) =>{
     prezzo = prices.prezzoIscrizioniSuccessive;
   }
   const user = await utenti.findOne({"cFiscale": cFiscale});
-  console.log(user._id)
   const id = `${user._id}`;
-  console.log(id)
   if(paymentMethod == 'stripe'){
     try {
       const session = await stripe.checkout.sessions.create({
@@ -335,7 +333,7 @@ app.post('/payment', async (req, res) =>{
       return res.render('errorPage', {error: 'Il Codice inserito è errato o altrimenti codice fiscale, email o patente sono diversi da quelli con cui è stato creato il codice.'});
     }
     try {
-      await setPayment(id, tipoPatente, prezzo, email);
+      await setPayment(id, 'Codice', tipoPatente, prezzo, email);
     } catch (error) {
       console.log(`errore durante il pagamento con codice ${error}`);
       return res.render('errorPage', {error: 'Si è verificato un errore con il pagamento riprova.'})

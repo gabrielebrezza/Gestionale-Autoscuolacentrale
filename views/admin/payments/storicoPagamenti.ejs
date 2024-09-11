@@ -13,6 +13,7 @@
             <thead>
                 <th>data</th>
                 <th>importo</th>
+                <th>link</th>
             </thead>
             <tbody>
                 <tr>
@@ -20,6 +21,24 @@
                         <tr>
                             <td><%= pagamento.data %></td>
                             <td><%= pagamento.importo %>€</td>
+                            <% 
+                                const services = ['Paypal', 'Stripe', 'Satispay', 'Codice'];
+                                const cleanedUrl = pagamento.paymentUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0].toLowerCase();
+                                let paymentMethod;
+                                for(const service of services){
+                                    if(cleanedUrl.includes(service.toLowerCase())){
+                                        paymentMethod = service;
+                                        break;
+                                    }
+                                }
+                              %>
+                            <td>
+                                <% if (paymentMethod != 'Codice') { %>
+                                    <a href="<%= pagamento.paymentUrl %>"><%= paymentMethod %></a>
+                                <% }else{ %>
+                                    <%= paymentMethod %>
+                                <% } %>
+                            </td>
                         </tr>
                     <% }); %>
                 </tr>

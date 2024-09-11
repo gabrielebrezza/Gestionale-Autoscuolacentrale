@@ -157,6 +157,10 @@ const UserSchema = new mongoose.Schema({
                 type: Number,
                 required: false
             },
+            paymentUrl: {
+                type: String,
+                required: false
+            },
             emessa: {
                 type: Boolean,
                 required: false
