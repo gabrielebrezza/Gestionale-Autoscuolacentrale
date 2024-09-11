@@ -19,7 +19,7 @@
                         <p class="card-text">Importo: <%= fattura.importo %>€</p>
                                                     <% 
                                 const services = ['Paypal', 'Stripe', 'Satispay', 'Codice'];
-                                const cleanedUrl = pagamento.paymentUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0].toLowerCase();
+                                const cleanedUrl = fattura.paymentUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0].toLowerCase();
                                 let paymentMethod;
                                 for(const service of services){
                                     if(cleanedUrl.includes(service.toLowerCase())){
@@ -28,9 +28,9 @@
                                     }
                                 }
                               %>
-                        <p class="card-text">
+                        <p class="card-text"> Metodo: 
                             <% if (paymentMethod != 'Codice') { %>
-                                <a href="<%= pagamento.paymentUrl %>"><%= paymentMethod %></a>
+                                <a href="<%= fattura.paymentUrl %>"><%= paymentMethod %></a>
                             <% }else{ %>
                                 <%= paymentMethod %>
                             <% } %>
