@@ -255,7 +255,7 @@ const fetchBookings = async () => {
                     res.on('end', () => {
                         const response = JSON.parse(body);
                         console.log(response)
-                        if(response.includes('html')) return console.log('errore c\'è un html');
+                        // if(response.includes('html')) return console.log('errore c\'è un html');
                         if (response.data.authenticateUserWithPassword.sessionToken) {
                             resolve(response.data.authenticateUserWithPassword.sessionToken);
                         } else {
