@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const fsp = require('fs').promises;
 const path = require('path');
 const https = require('https');
 const axios = require('axios');
@@ -413,8 +412,6 @@ const fetchBookings = async () => {
 setInterval(fetchBookings, 600000);
 
 setTimeout(fetchBookings, 5000);
-
-
 
 router.get('/admin/rinnovi/scadenziario', authenticateJWT, async (req, res) => {
     const { role } = await admins.findOne({"email": req.user.email});
