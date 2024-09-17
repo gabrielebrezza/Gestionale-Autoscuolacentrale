@@ -178,8 +178,8 @@
                             </span>
                         </button>
                     </th>
-                    <th>Nome</th>
                     <th>Cognome</th>
+                    <th>Nome</th>
                     <th>Email</th>
                     <th>Telefono</th>
                     <th>Visita Medica</th>
@@ -213,8 +213,8 @@
                                     </div>
                                 </div>
                             </td>
-                            <td><a href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>"><%= user.nome %></a></td>
-                            <td><%= user.cognome %></td>
+                            <td style="text-transform: uppercase;"><a href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>"><%= user.cognome %></a></td>
+                            <td style="text-transform: uppercase;"><%= user.nome %></td>
                             <td><%= user.contatti.email %></td>
                             <td><%= user.contatti.tel %></td>
                             <% const dataVisita = user.visita.data ? user.visita.data.split('-').reverse().join('/') : '' %>

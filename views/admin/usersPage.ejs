@@ -23,8 +23,8 @@
                             </span>
                         </button>
                     </th>
-                    <th>Nome</th>
                     <th>Cognome</th>
+                    <th>Nome</th>
                     <th>Email</th>
                     <th>Telefono</th>
                     <th>Visita Medica</th>
@@ -49,8 +49,8 @@
                                     </div>
                                 </div>
                             </td>
-                            <td><a href="<%=`/userPage?cf=${encodeURIComponent(user.cFiscale)}`%>"><%= user.nome %></a></td>
-                            <td><%= user.cognome %></td>
+                            <td style="text-transform: uppercase;"><a href="<%=`/userPage?cf=${encodeURIComponent(user.cFiscale)}`%>"><%= user.cognome %></a></td>
+                            <td style="text-transform: uppercase;"><%= user.nome %></td>
                             <td><%= user.contatti.email %></td>
                             <td><%= user.contatti.tel %></td>
                             <td><%= user.visita ? user.visita : 'Mancante' %></td>
@@ -82,7 +82,6 @@
                                             </span>
                                         </a>
                                 <% }else{ %>
-
                                         <a class="pagamenti" href="<%= `/admin/pagamenti?cf=${encodeURIComponent(user.cFiscale)}` %>">
                                             <span class="material-symbols-outlined">
                                                payments
