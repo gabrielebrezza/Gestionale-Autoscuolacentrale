@@ -55,7 +55,7 @@
                             <td><input type="checkbox" name="id_<%= transazione._id %>" value="<%= transazione._id %>"></td>
                             <td><%= transazione.causa %></td>
                             <td><%= transazione.data %></td>
-                            <td><%= Math.abs(transazione.importo) %>€</td>
+                            <td><%= Math.abs(transazione.importo).toFixed(2) %>€</td>
                             <td><%= transazione.importo < 0 ? 'Uscita' : 'Entrata' %></td>
                         </tr>
                     <% } %>
