@@ -258,7 +258,7 @@ router.post('/createCode', async (req, res) => {
     for (let i = 0; i < length; i++) {
         code += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-    await codes.create({"cFiscale": cf.toLowerCase(), "code": code, "email": email.toLowerCase(), "importo": importo});
+    await codes.create({"cFiscale": cf.toLowerCase().trim(), "code": code, "email": email.toLowerCase().trim(), "importo": importo});
     
     const subject = `Codice per pagamento AutoscuolaCentrale`;
     const text = `${code} Questo è il codice che dovrai usare per iscriverti alla patente ${patente}. Per iscriverti visita il sito iscrizione-autoscuolacentrale.com`;

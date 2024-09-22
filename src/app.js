@@ -328,7 +328,7 @@ app.post('/payment', async (req, res) =>{
     return res.redirect(redirect_url);
   }else if(paymentMethod == 'code'){
     const code = req.body.code; 
-    const codeExist = await codes.findOne({"cFiscale": cFiscale.toLowerCase(), "code": code, "email": email.toLowerCase(), "importo": prezzo});
+    const codeExist = await codes.findOne({"cFiscale": cFiscale.toLowerCase().trim(), "code": code, "email": email.toLowerCase().trim(), "importo": prezzo});
     if(!codeExist){
       return res.render('errorPage', {error: 'Il Codice inserito è errato o altrimenti codice fiscale, email o patente sono diversi da quelli con cui è stato creato il codice.'});
     }
