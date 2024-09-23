@@ -84,7 +84,7 @@ app.post('/payment', async (req, res) =>{
   const {anno, paymentMethod} = req.body;
   const oggi = new Date();
   const giornoReg = String(oggi.getDate()).padStart(2, '0');
-  const meseReg = String(oggi.getMonth() + 1).padStart(2, '0'); // +1 perché i mesi partono da 0
+  const meseReg = String(oggi.getMonth() + 1).padStart(2, '0');
   const annoReg = oggi.getFullYear();
 
   const dataRegistrazione = `${giornoReg}/${meseReg}/${annoReg}`;
@@ -135,7 +135,6 @@ app.post('/payment', async (req, res) =>{
       } 
     }
   });
-
 
 
   if(!existingUser){
@@ -328,10 +327,7 @@ app.post('/payment', async (req, res) =>{
     return res.redirect(redirect_url);
   }else if(paymentMethod == 'code'){
     const code = req.body.code;
-    console.log(req.body)
-    console.log(cFiscale.toLowerCase().trim(), '+', code, '+', email.toLowerCase().trim(), '+', prezzo)
     const codeExist = await codes.findOne({"cFiscale": cFiscale.toLowerCase().trim(), "code": code, "email": email.toLowerCase().trim(), "importo": prezzo});
-    console.log(codeExist)
     if(!codeExist){
       return res.render('errorPage', {error: 'Il Codice inserito è errato o altrimenti codice fiscale, email o patente sono diversi da quelli con cui è stato creato il codice.'});
     }
