@@ -327,8 +327,11 @@ app.post('/payment', async (req, res) =>{
     await utenti.findOneAndUpdate({"_id": id}, { "paymentId": payment_id });
     return res.redirect(redirect_url);
   }else if(paymentMethod == 'code'){
-    const code = req.body.code; 
+    const code = req.body.code;
+    console.log(req.body)
+    console.log(cFiscale.toLowerCase().trim(), '+', code, '+', email.toLowerCase().trim(), '+', prezzo)
     const codeExist = await codes.findOne({"cFiscale": cFiscale.toLowerCase().trim(), "code": code, "email": email.toLowerCase().trim(), "importo": prezzo});
+    console.log(codeExist)
     if(!codeExist){
       return res.render('errorPage', {error: 'Il Codice inserito è errato o altrimenti codice fiscale, email o patente sono diversi da quelli con cui è stato creato il codice.'});
     }
