@@ -365,17 +365,6 @@ const fetchBookings = async () => {
                   email: utente.client.email,
                   tel: utente.client.phone
                 }
-                console.log({
-                    "nome": utente.client.name.trim(),
-                    "cognome": utente.client.surname.trim(),
-                    "cf": utente.client.fiscalCode.trim(),
-                    "contatti": contatti,
-                    "spedizione": spedizione,
-                    "visita": visita,
-                    "nPatente": utente.client.licenseNumber.trim(),
-                    "protocollo": null,
-                    "note": null
-                  })
                 const saveUser = new rinnovi({
                   "nome": utente.client.name.trim(),
                   "cognome": utente.client.surname.trim(),
@@ -408,7 +397,6 @@ const fetchBookings = async () => {
         console.error(`Errore durante il recupero dei dati dall'API: ${error}`);
     }
 };
-
 setInterval(fetchBookings, 600000);
 
 setTimeout(fetchBookings, 5000);
@@ -440,10 +428,10 @@ router.post('/admin/rinnovi/ricerca/scadenzaPatente', authenticateJWT, async (re
     try {
         const dati = await searchExpirationPortale(cFiscale);
         const spedizione = {
-            via: `${dati.toponimo.toLowerCase()} ${dati.indirizzo.toLowerCase()}`,
-            nCivico: dati.numeroCivico.toLowerCase(),
-            cap: dati.cap,
-            comune: dati.comune.toLowerCase(),
+            via: `${dati.toponimo.toLowerCase().trim()} ${dati.indirizzo.toLowerCase().trim()}`,
+            nCivico: dati.numeroCivico.toLowerCase().trim(),
+            cap: dati.cap.trim(),
+            comune: dati.comune.toLowerCase().trim(),
             provincia: trovaProvincia(dati.cap.trim())
         };
         const saveUser = new Scadenziario({
@@ -468,11 +456,11 @@ router.post('/admin/rinnovi/ricerca/portaleAutomobilista', authenticateJWT, asyn
     try {
         const formData = await searchUserPortale(cFiscale, cognome, nPatente);
         const spedizione = {
-            via: `${formData.toponimo.toLowerCase()} ${formData.indirizzo.toLowerCase()}`,
-            nCivico: formData.numeroCivico.toLowerCase(),
-            cap: formData.cap.toLowerCase(),
-            comune: formData.comune.toLowerCase(),
-            provincia: formData.provinciaResidenza.toLowerCase()
+            via: `${formData.toponimo.toLowerCase().trim()} ${formData.indirizzo.toLowerCase().trim()}`,
+            nCivico: formData.numeroCivico.toLowerCase().trim(),
+            cap: formData.cap.toLowerCase().trim(),
+            comune: formData.comune.toLowerCase().trim(),
+            provincia: await trovaProvincia(formData.cap.toLowerCase().trim())
         };
 
         const saveUser = new rinnovi({
