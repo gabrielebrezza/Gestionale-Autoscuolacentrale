@@ -466,7 +466,7 @@ router.post('/admin/rinnovi/ricerca/portaleAutomobilista', authenticateJWT, asyn
         const saveUser = new rinnovi({
             "nome": formData.nome.replace(/\s/g, " ").trim().toLowerCase(),
             "cognome": formData.cognome.replace(/\s/g, " ").trim().toLowerCase(),
-            "cf": formData.codiceFiscale.replace(/\s/g, "").toLowerCase(),
+            "cf": formData.codiceFiscale.replace(/\s/g, "").toUpperCase(),
             "spedizione": spedizione,
             "nPatente": formData.numeroPatente.trim(),
         });
