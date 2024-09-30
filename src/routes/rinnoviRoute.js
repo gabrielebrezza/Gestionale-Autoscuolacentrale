@@ -118,7 +118,10 @@ router.get('/admin/rinnovi/pagamenti', async (req, res) => {
 
 router.post('/uploadUserImage', async (req, res) => {
     const data = req.body.image;
-    console.log(data)
+    for (const e of req.body) {
+        console.log('\n\n\n\n\n\n\n')
+        console.log(e)
+    }
     const id = req.body.id;
     const location = req.body.location;
     try{
