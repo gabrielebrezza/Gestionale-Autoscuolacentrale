@@ -6,7 +6,7 @@ const https = require('https');
 const axios = require('axios');
 
 const router = express.Router();
-router.use(bodyParser.json({ limit: '50mb' }));
+router.use(bodyParser.json({ limit: '200mb' }));
 
 //databases
 const admins = require('../DB/Admin');
