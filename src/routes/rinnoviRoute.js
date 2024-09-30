@@ -6,7 +6,7 @@ const https = require('https');
 const axios = require('axios');
 
 const router = express.Router();
-router.use(bodyParser.json({ limit: '200mb' }));
+router.use(bodyParser.json({ limit: '50mb' }));
 
 //databases
 const admins = require('../DB/Admin');
@@ -116,24 +116,7 @@ router.get('/admin/rinnovi/pagamenti', async (req, res) => {
 
 
 
-router.post('/uploadUserImage', authenticateJWT, async (req, res) => {
-    const data = req.body.image;
-    const id = req.body.id;
-    const location = req.body.location;
-    try{
-        const base64Data = data.replace(/^data:image\/jpeg;base64,/, "").replace(/\s/g, '');
-        const filePath = path.join('privateImages', location , `${id}.jpeg`);
-        fs.writeFile(filePath, base64Data, 'base64', (err) => {
-            if (err) {
-                console.error(`Errore nel salvataggio dell'immagine ${location} ${err}`);
-                return res.status(500).json({ message: `Errore nel salvataggio dell'immagine ${location}` });
-            }
-            res.status(200).json({ message: 'immagine salvata con successo' });
-        });
-    }catch(err){
-        console.error(`si è verificato un errore ${err}`);
-    }
-});
+
 
 router.delete('/deleteUserImage', authenticateJWT, async (req, res) => {
     const { id, location } = req.body;
