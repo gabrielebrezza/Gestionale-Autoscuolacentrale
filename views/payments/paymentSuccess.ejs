@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagamento effetuato con successo</title>
+    <title>Pagamento effettuato con successo</title>
     <link rel="stylesheet" href="/styles/paymentStatus.css">
-    <link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
 </head>
 <body>
@@ -68,69 +68,93 @@
                         document.getElementById('cropContainer').style.display = 'block';
                     }
                 };
-            </script>
-            <script>
+                function readFileAsDataURL(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                // Crea un canvas per disegnare l'immagine
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                
+                // Converte l'immagine in formato JPEG
+                const jpegDataUrl = canvas.toDataURL('image/jpeg');
+                resolve(jpegDataUrl);
+            };
+            img.onerror = function(error) {
+                reject(error);
+            };
+            img.src = event.target.result;
+        };
+        reader.onerror = function(error) {
+            reject(error);
+        };
+        reader.readAsDataURL(file);
+    });
+}
                 document.getElementById('combinedForm').addEventListener('submit', async function(event) {
                     event.preventDefault();
         
                     const form = event.target;
                     const id = form.querySelector('input[name="id"]').value; 
+                    
+                    // Prima carica la firma
                     const payloadFirma = {
                         image: form.querySelector('input[name="croppedImage"]').value,
                         location: 'firmeIscrizioni',
                         id: id
-                    }
-                    const profileImage = form.querySelector('input[name="inputProfileFile"]').files[0];
-
-                    function readFileAsDataURL(file) {
-                        return new Promise((resolve, reject) => {
-                            const reader = new FileReader();
-                            reader.onload = function(event) {
-                                resolve(event.target.result);
-                            };
-                            reader.onerror = function(error) {
-                                reject(error);
-                            };
-                            reader.readAsDataURL(file);
-                        });
-                    }
-                
-                    try {
-                        const profileImageDataURL = await readFileAsDataURL(profileImage);
-                        const payloadProfile = {
-                            image: profileImageDataURL,
-                            location: 'immaginiIscrizioni',
-                            id: id
-                        }
+                    };
                     
-                        const [responseFirma, responseImage] = await Promise.all([
-                            fetch('/uploadUserImage', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify(payloadFirma)
-                            }),
-                            fetch('/uploadUserImage', {
+                    try {
+                        const responseFirma = await fetch('/uploadUserImage', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payloadFirma)
+                        });
+
+                        if (!responseFirma.ok) {
+                            throw new Error('Errore durante il caricamento della firma.');
+                        }
+
+                        // Poi carica la fototessera
+                        const profileImage = form.querySelector('input[name="inputProfileFile"]').files[0];
+
+                        
+                        if (profileImage) {
+                            const profileImageDataURL = await readFileAsDataURL(profileImage);
+                            const payloadProfile = {
+                                image: profileImageDataURL,
+                                location: 'immaginiIscrizioni',
+                                id: id
+                            };
+                            
+                            const responseImage = await fetch('/uploadUserImage', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'
                                 },
                                 body: JSON.stringify(payloadProfile)
-                            })
-                        ]);
-                        
-                        if (responseFirma.ok && responseImage.ok) {
-                            alert('Entrambi i file sono stati caricati con successo!');
-                            window.location.assign('https://autoscuolacentrale.com/');
-                        } else {
-                            alert('Errore durante il caricamento dei file.');
+                            });
+
+                            if (!responseImage.ok) {
+                                throw new Error('Errore durante il caricamento della fototessera.');
+                            }
                         }
+
+                        alert('Entrambi i file sono stati caricati con successo!');
+                        window.location.assign('https://autoscuolacentrale.com/');
                     } catch (error) {
                         console.error('Errore:', error);
-                        alert('Errore durante il caricamento dei file.');
+                        alert(error.message);
                     }
                 });
+
             </script>
         </div>
         <h2>Documenti da portare in autoscuola</h2>
@@ -141,6 +165,7 @@
                 <li>2 foto tessere</li>
                 <li>I moduli che ti abbiamo inviato via email firmati</li>
             </ul>
+        </p>
         <a href="https://autoscuolacentrale.com/"><button>Torna alla home</button></a>
     </section>
 </body>

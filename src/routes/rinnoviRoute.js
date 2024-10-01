@@ -6,8 +6,7 @@ const https = require('https');
 const axios = require('axios');
 
 const router = express.Router();
-router.use(bodyParser.json({ limit: '50mb' }));
-
+router.use(bodyParser.json({ limit: '10mb' }));
 //databases
 const admins = require('../DB/Admin');
 const rinnovi = require('../DB/Rinnovi');
