@@ -36,10 +36,10 @@ router.post('/rinnovi/addUser', authenticateJWT, async (req, res) => {
     try {
         const [via, nCivico, cap, comune, provincia] = req.body.indirizzo.split(',');
         spedizione = {
-            via: via.trim(),
-            nCivico: nCivico.trim(),
+            via: via.toLowerCase().replace(/\s/g, " ").trim(),
+            nCivico: nCivico.toLowerCase().replace(/\s/g, "").trim(),
             cap: cap.trim(),
-            comune: comune.trim(),
+            comune: comune.toLowerCase().replace(/\s/g, " ").trim(),
             provincia: provincia.trim()
         }
         const [data, ora] = req.body.visita.split('T');
@@ -63,6 +63,7 @@ router.post('/rinnovi/addUser', authenticateJWT, async (req, res) => {
         "visita": visita,
         "nPatente": nPatente.trim(),
         "protocollo": protocollo.trim(),
+        "creationDate": new Date(),
         "note": note
     });
         saveUser.save()
@@ -348,11 +349,11 @@ const fetchBookings = async () => {
                 if(!utente.enabled || userExist) continue;
 
                 const spedizione = {
-                  via: utente.client.shippingAddress.trim(),
-                  nCivico: utente.client.shippingAddressNumber.trim(),
+                  via: utente.client.shippingAddress.toLowerCase().replace(/\s/g, " ").trim(),
+                  nCivico: utente.client.shippingAddressNumber.toLowerCase().replace(/\s/g, "").trim(),
                   cap: utente.client.shippingAddressCap.trim(),
-                  comune: utente.client.shippingAddressPlace.trim(),
-                  provincia: await trovaProvincia(utente.client.shippingAddressCap)
+                  comune: utente.client.shippingAddressPlace.toLowerCase().replace(/\s/g, " ").trim(),
+                  provincia: await trovaProvincia(utente.client.shippingAddressCap.trim())
                 }
                 const realDate = new Date(utente.startDate);
                 realDate.setHours(realDate.getHours() + 2);
@@ -374,6 +375,7 @@ const fetchBookings = async () => {
                   "visita": visita,
                   "nPatente": utente.client.licenseNumber.trim(),
                   "protocollo": null,
+                  "creationDate": new Date(),
                   "note": null
                 });
                 await saveUser.save()
@@ -458,17 +460,17 @@ router.post('/admin/rinnovi/ricerca/portaleAutomobilista', authenticateJWT, asyn
         const spedizione = {
             via: `${formData.toponimo.toLowerCase().replace(/\s/g, " ").trim()} ${formData.indirizzo.toLowerCase().replace(/\s/g, " ").trim()}`,
             nCivico: formData.numeroCivico.toLowerCase().replace(/\s/g, "").trim(),
-            cap: formData.cap.toLowerCase().trim(),
+            cap: formData.cap.trim(),
             comune: formData.comune.toLowerCase().replace(/\s/g, " ").trim(),
-            provincia: await trovaProvincia(formData.cap.toLowerCase().trim())
+            provincia: await trovaProvincia(formData.cap.trim())
         };
-
         const saveUser = new rinnovi({
             "nome": formData.nome.replace(/\s/g, " ").trim().toLowerCase(),
             "cognome": formData.cognome.replace(/\s/g, " ").trim().toLowerCase(),
             "cf": formData.codiceFiscale.replace(/\s/g, "").toUpperCase(),
             "spedizione": spedizione,
             "nPatente": formData.numeroPatente.trim(),
+            "creationDate": new Date()
         });
 
         await saveUser.save();

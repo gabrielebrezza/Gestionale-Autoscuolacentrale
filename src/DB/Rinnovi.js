@@ -82,6 +82,10 @@ const RinnoviSchema = new mongoose.Schema({
             required: false
         }
     },
+    creationDate: {
+        type: Date,
+        required: false
+    },
     note: {
         type: String,
         required: false

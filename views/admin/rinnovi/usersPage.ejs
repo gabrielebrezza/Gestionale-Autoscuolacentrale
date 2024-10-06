@@ -183,6 +183,7 @@
                     <th>Email</th>
                     <th>Telefono</th>
                     <th>Visita Medica</th>
+                    <th>Registrazione</th>
                     <th>Fatture</th>
                 </tr>
             </thead>
@@ -220,6 +221,7 @@
                             <% const dataVisita = user.visita.data ? user.visita.data.split('-').reverse().join('/') : '' %>
                             <% const oraVisita = user.visita.ora ? user.visita.ora : '' %>
                             <td><%= dataVisita || oraVisita ? `${dataVisita} ${oraVisita}`  : 'Mancante' %></td>
+                            <td><%= user.creationDate ? user.creationDate.toLocaleDateString() : 'N/A' %></td>
                             <td class="buttonCell">
                                 <% if (!user.fatture.importo) { %>
                                     <a class="pagamenti" href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>">
