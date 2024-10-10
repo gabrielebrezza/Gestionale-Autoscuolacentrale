@@ -61,7 +61,6 @@ async function searchUserPortale(cf, cognome, nPatente) {
         } catch (error) {
           console.error('Errore durante l\'estrazione dei dati:', error);
         }
-        console.log(data)
         return data;
       });
       return formData;

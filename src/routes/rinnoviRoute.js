@@ -36,10 +36,10 @@ router.post('/rinnovi/addUser', authenticateJWT, async (req, res) => {
     try {
         const [via, nCivico, cap, comune, provincia] = req.body.indirizzo.split(',');
         spedizione = {
-            via: via.toLowerCase().replace(/\s/g, " ").trim(),
-            nCivico: nCivico.toLowerCase().replace(/\s/g, "").trim(),
+            via: via.toLowerCase().replace(/\s+/g, " ").trim(),
+            nCivico: nCivico.toLowerCase().replace(/\s+/g, "").trim(),
             cap: cap.trim(),
-            comune: comune.toLowerCase().replace(/\s/g, " ").trim(),
+            comune: comune.toLowerCase().replace(/\s+/g, " ").trim(),
             provincia: provincia.trim()
         }
         const [data, ora] = req.body.visita.split('T');
@@ -430,16 +430,16 @@ router.post('/admin/rinnovi/ricerca/scadenzaPatente', authenticateJWT, async (re
     try {
         const dati = await searchExpirationPortale(cFiscale);
         const spedizione = {
-            via: `${dati.toponimo.toLowerCase().replace(/\s/g, " ").trim()} ${dati.indirizzo.toLowerCase().replace(/\s/g, " ").trim()}`,
-            nCivico: dati.numeroCivico.toLowerCase().replace(/\s/g, "").trim(),
+            via: `${dati.toponimo.toLowerCase().replace(/\s+/g, " ").trim()} ${dati.indirizzo.toLowerCase().replace(/\s/g, " ").trim()}`,
+            nCivico: dati.numeroCivico.toLowerCase().replace(/\s+/g, "").trim(),
             cap: dati.cap.trim(),
-            comune: dati.comune.toLowerCase().replace(/\s/g, " ").trim(),
+            comune: dati.comune.toLowerCase().replace(/\s+/g, " ").trim(),
             provincia: trovaProvincia(dati.cap.trim())
         };
         const saveUser = new Scadenziario({
-            "nome": dati.nome.trim().replace(/\s/g, " ").toLowerCase(),
-            "cognome": dati.cognome.trim().replace(/\s/g, " ").toLowerCase(),
-            "cf": cFiscale.trim().replace(/\s/g, "").toLowerCase(),
+            "nome": dati.nome.trim().replace(/\s+/g, " ").toLowerCase(),
+            "cognome": dati.cognome.trim().replace(/\s+/g, " ").toLowerCase(),
+            "cf": cFiscale.trim().replace(/\s+/g, "").toLowerCase(),
             "spedizione": spedizione,
             "nPatente": dati.numeroPatente.trim(),
             "expPatente": dati.expPatente
@@ -458,16 +458,16 @@ router.post('/admin/rinnovi/ricerca/portaleAutomobilista', authenticateJWT, asyn
     try {
         const formData = await searchUserPortale(cFiscale, cognome, nPatente);
         const spedizione = {
-            via: `${formData.toponimo.toLowerCase().replace(/\s/g, " ").trim()} ${formData.indirizzo.toLowerCase().replace(/\s/g, " ").trim()}`,
-            nCivico: formData.numeroCivico.toLowerCase().replace(/\s/g, "").trim(),
+            via: `${formData.toponimo.toLowerCase().replace(/\s+/g, " ").trim()} ${formData.indirizzo.toLowerCase().replace(/\s/g, " ").trim()}`,
+            nCivico: formData.numeroCivico.toLowerCase().replace(/\s+/g, "").trim(),
             cap: formData.cap.trim(),
-            comune: formData.comune.toLowerCase().replace(/\s/g, " ").trim(),
+            comune: formData.comune.toLowerCase().replace(/\s+/g, " ").trim(),
             provincia: await trovaProvincia(formData.cap.trim())
         };
         const saveUser = new rinnovi({
-            "nome": formData.nome.replace(/\s/g, " ").trim().toLowerCase(),
-            "cognome": formData.cognome.replace(/\s/g, " ").trim().toLowerCase(),
-            "cf": formData.codiceFiscale.replace(/\s/g, "").toUpperCase(),
+            "nome": formData.nome.replace(/\s+/g, " ").trim().toLowerCase(),
+            "cognome": formData.cognome.replace(/\s+/g, " ").trim().toLowerCase(),
+            "cf": formData.codiceFiscale.replace(/\s+/g, "").toUpperCase(),
             "spedizione": spedizione,
             "nPatente": formData.numeroPatente.trim(),
             "creationDate": new Date()
