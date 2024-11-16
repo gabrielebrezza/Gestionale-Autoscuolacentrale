@@ -50,21 +50,23 @@ app.post('/payment', async (req, res) =>{
   try {
     const luogoNascita = req.body.luogoNascita.split(',');
     const residenza = req.body.residenza.split(',');
-    if(luogoNascita.length < 3){
-      return res.render('errorPage', { error: `Dato mancante all'interno del luogo di nascita` });
-    }
-    if(residenza.length < 5){
-      return res.render('errorPage', { error: `Dato mancante all'interno dell'indirizzo di residenza` });
-    }
+
     const comuneNascita = luogoNascita[0].trim();
-    const provinciaNascita = luogoNascita[2].replace(/\s/g, "") != 'IT' ? 'EE' : luogoNascita[2].replace(/\s/g, "");
+    const provinciaNascita = luogoNascita[2].replace(/\s/g, "") != 'IT' ? 'EE' : luogoNascita[1].replace(/\s/g, "");
     const statoNascita = luogoNascita[2].replace(/\s/g, "");
     
+    if ( !comuneNascita || !provinciaNascita || !statoNascita) {
+      return res.render('errorPage', { error: `Dato mancante all'interno del luogo di nascita` });
+    }
+
     const via = residenza[0].trim();
     const nCivico = residenza[1].replace(/\s/g, "");
     const cap = residenza[2].replace(/\s/g, "");
     const comune = residenza[3].trim(); 
     const provinciaResidenza = residenza[4].replace(/\s/g, "");
+    if (!via || !nCivico || !cap || !comune || !provinciaResidenza ) {
+      return res.render('errorPage', { error: `Dato mancante all'interno dell'indirizzo di residenza` });
+    }
 
   const mese = req.body.mese.replace(/\s/g, "");
   const sesso = req.body.sesso.replace(/\s/g, "");
