@@ -349,14 +349,14 @@ const fetchBookings = async () => {
                 if(!utente.enabled || userExist) continue;
 
                 const spedizione = {
-                  via: utente.client.shippingAddress.toLowerCase().replace(/\s/g, " ").trim(),
-                  nCivico: utente.client.shippingAddressNumber.toLowerCase().replace(/\s/g, "").trim(),
-                  cap: utente.client.shippingAddressCap.trim(),
-                  comune: utente.client.shippingAddressPlace.toLowerCase().replace(/\s/g, " ").trim(),
-                  provincia: await trovaProvincia(utente.client.shippingAddressCap.trim())
+                    via: utente.client.shippingAddress.toLowerCase().replace(/\s/g, " ").trim(),
+                    nCivico: utente.client.shippingAddressNumber.toLowerCase().replace(/\s/g, "").trim(),
+                    cap: utente.client.shippingAddressCap.trim(),
+                    comune: utente.client.shippingAddressPlace.toLowerCase().replace(/\s/g, " ").trim(),
+                    provincia: await trovaProvincia(utente.client.shippingAddressCap.trim())
                 }
                 const realDate = new Date(utente.startDate);
-                realDate.setHours(realDate.getHours() + 2);
+                realDate.setHours(realDate.getHours() + 1);
                 const [data, ora] = realDate.toISOString().slice(0, -8).split('T');
                 const visita = {
                   data: data,
