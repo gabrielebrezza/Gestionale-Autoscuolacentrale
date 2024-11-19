@@ -29,11 +29,11 @@
                             <label for="fromDate">Da</label>
                             <input type="date" name="fromDate" id="fromDate">
                         </th>
-                        <th colspan="1">
+                        <th colspan="2">
                             <label for="toDate">A</label>
                             <input type="date" name="toDate" id="toDate">
                         </th>
-                        <th colspan="1">
+                        <th colspan="2">
                             <button type="submit">
                                 <span class="material-symbols-outlined">
                                     download
@@ -50,12 +50,13 @@
                             </span>
                         </label>
                         <input type="checkbox" id="selectUsersBtn" style="display: none;">
-
                     </th>
                     <th>numero</th>
                     <th>data</th>
                     <th>importo</th>
                     <th>File</th>
+                    <th>cliente</th>
+                    <th>pagata</th>
                 </tr>
             </thead>
             
@@ -67,6 +68,8 @@
                         <td><%= fattura.data %></td>
                         <td><%= fattura.importo %>€</td>
                         <td><%= fattura.nomeFile %></td>
+                        <td><%= fattura.user ? fattura.user : 'N/A' %></td>
+                        <td><input type="checkbox" data-fatturaid="<%= fattura._id%>" name="paid" <%= fattura.nomeFile.includes('m00') ? (fattura.paid ? 'checked' : '') : 'disabled checked' %>></td>
                     </tr>
                 <% } %>
             </tbody>
@@ -88,5 +91,28 @@
             }
         })
     </script>
+
+    <script>
+        const paidInput = document.querySelectorAll('[name="paid"]');
+
+        for (const input of paidInput) {
+            input.addEventListener('change', async () => {
+                console.log(input.checked);
+                const response = await fetch('/admin/editFatturaStatus',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({paid: input.checked, id: input.dataset.fatturaid})
+                });
+                if(!response.ok){
+                    alert(`Si è verificato un'errore con codice: ${response.status}`);
+                }
+                console.log('cambiamento di stato avvenuto con successo');
+            });
+        }
+    </script>
+
 </body>
 </html>

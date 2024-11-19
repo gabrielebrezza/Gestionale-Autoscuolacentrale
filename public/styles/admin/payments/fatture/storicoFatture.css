@@ -1,58 +1,73 @@
-main{
+main {
     margin-top: 175px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
 }
-table{
-    border-collapse:collapse;
+
+table {
+    border-collapse: collapse;
 }
-th, td{
+
+th,
+td {
     margin: 0;
     text-align: left;
     padding: 12px 15px;
     border-bottom: 2px solid #ddd;
     background: #f1f1f1;
 }
+
 th {
     color: #fff;
     background: #5681a9;
     text-transform: uppercase;
 }
-tr:first-child th:first-of-type{
-    border-radius: 5px 0 0 0 ;
+
+
+tr:first-child th:first-of-type {
+    border-radius: 5px 0 0 0;
 }
-tr:first-child th:last-of-type{
-    border-radius: 0 5px 0 0 ;
+
+tr:first-child th:last-of-type {
+    border-radius: 0 5px 0 0;
 }
-th:first-child{
+
+th:first-child {
     text-align: center;
 }
-td:first-child{
+
+td:first-child {
     text-align: center;
 }
-tr:last-child td:last-child{
+
+tr:last-child td:last-child {
     border-radius: 0 0 5px 0;
 }
-tr:last-child td:first-child{
+
+tr:last-child td:first-child {
     border-radius: 0 0 0 5px;
 }
-tr:last-child td{
+
+tr:last-child td {
     border: none;
 }
-.filters th{
+
+.filters th {
     text-align: center;
     border: none;
 }
-.filters input[type="date"]{
+
+.filters input[type="date"] {
     cursor: pointer;
     padding: 10px;
     outline: none;
     border: none;
     border-radius: 5px;
 }
-.filters button{
+
+.filters button {
     background: #0000;
     cursor: pointer;
     color: #f1f1f1;
@@ -62,6 +77,15 @@ tr:last-child td{
     border-radius: 5px;
     transition: .5s;
 }
-.filters button:hover{
+
+.filters button:hover {
     color: #8ec7f8;
-} 
+}
+
+.row:has(td input[name="paid"]:checked) td {
+    background: rgb(188, 239, 188);
+}
+
+.row:has(td input[name="paid"]) td {
+    background: rgb(239, 188, 188);
+}

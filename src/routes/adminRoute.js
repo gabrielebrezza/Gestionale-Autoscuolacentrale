@@ -491,6 +491,7 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
       tipo: iscrizione ? 'iscrizione' : (rinnovo ? 'rinnovo' : (duplicato ? 'duplicato' : 'generica')),
       numero: parseInt(dati.progressivoInvio.replace(/\D/g, ''), 10),
       importo: dati.importoPagamento,
+      user: `${dati.nomeCliente} ${dati.cognomeCliente}`,
       data: dataFatturazione,
       nomeFile: `IT06498290011_${dati.progressivoInvio}.xml`,
     });
@@ -566,7 +567,17 @@ router.get('/admin/storicoFatture', authenticateJWT, async (req, res)=> {
 
 
 
+router.post('/admin/editFatturaStatus', authenticateJWT, async (req, res) => {
+  try {
+    const { paid, id } = req.body;
+    await storicoFattureGenerali.findOneAndUpdate({ "_id": id }, { "paid": paid });
+    return res.status(200);
+  } catch (error) {
+    console.error('Si è verificato un\'errore: ', error)
+    return res.render('errorPage', { error: 'Si è verificato un\'errore nel cambiamento di stato'});
+  }
 
+});
 
 
 
@@ -649,20 +660,37 @@ router.post('/downloadFatture', authenticateJWT, async (req, res) => {
       }
     }
 
-    res.set('Content-Type', 'application/zip');
-    res.set('Content-Disposition', 'attachment; filename="fatture_gestionale.zip"');
+    if (fattureArr.length === 1) {
+      const nomeFile = fattureArr[0];
+      const filePath = path.join(__dirname, '../../fatture', 'elettroniche', nomeFile);
+      if (fs.existsSync(filePath)) {
+        res.set('Content-Type', 'application/xml');
+        res.set('Content-Disposition', `attachment; filename="${nomeFile}"`);
+        res.sendFile(filePath);
+      } else {
+        console.warn(`Il file ${nomeFile} non esiste nella cartella fatture.`);
+        res.status(404).send('File non trovato.');
+      }
+    } else if (fattureArr.length > 1) {
+      res.set('Content-Type', 'application/zip');
+      res.set('Content-Disposition', 'attachment; filename="fatture_gestionale.zip"');
 
-    const zip = archiver('zip');
-    zip.pipe(res);
-    for (const nomeFile of fattureArr) {
-        const filePath = path.join(__dirname, '../../fatture', 'elettroniche' , nomeFile);
+      const zip = archiver('zip');
+      zip.pipe(res);
+
+      for (const nomeFile of fattureArr) {
+        const filePath = path.join(__dirname, '../../fatture', 'elettroniche', nomeFile);
         if (fs.existsSync(filePath)) {
-            zip.append(fs.createReadStream(filePath), { name: nomeFile });
+          zip.append(fs.createReadStream(filePath), { name: nomeFile });
         } else {
-            console.warn(`Il file ${nomeFile} non esiste nella cartella fatture.`);
+          console.warn(`Il file ${nomeFile} non esiste nella cartella fatture.`);
         }
+      }
+
+      await zip.finalize();
+    } else {
+      res.status(400).send('Nessun file da inviare.');
     }
-    await zip.finalize();
   } catch (error) {
     console.error('Si è verificato un errore durante il download delle fatture:', error);
     res.render('errorPage', {error: 'Si è verificato un errore durante il download delle fatture'});

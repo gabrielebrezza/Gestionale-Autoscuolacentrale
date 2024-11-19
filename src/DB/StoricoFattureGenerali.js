@@ -14,12 +14,20 @@ const StoricoFattureSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    user: {
+        type: String,
+        required: false
+    },
     data: {
         type: String,
         required: true
     },
     nomeFile: {
         type: String,
+        required: true
+    },
+    paid: {
+        type: Boolean,
         required: true
     }
 });
