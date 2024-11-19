@@ -28,7 +28,7 @@ const StoricoFattureSchema = new mongoose.Schema({
     },
     paid: {
         type: Boolean,
-        required: true
+        required: false
     }
 });
 const storicoFattureGenerali = new mongoose.model('storicofattureGenerali', StoricoFattureSchema);
