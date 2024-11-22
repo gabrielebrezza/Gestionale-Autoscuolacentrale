@@ -418,16 +418,34 @@
                     const teoriaAssente = user.teoria.filter(item => item.assente === true);
                     const countTeoriaAssente = teoriaAssente.length;
                 %>
+                
                 <input type="hidden" name="teoriaLength" value="<%= user.teoria.length %>">
                 <input type="hidden" name="countTeoriaAssente" value="<%= countTeoriaAssente %>">
+                <% if (user.teoria.length == 0) { %>
+                    <tr>
+                        <td>Esame di Teoria 1</td>
+                        <td>
+                            Esame di Teoria 1<br>
+                            <label for="dataEsame0">Data: </label>
+                            <input type="date" id="dataEsame0" name="dataEsame0"> <br>
+                            <label for="esitoEsame0">Idoneo: </label>
+                            <input type="radio" name="esitoEsame0" value="idoneo"><br>
+                            <label for="esitoEsame0">Respinto: </label>
+                            <input type="radio" name="esitoEsame0" value="respinto"><br>
+                            <label for="esitoEsame0">Assente: </label>
+                            <input type="radio" name="esitoEsame0" value="assente"><br>
+                        </td>
+                    </tr>
+                <% } %>
                 <% for( let i = 0; i < user.teoria.length && i<2+countTeoriaAssente; i++ ) { %>
                     <% const esame = user.teoria[i] %>
+
                     <tr>
                         <td>Esame di Teoria <%= i+1 %></td>
                         <td>
                             Esame di Teoria <%= i+1 %><br>
                             <label for="dataEsame<%= i %>">Data: </label>
-                            <input type="date" id="dataEsame<%= i %>" name="dataEsame<%= i %>" value="<%= esame.data != null ? (esame.data).split('/').reverse().join('-') : '' %>"> <br>
+                            <input type="date" id="dataEsame<%= i %>" name="dataEsame<%= i %>" value="<%= esame.data ? (esame.data).split('/').reverse().join('-') : '' %>"> <br>
                             <label for="esitoEsame<%= i %>">Idoneo: </label>
                             <input type="radio" name="esitoEsame<%= i %>" <%= esame.esito ? 'checked' : '' %> value="idoneo"><br>
                             <label for="esitoEsame<%= i %>">Respinto: </label>

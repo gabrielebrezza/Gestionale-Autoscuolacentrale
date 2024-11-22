@@ -144,7 +144,18 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
           }
       }));    
         let respinto, idoneo, assente;
-
+        if (dati.teoriaLength == 0){
+          const esameData = dati.dataEsame0;
+          idoneo = dati.esitoEsame0 === 'idoneo';
+          respinto = dati.esitoEsame0 === 'respinto';
+          assente = dati.esitoEsame0 === 'assente';
+          userData.teoria.push({
+            data: esameData ? esameData.split('-').reverse().join('/') : '',
+            esito: idoneo ? true : respinto ? false : null,
+            assente: assente,
+            emailSent: emailSent ? true : false
+          });
+        }
         for (let i = 0; i < dati.teoriaLength && i < 2 + dati.countTeoriaAssente; i++) {
           const esameData = dati[`dataEsame${i}`];
           idoneo = dati[`esitoEsame${i}`] === 'idoneo';
