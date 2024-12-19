@@ -32,8 +32,6 @@ tr {
 tbody tr:hover {
     background-color: #ede7e7;
     color: #71a1cb;
-    font-size: 16px;
-    letter-spacing: 0.55px;
 }
 
 tbody tr:hover a {
