@@ -54,7 +54,7 @@ app.post('/payment', async (req, res) =>{
     const comuneNascita = luogoNascita[0].trim();
     const provinciaNascita = luogoNascita[2].replace(/\s/g, "") != 'IT' ? 'EE' : luogoNascita[1].replace(/\s/g, "");
     const statoNascita = luogoNascita[2].replace(/\s/g, "");
-    
+
     if ( !comuneNascita || !provinciaNascita || !statoNascita) {
       return res.render('errorPage', { error: `Dato mancante all'interno del luogo di nascita` });
     }
@@ -137,7 +137,6 @@ app.post('/payment', async (req, res) =>{
       } 
     }
   });
-
 
   if(!existingUser){
     const saveUser = new utenti({

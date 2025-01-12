@@ -183,9 +183,17 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
           });
         }else if(idoneo && !emailSent){
           try{
-            const result = await sendEmail(dati.email, 'Superamento Esame Teoria', `Complimenti ${dati.nome} hai superato l'esame di teoria, vai sul sito agenda-autoscuolacentrale.com e registrati per poter iniziare a prenotare le lezioni di guida`);
+            const response = await fetch('https://agenda-autoscuolacentrale.com/admin/api/newUser', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': process.env.API_KEY_AGENDA
+              },
+              body: JSON.stringify(dati)
+            })
+            const result = await sendEmail(dati.email, 'Superamento Esame Teoria', `Complimenti ${dati.nome} hai superato l'esame di teoria, Ti arriverà un'altra email fra qualche minuto con le credenziali per accedere all'agenda guide!`);
             console.log(result);
-            userData.teoria[dati.teoriaLength-1] = {
+            userData.teoria[dati.teoriaLength-1] = { 
               ...userData.teoria[dati.teoriaLength-1],
               emailSent: true
             };
