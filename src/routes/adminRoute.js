@@ -191,6 +191,16 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
               },
               body: JSON.stringify(dati)
             })
+
+            if (!response.ok) {
+              const errorDetails = await response.json();
+              console.log(`Errore HTTP ${response.status}: ${errorDetails.message || 'Errore sconosciuto'}`);
+            }
+          
+            const responseData = await response.json();
+          
+            // Gestione della risposta corretta
+            console.log('Risposta ricevuta:', responseData);
             const result = await sendEmail(dati.email, 'Superamento Esame Teoria', `Complimenti ${dati.nome} hai superato l'esame di teoria, Ti arriverà un'altra email fra qualche minuto con le credenziali per accedere all'agenda guide!`);
             console.log(result);
             userData.teoria[dati.teoriaLength-1] = { 
