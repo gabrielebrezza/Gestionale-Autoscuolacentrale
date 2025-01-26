@@ -183,26 +183,28 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
           });
         }else if(idoneo && !emailSent){
           try{
-            const response = await fetch('https://agenda-autoscuolacentrale.com/admin/api/newUser', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': process.env.API_KEY_AGENDA
-              },
-              body: JSON.stringify(dati)
-            })
+            if(dati.patente == 'B'){
+              const response = await fetch('https://agenda-autoscuolacentrale.com/admin/api/newUser', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': process.env.API_KEY_AGENDA
+                },
+                body: JSON.stringify(dati)
+              })
 
-            if (!response.ok) {
-              const errorDetails = await response.json();
-              console.log(`Errore HTTP ${response.status}: ${errorDetails.message || 'Errore sconosciuto'}`);
+              if (!response.ok) {
+                const errorDetails = await response.json();
+                console.log(`Errore HTTP ${response.status}: ${errorDetails.message || 'Errore sconosciuto'}`);
+              }
+              
+              const responseData = await response.json();
+              
+              // Gestione della risposta corretta
+              console.log('Risposta ricevuta:', responseData);
+              const result = await sendEmail(dati.email, 'Superamento Esame Teoria', `Complimenti ${dati.nome} hai superato l'esame di teoria, Ti arriverà un'altra email fra qualche minuto con le credenziali per accedere all'agenda guide!`);
+              console.log(result);
             }
-          
-            const responseData = await response.json();
-          
-            // Gestione della risposta corretta
-            console.log('Risposta ricevuta:', responseData);
-            const result = await sendEmail(dati.email, 'Superamento Esame Teoria', `Complimenti ${dati.nome} hai superato l'esame di teoria, Ti arriverà un'altra email fra qualche minuto con le credenziali per accedere all'agenda guide!`);
-            console.log(result);
             userData.teoria[dati.teoriaLength-1] = { 
               ...userData.teoria[dati.teoriaLength-1],
               emailSent: true
