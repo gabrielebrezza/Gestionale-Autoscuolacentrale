@@ -62,7 +62,7 @@ app.post('/payment', async (req, res) =>{
     const via = residenza[0].trim();
     const nCivico = residenza[1].replace(/\s/g, "");
     const cap = residenza[2].replace(/\s/g, "");
-    if(!cap.match(`^\d{5}$`)) return res.render('errorPage', { error: `CAP errato` });
+    if(!cap.match(`^\\d{5}$`)) return res.render('errorPage', { error: `CAP errato` });
     const comune = residenza[3].trim(); 
     const provinciaResidenza = residenza[4].replace(/\s/g, "");
     if(provinciaResidenza.length != 2 || provinciaNascita.length != 2) return res.render('errorPage', { error: `Provincia errata` });
