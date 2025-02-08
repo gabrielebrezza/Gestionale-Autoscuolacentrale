@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterVisitaTo = document.getElementById('filterVisitaTo');
     const filterVisitaMancante = document.getElementById('filterVisitaMancante');
     const filterPatente = document.getElementById('filterPatente');
-    const filterArchiviato = document.getElementById('archiviato');
+    const filterStatus = document.querySelectorAll('input[name="status"]');
     const filterRegistrazioneFrom = document.getElementById('filterRegistrazioneFrom');
     const filterRegistrazioneTo = document.getElementById('filterRegistrazioneTo');
     const filterEsameFrom = document.getElementById('filterEsameFrom');
@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const visitaMancante = filterVisitaMancante.checked;
         const dataEsameDa = filterEsameFrom.value;
         const dataEsameA = filterEsameTo.value;
-        const archiviato = filterArchiviato.checked;
+        const status = document.querySelector('input[name="status"]:checked').value;
+        console.log(status)
         let enumeration = 1;
         for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
@@ -45,20 +46,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (isDateEsameInRange) break;
             }
             let isDateVisitaInRange, isVisitaMancante;
-            if(!visitaMancante){
+            if (!visitaMancante) {
                 const dataVisita = new Date(visitaTd.split('/').reverse().join('-'));
                 const startVisitaDate = new Date(dataVisitaDa);
                 const endVisitaDate = new Date(dataVisitaA);
                 isDateVisitaInRange = dataVisita >= startVisitaDate && dataVisita <= endVisitaDate;
-            }else{
-                isVisitaMancante = visitaTd == 'mancante' ? true : false;      
+            } else {
+                isVisitaMancante = visitaTd == 'mancante' ? true : false;
             }
             const dataRegistrazione = new Date(dataRegTd.split('/').reverse().join('-'));
             const startRegistrazioneDate = new Date(dataRegistrazioneDa);
             const endRegistrazioneDate = new Date(dataRegistrazioneA);
 
             const isDateRegInRange = dataRegistrazione >= startRegistrazioneDate && dataRegistrazione <= endRegistrazioneDate;
-            
+
             if (
                 (nome === '' || nomeTd.includes(nome)) &&
                 (cognome === '' || cognomeTd.includes(cognome)) &&
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 (dataVisitaDa === '' || dataVisitaA === '' || isDateVisitaInRange) &&
                 (!visitaMancante || isVisitaMancante) &&
                 (dataEsameDa === '' || dataEsameA === '' || isDateEsameInRange) &&
-                ((archiviato && isArchiviato) || (!archiviato && !isArchiviato))
+                ((status == 'archived' && isArchiviato) || (status == 'all') || (status == 'active' && !isArchiviato))
             ) {
                 row.getElementsByTagName('td')[0].querySelector('.numero').innerText = enumeration++;
                 row.style.display = 'table-row';
@@ -87,5 +88,5 @@ document.addEventListener('DOMContentLoaded', () => {
     filterVisitaMancante.addEventListener('input', filterTable);
     filterEsameFrom.addEventListener('input', filterTable);
     filterEsameTo.addEventListener('input', filterTable);
-    filterArchiviato.addEventListener('input', filterTable);
+    filterStatus.forEach(el => el.addEventListener('change', filterTable))
 });

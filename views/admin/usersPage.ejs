@@ -1,115 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Allievi</title>
     <link rel="stylesheet" href="/styles/admin/users.css">
 </head>
+
 <body>
     <%- include('components/header.ejs') %>
-    <%- include('components/usersFilters.ejs') %>
-    <table>
-        <form action="/deleteUsers" id="deleteUsersForm" method="POST">
-            <thead>
-                <tr>
-                    <th>
-                        <span id="selectUsers" class="material-symbols-outlined">
+        <%- include('components/usersFilters.ejs') %>
+            <table>
+                <form action="/deleteUsers" id="deleteUsersForm" method="POST">
+                    <thead>
+                        <tr>
+                            <th>
+                                <span id="selectUsers" class="material-symbols-outlined">
                             checklist
                         </span>
-                        <button type="submit" class="elimina action">
+                                <button type="submit" class="elimina action">
                             <span class="material-symbols-outlined">
                                 delete_forever
                             </span>
                         </button>
-                    </th>
-                    <th>Cognome</th>
-                    <th>Nome</th>
-                    <th>Email</th>
-                    <th>Telefono</th>
-                    <th>Visita Medica</th>
-                    <th>Patente</th>
-                    <th>Registrazione</th>
-                    <th>Esami</th>
-                    <th>Fatture</th>
-                </tr>
-            </thead>
-            <tbody id="usersTableBody">
-                <% let enumArchiviati = 1 %>
-                <% let enumUtenti = 1 %>
-                <% users.forEach(function(user, index) { %>
-                    <% const pagato = user.patente.some(patenti => patenti.pagato);%>
-                    <% if(pagato){ %>
-                        <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %>" data-archiviato="<%= user.archiviato %>">
-                            <td>
-                                <div class="cellContent">
-                                    <input class="action" type="checkbox" name="user<%= index %>" value="<%= user._id %>">
-                                    <div class="numero">
-                                        <%= user.archiviato ? enumArchiviati++ : enumUtenti++ %>
-                                    </div>
-                                </div>
-                            </td>
-                            <td style="text-transform: uppercase;"><a href="<%=`/userPage?cf=${encodeURIComponent(user.cFiscale)}`%>"><%= user.cognome %></a></td>
-                            <td style="text-transform: uppercase;"><%= user.nome %></td>
-                            <td><%= user.contatti.email %></td>
-                            <td><%= user.contatti.tel %></td>
-                            <td><%= user.visita ? user.visita : 'Mancante' %></td>
-                            <td>
-                                <% user.patente.forEach(function(patente) { %>
-                                    <% if(patente.pagato){ %>
-                                    <%= patente.tipo %><br>
-                                    <% } %>
-                                <% }); %>
-                            </td>
-                            <td><%= user.dataRegistrazione %></td>
-                            <td>
-                                <% user.teoria.forEach(function(esame) { %>
-                                    <%= esame.data %> <br>
-                                <% }); %>
-                            </td>
-                            <%  
+                            </th>
+                            <th>Cognome</th>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Telefono</th>
+                            <th>Visita Medica</th>
+                            <th>Patente</th>
+                            <th>Registrazione</th>
+                            <th>Esami</th>
+                            <th>Fatture</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <% let enumUtenti = 1 %>
+                            <% users.forEach(function(user, index) { %>
+                                <% const pagato = user.patente.some(patenti => patenti.pagato);%>
+                                    <% if(pagato){ %>
+                                        <tr id="row<%= index %>" data-archiviato="<%= user.archiviato %>">
+                                            <td>
+                                                <div class="cellContent">
+                                                    <input class="action" type="checkbox" name="user<%= index %>" value="<%= user._id %>">
+                                                    <div class="numero">
+                                                        <%= enumUtenti++ %>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td style="text-transform: uppercase;">
+                                                <a href="<%=`/userPage?cf=${encodeURIComponent(user.cFiscale)}`%>">
+                                                    <%= user.cognome %>
+                                                </a>
+                                            </td>
+                                            <td style="text-transform: uppercase;">
+                                                <%= user.nome %>
+                                            </td>
+                                            <td>
+                                                <%= user.contatti.email %>
+                                            </td>
+                                            <td>
+                                                <%= user.contatti.tel %>
+                                            </td>
+                                            <td>
+                                                <%= user.visita ? user.visita : 'Mancante' %>
+                                            </td>
+                                            <td>
+                                                <% user.patente.forEach(function(patente) { %>
+                                                    <% if(patente.pagato){ %>
+                                                        <%= patente.tipo %><br>
+                                                            <% } %>
+                                                                <% }); %>
+                                            </td>
+                                            <td>
+                                                <%= user.dataRegistrazione %>
+                                            </td>
+                                            <td>
+                                                <% user.teoria.forEach(function(esame) { %>
+                                                    <%= esame.data %> <br>
+                                                        <% }); %>
+                                            </td>
+                                            <%  
                             const fatturaEmessa = user.fatture.find(function(fattura) {
                                 return fattura.emessa === false;
                             });
                             const daEmettere = !!fatturaEmessa;
 
                             %>
-                            <td class="buttonCell">
-                                <% if (daEmettere) { %>
-                                        <a class="fatturaDaEmettere" href="<%= `/admin/fattureDaEmettere?cf=${encodeURIComponent(user.cFiscale)}` %>">
-                                            <span class="material-symbols-outlined">
+                                                <td class="buttonCell">
+                                                    <% if (daEmettere) { %>
+                                                        <a class="fatturaDaEmettere" href="<%= `/admin/fattureDaEmettere?cf=${encodeURIComponent(user.cFiscale)}` %>">
+                                                            <span class="material-symbols-outlined">
                                                 receipt_long
                                             </span>
-                                        </a>
-                                <% }else{ %>
-                                        <a class="pagamenti" href="<%= `/admin/pagamenti?cf=${encodeURIComponent(user.cFiscale)}` %>">
-                                            <span class="material-symbols-outlined">
+                                                        </a>
+                                                        <% }else{ %>
+                                                            <a class="pagamenti" href="<%= `/admin/pagamenti?cf=${encodeURIComponent(user.cFiscale)}` %>">
+                                                                <span class="material-symbols-outlined">
                                                payments
                                             </span>
-                                        </a>
-                                <% } %>
-                            </td>
-                        </tr>
-                    <% } %>
-                <% }); %>
-            </tbody>
-        </form>
-    </table>
-    <script>
-        const selectUsersBtn = document.getElementById('selectUsers');
-        const usersTd = document.querySelectorAll('.action');
-        const deleteUsersForm = document.getElementById('deleteUsersForm');
-        selectUsersBtn.addEventListener('click', () => {
-            usersTd.forEach((td) => {
-                td.style.display = td.style.display != 'inline-flex' ? 'inline-flex' : 'none';
-            });
-        });
-        deleteUsersForm.addEventListener('submit',event => {
-            const confirmSubmission = confirm("Sei sicuro di voler eliminare gli utenti selezionati?");
-            if (!confirmSubmission) {
-                event.preventDefault();
-            }
-        });
-    </script>
+                                                            </a>
+                                                            <% } %>
+                                                </td>
+                                        </tr>
+                                        <% } %>
+                                            <% }); %>
+                    </tbody>
+                </form>
+            </table>
+            <script>
+                const selectUsersBtn = document.getElementById('selectUsers');
+                const usersTd = document.querySelectorAll('.action');
+                const deleteUsersForm = document.getElementById('deleteUsersForm');
+                selectUsersBtn.addEventListener('click', () => {
+                    usersTd.forEach((td) => {
+                        td.style.display = td.style.display != 'inline-flex' ? 'inline-flex' : 'none';
+                    });
+                });
+                deleteUsersForm.addEventListener('submit', event => {
+                    const confirmSubmission = confirm("Sei sicuro di voler eliminare gli utenti selezionati?");
+                    if (!confirmSubmission) {
+                        event.preventDefault();
+                    }
+                });
+            </script>
 </body>
+
 </html>
