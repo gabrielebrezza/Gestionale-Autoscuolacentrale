@@ -144,6 +144,11 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
           }
       }));    
         let respinto, idoneo, assente;
+        for (const pat of userData.patente) {
+          if(pat.bocciato == null && pat.pagato == true){
+            dati.patente = pat.tipo;
+          }
+        }
         if (dati.teoriaLength == 0){
           const esameData = dati.dataEsame0;
           idoneo = dati.esitoEsame0 === 'idoneo';
@@ -184,6 +189,7 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
         }else if(idoneo && !emailSent){
           try{
             if(dati.patente == 'B'){
+              console.log('ci sono')
               const response = await fetch('https://agenda-autoscuolacentrale.com/admin/api/newUser', {
                 method: 'POST',
                 headers: {
