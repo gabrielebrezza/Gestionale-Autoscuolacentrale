@@ -32,9 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const numTd = row.getElementsByTagName('td')[0].textContent.toLowerCase();
             const cognomeTd = row.getElementsByTagName('td')[1].textContent.toLowerCase();
             const nomeTd = row.getElementsByTagName('td')[2].textContent.toLowerCase();
-            const visitaTd = row.getElementsByTagName('td')[5].textContent.toLowerCase();
             const patenteTd = row.getElementsByTagName('td')[6].textContent.toLowerCase();
-            const dataRegTd = row.getElementsByTagName('td')[7].textContent.toLowerCase();
+            const visitaTd = row.getElementsByTagName('td')[5].textContent.toLowerCase().replace(/\s+/g, ' ').trim();
+            const dataRegTd = row.getElementsByTagName('td')[7].textContent.toLowerCase().replace(/\s+/g, ' ').trim();
             const dataEsamiTd = row.getElementsByTagName('td')[8].textContent.toLowerCase().replace(/\s+/g, ' ').trim().split(' ');
             const isArchiviato = row.dataset.archiviato == 'true';
             let isDateEsameInRange;
@@ -47,19 +47,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             let isDateVisitaInRange, isVisitaMancante;
             if (!visitaMancante) {
-                const dataVisita = new Date(visitaTd.split('/').reverse().join('-'));
+                const dataVisita = new Date(visitaTd.split('/').reverse().join('-').trim());
                 const startVisitaDate = new Date(dataVisitaDa);
                 const endVisitaDate = new Date(dataVisitaA);
                 isDateVisitaInRange = dataVisita >= startVisitaDate && dataVisita <= endVisitaDate;
             } else {
                 isVisitaMancante = visitaTd == 'mancante' ? true : false;
             }
-            const dataRegistrazione = new Date(dataRegTd.split('/').reverse().join('-'));
+            console.log(dataRegTd)
+            const dataRegistrazione = new Date(dataRegTd.split('/').reverse().join('-').trim());
+            console.log(dataRegistrazione)
             const startRegistrazioneDate = new Date(dataRegistrazioneDa);
             const endRegistrazioneDate = new Date(dataRegistrazioneA);
 
             const isDateRegInRange = dataRegistrazione >= startRegistrazioneDate && dataRegistrazione <= endRegistrazioneDate;
-
+            console.log(dataRegistrazioneDa, dataRegistrazioneA, dataRegistrazione, 'registrazi/ESAME',dataEsameDa , dataEsameA)
             if (
                 (nome === '' || nomeTd.includes(nome)) &&
                 (cognome === '' || cognomeTd.includes(cognome)) &&
