@@ -490,7 +490,6 @@
 
         selectProvince.forEach((opt) => {
             provinceList.forEach(province => {
-                // Verifica se l'opzione è già presente nel menu a discesa
                 if (!opt.querySelector(`option[value="${province}"]`)) {
                     const option = document.createElement("option");
                     option.value = province;

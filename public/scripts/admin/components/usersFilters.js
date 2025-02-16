@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const dataEsameDa = filterEsameFrom.value;
         const dataEsameA = filterEsameTo.value;
         const status = document.querySelector('input[name="status"]:checked').value;
-        console.log(status)
         let enumeration = 1;
         for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
