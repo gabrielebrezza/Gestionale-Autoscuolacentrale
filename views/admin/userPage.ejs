@@ -136,11 +136,11 @@
         .imageForm input{
             display: none;
         }
-        tr:has(.attivo){
+        tr:has(.attivo) td{
             background: green;
             color: #fff;
         }
-        tr:has(.scaduto){
+        tr:has(.scaduto) td{
             background: red;
             color: #fff;
         }
@@ -153,15 +153,15 @@
         .field p{
             font-weight: bold;
         }
-        tr:has(input[value="respinto"]:checked){
+        tr:has(input[value="respinto"]:checked) td{
             background: red;
             color: #fff;
         }
-        tr:has(input[value="idoneo"]:checked){
+        tr:has(input[value="idoneo"]:checked) td{
             background: green;
             color: #fff;
         }
-        tr:has(input[value="assente"]:checked){
+        tr:has(input[value="assente"]:checked) td{
             background: orange;
             color: #fff;
         }
