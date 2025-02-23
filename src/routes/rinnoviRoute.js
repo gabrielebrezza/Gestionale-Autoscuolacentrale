@@ -254,7 +254,6 @@ const fetchBookings = async () => {
 
                     res.on('end', () => {
                         const response = JSON.parse(body);
-                        if(response.includes('html')) return console.log('Ricevuta risposta errata da rinnovo patenti');
                         if (response.data.authenticateUserWithPassword.sessionToken) {
                             resolve(response.data.authenticateUserWithPassword.sessionToken);
                         } else {
