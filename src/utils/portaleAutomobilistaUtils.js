@@ -49,13 +49,13 @@ async function searchUserPortale(cf, cognome, nPatente) {
         const data = {};
         try {
           data.cognome = document.getElementById('noTastoInvio_richiestaView_cognome').value;
-          data.nome = document.getElementById('noTastoInvio_richiestaView_nome').value;
+          data.nome = document.getElementById('noTastoInvio_richiestaView_nome').value.replaceAll('’', "'");
           data.codiceFiscale = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_codiceFiscale').value;
           data.numeroPatente = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_thePatentePosseduta_numeroPatenteCompleto').value;
           data.provinciaResidenza = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_theComune_theProvincia_descrizione').value;
-          data.comune = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_theComune_descrizioneComune').value;
+          data.comune = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_theComune_descrizioneComune').value.replaceAll('’', "'");
           data.toponimo = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_toponimo').value;
-          data.indirizzo = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_indirizzo').value;
+          data.indirizzo = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_indirizzo').value.replaceAll('’', "'");
           data.numeroCivico = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_numeroCivico').value;
           data.cap = document.getElementById('noTastoInvio_richiestaView_richiestaRinnAgenziaFrom_theAnagrafica_cap').value;
         } catch (error) {

@@ -215,9 +215,9 @@ router.post('/admin/rinnovi/downloadFattura', authenticateJWT, async (req, res)=
 
 const fetchBookings = async () => {
     if(process.env.SERVER_URL == 'http://localhost') return;
-    const GRAPHQL_URL = 'https://backend.rinnovopatenti.it/api/graphql';
-    const AUTH_EMAIL = 'rinnovopatentimarconi@gmail.com';
-    const AUTH_PASSWORD = 'Marconi@2024';
+    const GRAPHQL_URL = process.env.GRAPHQL_URL_RINNOVO;
+    const AUTH_EMAIL = process.env.AUTH_EMAIL_RINNOVO;
+    const AUTH_PASSWORD = process.env.AUTH_PASSWORD_RINNOVO;
     const authenticate = async () => {
         try {
             const authQuery = `
@@ -254,7 +254,7 @@ const fetchBookings = async () => {
 
                     res.on('end', () => {
                         const response = JSON.parse(body);
-                        // if(response.includes('html')) return console.log('errore c\'è un html');
+                        if(response.includes('html')) return console.log('Ricevuta risposta errata da rinnovo patenti');
                         if (response.data.authenticateUserWithPassword.sessionToken) {
                             resolve(response.data.authenticateUserWithPassword.sessionToken);
                         } else {
@@ -277,7 +277,7 @@ const fetchBookings = async () => {
     try {
         
         const AUTH_TOKEN = await authenticate();
-        if(AUTH_TOKEN.includes('html')) return;
+        if(AUTH_TOKEN.includes('html')) return console.log('Ricevuta risposta errata da rinnovo patenti');
         const currentDateTime = new Date(Date.now() - 10 * 60 * 60 * 1000);
         const lastSync = await SyncDate.findOne()
         await SyncDate.updateOne({"data": currentDateTime.toISOString()})
