@@ -10,28 +10,34 @@ mongoose.connect(process.env.MONGODB_CONNECTION_URL)
 const UserSchema = new mongoose.Schema({
     cFiscale: {
         type: String,
-        required: true
+        required: true,
+        uppercase: true
     },
     nome: {
         type: String,
-        required: true
+        required: true,
+        uppercase: true
     },
     cognome: {
         type: String,
-        required: true
+        required: true,
+        uppercase: true
     },
     nascita: {
         comune: {
             type: String,
-            required: false
+            required: false,
+            uppercase: true
         },
         provincia: {
             type: String,
-            required: false
+            required: false,
+            uppercase: true
         },
         stato: {
             type: String,
-            required: false
+            required: false,
+            uppercase: true
         },
         data: {
             type: String,
@@ -45,11 +51,13 @@ const UserSchema = new mongoose.Schema({
     residenza: {
         via: {
             type: String,
-            required: false
+            required: false,
+            uppercase: true
         },
         nCivico: {
             type: String,
-            required: false
+            required: false,
+            uppercase: true
         },
         cap: {
             type: String,
@@ -57,15 +65,18 @@ const UserSchema = new mongoose.Schema({
         },
         comune: {
             type: String,
-            required: false
+            required: false,
+            uppercase: true
         },
         provincia: {
             type: String,
-            required: false
+            required: false,
+            uppercase: true
         },
         stato: {
             type: String,
-            required: false
+            required: false,
+            uppercase: true
         }
     },
     contatti: {
@@ -84,7 +95,8 @@ const UserSchema = new mongoose.Schema({
     },
     nDocumento: {
         type: String,
-        required: true
+        required: true,
+        uppercase: true
     },
     patente: [
         {
