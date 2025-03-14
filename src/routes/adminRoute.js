@@ -34,11 +34,9 @@ router.get('/admin', authenticateJWT, async (req, res) =>{
     const users = await utenti.find({});
     res.render('admin/usersPage', {users})
 });
-router.get('/userPage', authenticateJWT, async (req, res) =>{
-    const user = await utenti.findOne({"cFiscale": req.query.cf.toUpperCase()});
-    if(!user){
-        return res.render('errorPage',{error: 'utente non trovato'});
-    }
+router.get('/userPage/:id', authenticateJWT, async (req, res) =>{
+    const user = await utenti.findOne({"_id": req.params.id});
+    if(!user) return res.render('errorPage',{error: 'utente non trovato'});
     res.render('admin/userPage',{user});
 });
 const storage = multer.memoryStorage();
@@ -104,7 +102,7 @@ router.use(express.urlencoded({ extended: true }));
 router.post('/updateUser', authenticateJWT, async (req, res) =>{
       try {
         const dati = req.body;
-        const utenteDatabase = await utenti.findOne({'cFiscale': dati.cf})
+        const utenteDatabase = await utenti.findOne({'_id': dati.id})
         const userData= {
             nome: dati.nome,
             cognome: dati.cognome,
@@ -226,8 +224,8 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
           }
         }
         
-        await utenti.findOneAndUpdate({"cFiscale": dati.cf}, userData);
-        res.redirect(`/userPage?cf=${dati.cf.toUpperCase()}`);
+        await utenti.findOneAndUpdate({"_id": dati.id}, userData);
+        res.redirect(`/userPage/${dati.id}`);
     } catch (error) {
         console.error('Errore durante l\'aggiornamento dei dati dell\'utente:', error);
         res.status(500).send({ error: 'Si è verificato un errore durante l\'aggiornamento dei dati dell\'utente' });
