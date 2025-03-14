@@ -35,7 +35,7 @@ router.get('/admin', authenticateJWT, async (req, res) =>{
     res.render('admin/usersPage', {users})
 });
 router.get('/userPage', authenticateJWT, async (req, res) =>{
-    const user = await utenti.findOne({"cFiscale": req.query.cf});
+    const user = await utenti.findOne({"cFiscale": req.query.cf.toUpperCase()});
     if(!user){
         return res.render('errorPage',{error: 'utente non trovato'});
     }
