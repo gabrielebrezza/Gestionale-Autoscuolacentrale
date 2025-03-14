@@ -51,7 +51,7 @@
                                                 </div>
                                             </td>
                                             <td style="text-transform: uppercase;">
-                                                <a href="<%=`/userPage?cf=${encodeURIComponent(user.cFiscale)}`%>">
+                                                <a href="<%=`/userPage?cf=${encodeURIComponent(user.cFiscale.toUpperCase())}`%>">
                                                     <%= user.cognome %>
                                                 </a>
                                             </td>

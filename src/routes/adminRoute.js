@@ -227,7 +227,7 @@ router.post('/updateUser', authenticateJWT, async (req, res) =>{
         }
         
         await utenti.findOneAndUpdate({"cFiscale": dati.cf}, userData);
-        res.redirect(`/userPage?cf=${dati.cf}`);
+        res.redirect(`/userPage?cf=${dati.cf.toUpperCase()}`);
     } catch (error) {
         console.error('Errore durante l\'aggiornamento dei dati dell\'utente:', error);
         res.status(500).send({ error: 'Si è verificato un errore durante l\'aggiornamento dei dati dell\'utente' });
