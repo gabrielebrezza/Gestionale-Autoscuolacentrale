@@ -6,7 +6,6 @@ async function trovaProvincia(cap) {
       trimmedCap = cap.trim();
       const comune = comuni.find(item => item.cap.includes(cap.trim()));
       
-      console.log(comune.sigla)
       return comune ? comune.sigla : ' ';
     } catch (error) {
       console.error('Errore nel caricamento del file:', error);
