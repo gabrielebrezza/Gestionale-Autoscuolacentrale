@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const axios = require('axios');
+const exceljs = require('exceljs');
 
 const router = express.Router();
 router.use(bodyParser.json({ limit: '900mb' }));
@@ -16,6 +17,7 @@ const storicoFattureGenerali = require('../DB/StoricoFattureGenerali');
 const Credentials = require('../DB/Credentials');
 const Scadenziario = require('../DB/Scadenziario');
 const Duplicati = require('../DB/Duplicati');
+const programmaScadenziario = require('../DB/programmaScadenziario');
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
@@ -405,7 +407,9 @@ setTimeout(fetchBookings, 5000);
 router.get('/admin/rinnovi/scadenziario', authenticateJWT, async (req, res) => {
     const { role } = await admins.findOne({"email": req.user.email});
     const scadenziario = await Scadenziario.find();
-    res.render('admin/rinnovi/scadenziario/usersPage', {scadenziario, role});
+    let ricercheProgrammate = await programmaScadenziario.find();
+    ricercheProgrammate = ricercheProgrammate.map(user => user.cf);
+    res.render('admin/rinnovi/scadenziario/usersPage', {scadenziario, ricercheProgrammate, role});
 });
 
 router.post('/admin/rinnovi/scadenziario/deleteUsers', authenticateJWT, async (req, res)=> {
@@ -419,8 +423,125 @@ router.post('/admin/rinnovi/scadenziario/deleteUsers', authenticateJWT, async (r
         }
         return res.redirect('/admin/rinnovi/scadenziario');
     } catch (error) {
-        console.error(`errore durante l'eliminazione degli utenti rinnovi: ${error}`);
+        console.error(`errore durante l'eliminazione degli utenti scadenziario: ${error}`);
         return res.render('errorPage', {error: `errore durante l'eliminazione degli alievi`});
+    }
+});
+router.post('/admin/programmaScadenziario', authenticateJWT, async (req, res) => {
+    try {
+        let users = req.body.users.split(',');
+        users = users.map(u => u.trim());
+        const schedule = await programmaScadenziario.find();
+        
+        const receivedUsers = new Set(users);
+        
+        const scheduledUsers = new Set(schedule.map(p => p.cf));
+        const filteredUsers = [...receivedUsers].filter(user => !scheduledUsers.has(user));
+        
+        for (const u of filteredUsers) {
+            if(u){
+                const newUser = new programmaScadenziario({
+                    cf: u,
+                    retrieved: false
+                });
+                await newUser.save();
+            }
+        }
+        
+        await programmaScadenziario.deleteMany({ cf: { $nin: [...receivedUsers] } });
+        res.redirect('/admin/rinnovi/scadenziario')
+    } catch (error) {
+        console.log(`An error occured while programming the retrive for license expiration date: ${error}`)
+    }
+});
+
+const cron = require("node-cron");
+//  * * *
+cron.schedule(" 0 8 * * *", async () => {
+    console.log("🔄 Avvio ricerca scadenze patente degli utenti programmati");
+    try {
+        const schedule = await programmaScadenziario.find();
+        let userProcessedCorrectly = [];
+        for (const u of schedule) {
+            try {
+            const dati = await searchExpirationPortale(u.cf);
+                const spedizione = {
+                    via: `${dati.toponimo.toLowerCase().replace(/\s+/g, " ").trim()} ${dati.indirizzo.toLowerCase().replace(/\s/g, " ").trim()}`,
+                    nCivico: dati.numeroCivico.toLowerCase().replace(/\s+/g, "").trim(),
+                    cap: dati.cap.trim(),
+                    comune: dati.comune.toLowerCase().replace(/\s+/g, " ").trim(),
+                    provincia: await trovaProvincia(dati.cap.trim())
+                };
+                const saveUser = new Scadenziario({
+                    "nome": dati.nome.trim().replace(/\s+/g, " ").toLowerCase(),
+                    "cognome": dati.cognome.trim().replace(/\s+/g, " ").toLowerCase(),
+                    "cf": u.cf.trim().replace(/\s+/g, "").toLowerCase(),
+                    "spedizione": spedizione,
+                    "nPatente": dati.numeroPatente.trim(),
+                    "expPatente": dati.expPatente
+                });
+                
+                await saveUser.save();
+                userProcessedCorrectly.push(u._id);
+            } catch (error) {
+                console.log(`error occured while processing ${u.id} for license expiration: ${error}`);
+            }
+        }
+        await programmaScadenziario.deleteMany({ _id: { $in: [...userProcessedCorrectly] } });
+    } catch (error) {
+        console.log(`error occured while processing scheduled users for license expiration: ${error}`);
+    }
+});
+
+router.post('/admin/rinnovi/scadenziario/downloadExcel', authenticateJWT, async (req, res) =>{
+    try {
+        const users = await Scadenziario.find();
+    
+        const workbook = new exceljs.Workbook();
+        const worksheet = workbook.addWorksheet('Scadenziario');
+    
+        const headerFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6EFCE' } };
+        const headerFont = { bold: true };
+        const headers = ['Nome', 'Cognome', 'Codice Fiscale', 'Via', 'Civico',	'Cap',	'Comune', 'Provincia', 'Numero Patente', 'Scadenza'];
+        const columns = [];
+
+        headers.forEach(h => columns.push({ header: h, key: h, width: 20 }));
+    
+        worksheet.columns = columns;
+    
+        const headerRow = worksheet.getRow(1);
+        headerRow.fill = headerFill;
+        headerRow.font = headerFont;
+        headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+        for (const u of users) {
+            const row = [
+                u.nome,
+                u.cognome,
+                u.cf,
+                u.spedizione.via,
+                u.spedizione.nCivico,
+                u.spedizione.cap,
+                u.spedizione.comune,
+                u.spedizione.provincia,
+                u.nPatente,
+                u.expPatente
+            ]
+            
+            const rowNumber = worksheet.addRow(row).number;
+            worksheet.getRow(rowNumber).height = 20;
+    
+            worksheet.getRow(rowNumber).eachCell((cell) => {
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+            });
+        }
+        res.setHeader('Content-Disposition', 'attachment; filename="scadenziario.xlsx"');
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        
+        await workbook.xlsx.write(res);
+        res.end();
+    } catch (error) {
+        console.log(`an error occured while downloading the excel file, ${error}`)
     }
 });
 

@@ -73,6 +73,61 @@
         .material-symbols-outlined{
             user-select: none;
         }
+        #programmaScadenziario{
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100dvh;
+            width: 100dvw;
+            background: rgba(255, 255, 255, 0.38);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s ease-in-out;
+        }
+        #programmaScadenziario.active{
+            opacity: 1;
+            pointer-events: all;
+        }
+        #programmaScadenziario form{
+            padding: 25px;
+            border-radius: 15px;
+            filter: drop-shadow(10px 10px 10px #00000072);
+            background: #ebebeb;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            font-size: 1rem;
+        }
+        #programmaScadenziario form h2{
+            font-size: 1.4rem;
+            color: #5681a9;
+        }
+        #programmaScadenziario form label{
+            color: #71a1cb;
+        }
+        #programmaScadenziario form textarea{
+            padding: 10px;
+            border-radius: 10px;
+            outline: none;
+            min-height: 100px;
+        }
+        #programmaScadenziario form button{
+            padding: 10px;
+            border-radius: 10px;
+            outline: none;
+            border: none;
+            width: 100%;
+            background: #5681a9;
+            color: #f1f1f1;
+            cursor: pointer;
+            transition: .25s ease-in-out;
+        }
+        #programmaScadenziario form button:hover{
+            opacity: .8;
+        }
     </style>
 </head>
 <body>
@@ -88,16 +143,29 @@
                     </tr>
                     <form id="searchExpiration" action="/admin/rinnovi/ricerca/scadenzaPatente" method="POST">
                         <tr>
-                            <th class="searchExpField" colspan="6">
+                            <th class="searchExpField" colspan="5">
                                 <label for="cFiscale">Codice Fiscale:</label>
                                 <input type="text" name="cFiscale" id="cFiscale" required>
                             </th>
-                            <th class="searchExpField" colspan="5">
+                            <th class="searchExpField" colspan="4">
                                 <button id="searchExpirationBtn" type="submit">
                                     <span class="material-symbols-outlined">
                                         search
                                     </span>
                                 </button>
+                            </th>
+                            <th>
+                                <div id="downloadExcel" style="display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined">
+                                        docs
+                                    </span>
+                                    Scarica Excel
+                                </div>
+                            </th>
+                            <th>
+                                <span class="material-symbols-outlined" id="toggleSchedule" style="cursor: pointer;">
+                                    edit_calendar
+                                </span>
                             </th>
                         </tr>
                     </form>
@@ -161,7 +229,17 @@
         </form>
         </table>
     </main>
-    
+    <div id="programmaScadenziario">
+        <form action="/admin/programmaScadenziario" method="POST">
+            <span id="closeModalBtn" class="material-symbols-outlined">
+                close
+            </span>
+            <h2>Programma Scadenziario</h2>
+            <label for="scheduledUsers">Scrivi i codici fiscali separati da una virgola ","</label>
+            <textarea name="users" id="scheduledUsers"><%= ricercheProgrammate.join(', ') %></textarea>
+            <button type="submit">Salva</button>
+        </form>
+    </div>
     <script>
         const selectUsers = document.getElementById('selectUsers');
         const actionBtns = document.querySelectorAll('.action');
@@ -170,6 +248,38 @@
                 btn.style.display = btn.style.display == 'block' ? 'none' : 'block';
             }
         });
+        const toggleSchedule = document.getElementById('toggleSchedule');
+        const programmaScadenziarioForm = document.getElementById('programmaScadenziario');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        toggleSchedule.addEventListener('click', () => {
+            programmaScadenziarioForm.classList.toggle('active');
+        });
+        closeModalBtn.addEventListener('click', () => {
+            programmaScadenziarioForm.classList.remove('active');
+        });
+        const downloadExcelBtn = document.getElementById('downloadExcel');
+        downloadExcel.addEventListener('click', async () => {
+            console.log('ciao')
+            const response = await fetch('/admin/rinnovi/scadenziario/downloadExcel', {method: 'POST'})
+            if(!response.ok) {
+                console.log('si è verificato un\'errore durante il download')
+                return;
+            }
+            const blob = await response.blob();
+
+            const url = window.URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'scadenziario.xlsx');
+            document.body.appendChild(link);
+            
+            link.click();
+            
+            document.body.removeChild(link);
+            
+            window.URL.revokeObjectURL(url);
+        })
     </script>
 </body>
 </html>
