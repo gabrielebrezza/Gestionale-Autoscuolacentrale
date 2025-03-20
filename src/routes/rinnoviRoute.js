@@ -457,7 +457,7 @@ router.post('/admin/programmaScadenziario', authenticateJWT, async (req, res) =>
 
 const cron = require("node-cron");
 //  * * *
-cron.schedule(" 0 8 * * *", async () => {
+cron.schedule(" 0 15 * * *", async () => {
     console.log("🔄 Avvio ricerca scadenze patente degli utenti programmati");
     try {
         const schedule = await programmaScadenziario.find();
