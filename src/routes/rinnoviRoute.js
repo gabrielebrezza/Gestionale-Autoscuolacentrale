@@ -439,9 +439,10 @@ router.post('/admin/programmaScadenziario', authenticateJWT, async (req, res) =>
         const filteredUsers = [...receivedUsers].filter(user => !scheduledUsers.has(user));
         
         for (const u of filteredUsers) {
-            if(u){
+            if(u && u.length == 16){
+                if(await Scadenziario.findOne({'cf': u.toUpperCase().trim() })) continue;
                 const newUser = new programmaScadenziario({
-                    cf: u,
+                    cf: u.toUpperCase(),
                     retrieved: false
                 });
                 await newUser.save();
@@ -457,7 +458,8 @@ router.post('/admin/programmaScadenziario', authenticateJWT, async (req, res) =>
 
 const cron = require("node-cron");
 //  * * *
-cron.schedule(" 0 15 * * *", async () => {
+console.log(new Date())
+cron.schedule(" 05 12 * * *", async () => {
     console.log("🔄 Avvio ricerca scadenze patente degli utenti programmati");
     try {
         const schedule = await programmaScadenziario.find();

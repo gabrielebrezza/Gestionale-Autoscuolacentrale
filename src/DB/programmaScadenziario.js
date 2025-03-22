@@ -7,7 +7,8 @@ const programmaScadenziarioSchema = new mongoose.Schema({
     },
     retrieved: {
         type: Boolean,
-        required: true
+        required: true,
+        uppercase: true
     }
 });
 const programmaScadenziario = new mongoose.model('programmaScadenziario', programmaScadenziarioSchema);

@@ -248,6 +248,24 @@
                 btn.style.display = btn.style.display == 'block' ? 'none' : 'block';
             }
         });
+        const scheduledUsers = document.getElementById('scheduledUsers');
+        scheduledUsers.addEventListener('paste', (event) => {
+            event.preventDefault();
+            let pastedText = event.clipboardData.getData("text");
+
+            pastedText = pastedText.replace(/[\r\n]+/g, ', ');
+
+            if (scheduledUsers.value.trim() && scheduledUsers.value.replaceAll(' ', '').slice(-1) == ',') {
+                scheduledUsers.value += pastedText;
+            } else if(scheduledUsers.value.trim()){
+                scheduledUsers.value += ', ' + pastedText;
+            }else{
+                scheduledUsers.value = pastedText;
+            }
+            let users = scheduledUsers.value.split(', ').filter(u => u.length === 16);
+
+            scheduledUsers.value = users.map(u => u.toUpperCase()).join(', ');
+        });
         const toggleSchedule = document.getElementById('toggleSchedule');
         const programmaScadenziarioForm = document.getElementById('programmaScadenziario');
         const closeModalBtn = document.getElementById('closeModalBtn');
