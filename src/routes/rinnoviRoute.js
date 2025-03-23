@@ -18,6 +18,7 @@ const Credentials = require('../DB/Credentials');
 const Scadenziario = require('../DB/Scadenziario');
 const Duplicati = require('../DB/Duplicati');
 const programmaScadenziario = require('../DB/programmaScadenziario');
+const infoScadenziario = require('../DB/infoScadenziario');
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
@@ -406,11 +407,43 @@ setTimeout(fetchBookings, 5000);
 
 router.get('/admin/rinnovi/scadenziario', authenticateJWT, async (req, res) => {
     const { role } = await admins.findOne({"email": req.user.email});
-    const scadenziario = await Scadenziario.find();
+
+    const page = 1;
+    const limit = 20;
+    const skip = (page - 1) * limit; 
+
+    const totalUsers = await Scadenziario.countDocuments();
+    const scadenziario = await Scadenziario.find().skip(skip).limit(limit);
+    
+    const info = await infoScadenziario.findOne();
     let ricercheProgrammate = await programmaScadenziario.find();
     ricercheProgrammate = ricercheProgrammate.map(user => user.cf);
-    res.render('admin/rinnovi/scadenziario/usersPage', {scadenziario, ricercheProgrammate, role});
+    res.render('admin/rinnovi/scadenziario/usersPage', {
+        scadenziario,
+        totalUsers,
+        totalPages: Math.ceil(totalUsers / limit),
+        currentPage: page,
+        ricercheProgrammate,
+        info,
+        role
+    });
 });
+
+router.get('/admin/rinnovi/scadenziario/data', authenticateJWT, async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 20;
+    const skip = (page - 1) * limit;
+
+    const scadenziario = await Scadenziario.find().skip(skip).limit(limit);
+    const totalUsers = await Scadenziario.countDocuments();
+
+    res.json({
+        scadenziario,
+        skip: skip,
+        hasMore: skip + scadenziario.length < totalUsers
+    });
+});
+
 
 router.post('/admin/rinnovi/scadenziario/deleteUsers', authenticateJWT, async (req, res)=> {
     const ids = (Object.keys(req.body)
@@ -427,6 +460,25 @@ router.post('/admin/rinnovi/scadenziario/deleteUsers', authenticateJWT, async (r
         return res.render('errorPage', {error: `errore durante l'eliminazione degli alievi`});
     }
 });
+
+(async () => {
+    const duplicati = await Scadenziario.aggregate([
+        {
+            $group: {
+                _id: "$cf",
+                ids: { $push: "$_id" },
+                count: { $sum: 1 }
+            }
+        },
+        { $match: { count: { $gt: 1 } } }
+    ]);
+
+    for (const doc of duplicati) {
+        const [keep, ...remove] = doc.ids;
+        await Scadenziario.deleteMany({ _id: { $in: remove } });
+    }
+})();
+
 router.post('/admin/programmaScadenziario', authenticateJWT, async (req, res) => {
     try {
         let users = req.body.users.split(',');
@@ -457,7 +509,7 @@ router.post('/admin/programmaScadenziario', authenticateJWT, async (req, res) =>
 });
 
 const cron = require("node-cron");
-cron.schedule("0 8-23 * * 1-6", async () => {
+cron.schedule("0 8-23 * * 1-7", async () => {
     console.log("🔄 Avvio ricerca scadenze patente degli utenti programmati");
     try {
         const schedule = await programmaScadenziario.find();
@@ -482,12 +534,14 @@ cron.schedule("0 8-23 * * 1-6", async () => {
                 });
                 
                 await saveUser.save();
-                userProcessedCorrectly.push(u._id);
+                userProcessedCorrectly.push(u.cf);
             } catch (error) {
                 console.log(`error occured while processing ${u.id} for license expiration: ${error}`);
             }
         }
-        await programmaScadenziario.deleteMany({ _id: { $in: [...userProcessedCorrectly] } });
+        const errors = schedule.length - userProcessedCorrectly.length;
+        await infoScadenziario.updateOne({totalErrors: {$inc: errors }});
+        await programmaScadenziario.deleteMany({ cf: { $in: [...userProcessedCorrectly] } });
     } catch (error) {
         console.log(`error occured while processing scheduled users for license expiration: ${error}`);
     }

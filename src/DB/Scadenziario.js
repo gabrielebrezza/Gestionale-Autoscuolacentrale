@@ -13,7 +13,9 @@ const ScadenziarioSchema = new mongoose.Schema({
     cf: {
         type: String,
         required: true,
-        uppercase: true
+        uppercase: true,
+        dropDups: true,
+        unique: true
     },
     spedizione: {
         via: {

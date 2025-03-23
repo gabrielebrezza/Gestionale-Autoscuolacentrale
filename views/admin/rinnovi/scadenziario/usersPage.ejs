@@ -141,6 +141,10 @@
                     <tr>
                         <th class="table-title" colspan="11">Cerca Utenti</th>
                     </tr>
+                    <tr style="text-align: center; text-transform: uppercase;">
+                        <th colspan="6">utenti totali: <%= info.totalUsersSearched %></th>
+                        <th colspan="5">errori: <%= info.totalErrors %></th>
+                    </tr>
                     <form id="searchExpiration" action="/admin/rinnovi/ricerca/scadenzaPatente" method="POST">
                         <tr>
                             <th class="searchExpField" colspan="5">
@@ -229,6 +233,57 @@
         </form>
         </table>
     </main>
+
+    <script>
+        let currentPage = 1;
+        let isLoading = false;
+        
+        async function loadMoreUsers() {
+            if (isLoading) return;
+            isLoading = true;
+        
+            const response = await fetch(`/admin/rinnovi/scadenziario/data?page=${currentPage + 1}`);
+            const data = await response.json();
+            let usersLoadedYet = data.skip
+            if (data.scadenziario.length > 0) {
+                currentPage++;
+                const tbody = document.querySelector("tbody");
+                
+                data.scadenziario.forEach((utente, i) => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>
+                            <div class="cellContent">
+                                <input class="action" type="checkbox" name="user${usersLoadedYet++}" value="${utente._id}">
+                                <div class="numero">${usersLoadedYet}</div>
+                            </div>
+                        </td>
+                        <td>${utente.nome}</td>
+                        <td>${utente.cognome}</td>
+                        <td>${utente.cf}</td>
+                        <td>${utente.spedizione.via}</td>
+                        <td>${utente.spedizione.nCivico}</td>
+                        <td>${utente.spedizione.cap}</td>
+                        <td>${utente.spedizione.comune}</td>
+                        <td>${utente.spedizione.provincia}</td>
+                        <td>${utente.nPatente}</td>
+                        <td>${utente.expPatente}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        
+            isLoading = false;
+        }
+        
+        window.addEventListener("scroll", () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 20) {
+                loadMoreUsers();
+            }
+        });
+        </script>
+        
+
     <div id="programmaScadenziario">
         <form action="/admin/programmaScadenziario" method="POST">
             <span id="closeModalBtn" class="material-symbols-outlined">
@@ -277,7 +332,6 @@
         });
         const downloadExcelBtn = document.getElementById('downloadExcel');
         downloadExcel.addEventListener('click', async () => {
-            console.log('ciao')
             const response = await fetch('/admin/rinnovi/scadenziario/downloadExcel', {method: 'POST'})
             if(!response.ok) {
                 console.log('si è verificato un\'errore durante il download')

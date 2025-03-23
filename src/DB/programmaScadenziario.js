@@ -3,12 +3,13 @@ const mongoose = require('mongoose');
 const programmaScadenziarioSchema = new mongoose.Schema({
     cf: {
         type: String,
-        required: true
+        required: true,
+        uppercase: true,
+        unique: true
     },
     retrieved: {
         type: Boolean,
-        required: true,
-        uppercase: true
+        required: true
     }
 });
 const programmaScadenziario = new mongoose.model('programmaScadenziario', programmaScadenziarioSchema);
