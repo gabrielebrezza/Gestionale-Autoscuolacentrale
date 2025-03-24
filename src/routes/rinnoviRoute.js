@@ -535,13 +535,14 @@ cron.schedule("0 8-23 * * 1-6", async () => {
                 
                 await saveUser.save();
                 userProcessedCorrectly.push(u.cf);
+                await programmaScadenziario.deleteOne({"_id": u._id})
             } catch (error) {
                 console.log(`error occured while processing ${u.id} for license expiration: ${error}`);
             }
         }
         const errors = schedule.length - userProcessedCorrectly.length;
         await infoScadenziario.updateOne({totalErrors: {$inc: errors }});
-        await programmaScadenziario.deleteMany({ cf: { $in: [...userProcessedCorrectly] } });
+        // await programmaScadenziario.deleteMany({ cf: { $in: [...userProcessedCorrectly] } });
     } catch (error) {
         console.log(`error occured while processing scheduled users for license expiration: ${error}`);
     }
