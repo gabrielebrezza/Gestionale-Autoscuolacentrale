@@ -545,7 +545,7 @@ cron.schedule("0 8-23 * * 1-6", async () => {
             }
         }
         const errors = schedule.length - userProcessedCorrectly.length;
-        await infoScadenziario.updateOne({totalErrors: {$inc: errors }});
+        await infoScadenziario.updateOne({}, { $inc: { totalErrors: errors } });
         // await programmaScadenziario.deleteMany({ cf: { $in: [...userProcessedCorrectly] } });
     } catch (error) {
         console.log(`error occured while processing scheduled users for license expiration: ${error}`);
