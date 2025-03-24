@@ -75,6 +75,7 @@
         }
         #downloadExcel{
             transition: .25s ease-in-out;
+            cursor: pointer;
         }
         #downloadExcel:hover{
             color: #333;
@@ -149,7 +150,7 @@
                         <th class="table-title" colspan="11">Cerca Utenti</th>
                     </tr>
                     <tr style="text-align: center; text-transform: uppercase;">
-                        <th colspan="6">utenti totali: <%= scadenziario.length %></th>
+                        <th colspan="6">utenti totali: <%= totalUsers %></th>
                         <th colspan="5">errori: <%= info.totalErrors %></th>
                     </tr>
                     <form id="searchExpiration" action="/admin/rinnovi/ricerca/scadenzaPatente" method="POST">
