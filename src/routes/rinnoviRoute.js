@@ -493,10 +493,8 @@ router.post('/admin/programmaScadenziario', authenticateJWT, async (req, res) =>
         for (const u of filteredUsers) {
             if(u && u.length == 16){
                 const userExist = await Scadenziario.findOne({'cf': u.toUpperCase().trim() });
-                console.log(userExist)
                 if(userExist){
-                    console.log(receivedUsers)
-                    receivedUsers.delete(u.cf);
+                    await programmaScadenziario.deleteOne({'cf': u.toUpperCase().trim() });
                     continue;
                 } 
                 const newUser = new programmaScadenziario({
