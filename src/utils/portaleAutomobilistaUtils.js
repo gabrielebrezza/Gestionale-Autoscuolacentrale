@@ -80,7 +80,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
     let browser;
     try {
         browser = await puppeteer.launch({ 
-            headless: true,
+            headless: false,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
         const credenziali = await Credentials.findOne();
@@ -124,10 +124,10 @@ async function searchUserPortale(cf, cognome, nPatente) {
                 datiUtente.cognome = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_desCog').value;
                 datiUtente.numeroPatente = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_thePatente_numeroPatenteCompleto').value.trim();
                 const selectedComune = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_theComuneResidenza_selectRowId');
-                datiUtente.comune = selectedComune .options[selectedComune .selectedIndex].text.toLowerCase().trim();
-                datiUtente.toponimo = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_codTpnIndRes').value.toLowerCase().trim();
-                datiUtente.indirizzo = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_desIndRes').value.toLowerCase().trim();
-                datiUtente.numeroCivico = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_codNumCvoIndRes').value.toLowerCase().trim();
+                datiUtente.comune = selectedComune.options[selectedComune .selectedIndex].text.toLowerCase().trim() || 'N/A';
+                datiUtente.toponimo = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_codTpnIndRes').value.toLowerCase().trim() || 'N/A';
+                datiUtente.indirizzo = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_desIndRes').value.toLowerCase().trim() || 'N/A';
+                datiUtente.numeroCivico = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_codNumCvoIndRes').value.toLowerCase().trim() || 'N/A';
                 datiUtente.cap = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_codCapRes').value.toLowerCase().trim();
             } catch (error) {
                 console.error('Errore durante l\'estrazione dei dati:', error);
