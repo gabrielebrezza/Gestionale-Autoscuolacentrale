@@ -108,7 +108,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiestaCertificatoMedico/ReadAcqCertificatoPrimaFase_initAcqCertificatoPrimaFase.action');
         await new Promise(resolve => setTimeout(resolve, 4000));
 
-        await page.type('input[name="richiestaCertificatoMedicoView.richiestaCertificatoMedicoFrom.codFis"]', cf.toUpperCase());
+        await page.type('input[name="richiestaCertificatoMedicoView.richiestaCertificatoMedicoFrom.codFis"]', cf.toUpperCase().trim());
         
         await Promise.all([
             page.waitForNavigation({ waitUntil: 'networkidle0' }),
@@ -134,6 +134,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
             }
             return datiUtente;
         });
+        console.log(dati)
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/permessoProvvisorioGuida/ReadAcqPermessoProvvisorio_initAcqPermessoProvvisorio.action');
         await new Promise(resolve => setTimeout(resolve, 4000));
         await page.type('input[name="permessoProvvisorioGuidaView.permessoProvvisorioGuidaFrom.numeroPatenteCompleto"]', dati.numeroPatente);
