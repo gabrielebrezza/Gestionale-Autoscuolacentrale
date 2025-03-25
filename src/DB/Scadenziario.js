@@ -20,23 +20,23 @@ const ScadenziarioSchema = new mongoose.Schema({
     spedizione: {
         via: {
             type: String,
-            required: true
+            required: false
         },
         nCivico: {
             type: String,
-            required: true
+            required: false
         },
         cap: {
             type: String,
-            required: true
+            required: false
         },
         comune: {
             type: String,
-            required: true
+            required: false
         },
         provincia: {
             type: String,
-            required: true
+            required: false
         }
     },
     nPatente: {
