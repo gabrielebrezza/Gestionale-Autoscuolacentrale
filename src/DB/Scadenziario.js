@@ -56,7 +56,7 @@ const ScadenziarioSchema = new mongoose.Schema({
         required: true
     },
     expPatente: {
-        type: String,
+        type: Date,
         required: false
     },
     note: {

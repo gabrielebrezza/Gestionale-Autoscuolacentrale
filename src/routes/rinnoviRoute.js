@@ -562,7 +562,7 @@ router.post('/admin/rinnovi/scadenziario/downloadExcel', authenticateJWT, async 
                 u.residenza,
                 u.email,
                 u.nPatente,
-                u.expPatente
+                u.expPatente.toLocaleDateString('it-IT')
             ]
             
             const rowNumber = worksheet.addRow(row).number;

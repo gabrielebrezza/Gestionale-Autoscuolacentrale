@@ -126,10 +126,10 @@ async function searchUserPortale(cf, cognome, nPatente) {
                 datiUtente.cognome = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_desCog').value;
                 datiUtente.numeroPatente = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_thePatente_numeroPatenteCompleto').value.trim();
                 const selectedComune = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_theComuneResidenza_selectRowId');
-                datiUtente.comune = selectedComune.options[selectedComune .selectedIndex].text.toLowerCase().trim() || 'N/A';
-                datiUtente.toponimo = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_codTpnIndRes').value.toLowerCase().trim() || 'N/A';
-                datiUtente.indirizzo = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_desIndRes').value.toLowerCase().trim() || 'N/A';
-                datiUtente.numeroCivico = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_codNumCvoIndRes').value.toLowerCase().trim() || 'N/A';
+                datiUtente.comune = selectedComune.options[selectedComune .selectedIndex].text.toLowerCase().trim() || '';
+                datiUtente.toponimo = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_codTpnIndRes').value.toLowerCase().trim() || '';
+                datiUtente.indirizzo = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_desIndRes').value.toLowerCase().trim() || '';
+                datiUtente.numeroCivico = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_codNumCvoIndRes').value.toLowerCase().trim() || '';
                 datiUtente.cap = document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_codCapRes').value.toLowerCase().trim();
             } catch (error) {
                 console.error('Errore durante l\'estrazione dei dati:', error);
@@ -215,7 +215,6 @@ async function searchUserPortale(cf, cognome, nPatente) {
           ]);
           await new Promise(resolve => setTimeout(resolve, 5000));
         
-      //   Estrai i dati dai risultati
           let numeroPatente = await page.evaluate( async () => {
             try {
               return document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_thePatente_numeroPatenteCompleto').value.trim();
@@ -274,7 +273,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
                 residenza: u.residenza,
                 email: u.email,
                 nPatente: numeroPatente,
-                expPatente: exp
+                expPatente: new Date(exp.split('/').reverse().join('-'))
               });
               await newUser.save();
               await programmaScadenziario.deleteOne({"_id": u._id});

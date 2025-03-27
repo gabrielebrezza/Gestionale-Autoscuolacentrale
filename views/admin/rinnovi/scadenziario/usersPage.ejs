@@ -225,7 +225,7 @@
                         <td><%= utente.cf %></td>
                         <td><%= utente.residenza %></td>
                         <td><%= utente.nPatente %></td>
-                        <td><%= utente.expPatente %></td>
+                        <td><%= utente.expPatente.toLocaleDateString('it-IT') %></td>
                     </tr>
                 <% } %>
             </tbody>
@@ -261,7 +261,7 @@
                         <td>${utente.cf}</td>
                         <td>${utente.residenza}</td>
                         <td>${utente.nPatente}</td>
-                        <td>${utente.expPatente}</td>
+                        <td>${utente.expPatente.toLocaleDateString('it-IT')}</td>
                     `;
                     tbody.appendChild(tr);
                 });
