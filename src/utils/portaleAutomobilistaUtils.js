@@ -221,13 +221,6 @@ async function searchUserPortale(cf, cognome, nPatente) {
               return document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_thePatente_numeroPatenteCompleto').value.trim();
             } catch (error) {
               console.error('Errore durante l\'estrazione del numero della patente:', error);
-              const utente = await programmaScadenziario.findOne({"_id": u._id});
-              if(utente.try > 2){
-                await programmaScadenziario.deleteOne({"_id": u._id});
-              }else{
-                await programmaScadenziario.findOneAndUpdate({"_id": u._id}, {$inc: {"try" : 1}});
-              }
-              totalErrors++;
               return null;
             }
 
