@@ -232,7 +232,16 @@ async function searchUserPortale(cf, cognome, nPatente) {
             }
 
           });
-          if(!numeroPatente) continue;
+          if(!numeroPatente){
+            const utente = await programmaScadenziario.findOne({"_id": u._id});
+            if(utente.try > 2){
+              await programmaScadenziario.deleteOne({"_id": u._id});
+            }else{
+              await programmaScadenziario.findOneAndUpdate({"_id": u._id}, {$inc: {"try" : 1}});
+            }
+            totalErrors++;
+            continue;
+          }
           console.log(numeroPatente)
           await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/permessoProvvisorioGuida/ReadAcqPermessoProvvisorio_initAcqPermessoProvvisorio.action');
           await new Promise(resolve => setTimeout(resolve, 4000));
@@ -251,16 +260,19 @@ async function searchUserPortale(cf, cognome, nPatente) {
                 return document.getElementById('noTastoInvio_permessoProvvisorioGuidaView_permessoProvvisorioGuidaFrom_thePatente_dataScadenza').value;
               } catch (error) {
                   console.error('Errore durante l\'estrazione della scadenza della patente:', error);
-                  const utente = await programmaScadenziario.findOne({"_id": u._id});
-                  if(utente.try > 2){
-                    await programmaScadenziario.deleteOne({"_id": u._id});
-                  }else{
-                    await programmaScadenziario.findOneAndUpdate({"_id": u._id}, {$inc: {"try" : 1}});
-                  }
-                  totalErrors++;
                   return null;
               }
           });
+          if(!exp){
+            const utente = await programmaScadenziario.findOne({"_id": u._id});
+            if(utente.try > 2){
+              await programmaScadenziario.deleteOne({"_id": u._id});
+            }else{
+              await programmaScadenziario.findOneAndUpdate({"_id": u._id}, {$inc: {"try" : 1}});
+            }
+            totalErrors++;
+            continue;
+          }
           if(exp && numeroPatente){
             try {
               const newUser = new Scadenziario({
