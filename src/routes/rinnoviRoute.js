@@ -477,37 +477,37 @@ router.post('/admin/rinnovi/scadenziario/deleteUsers', authenticateJWT, async (r
     }
 });
 
-router.post('/admin/programmaScadenziario', authenticateJWT, async (req, res) => {
-    try {
-        let users = req.body.users.split(',');
-        users = users.map(u => u.trim());
-        const schedule = await programmaScadenziario.find();
+// router.post('/admin/programmaScadenziario', authenticateJWT, async (req, res) => {
+//     try {
+//         let users = req.body.users.split(',');
+//         users = users.map(u => u.trim());
+//         const schedule = await programmaScadenziario.find();
         
-        const receivedUsers = new Set(users);
+//         const receivedUsers = new Set(users);
         
-        const scheduledUsers = new Set(schedule.map(p => p.cf));
-        const filteredUsers = [...receivedUsers].filter(user => !scheduledUsers.has(user));
+//         const scheduledUsers = new Set(schedule.map(p => p.cf));
+//         const filteredUsers = [...receivedUsers].filter(user => !scheduledUsers.has(user));
         
-        for (const u of filteredUsers) {
-            if(u && u.length == 16){
-                const userExist = await Scadenziario.findOne({'cf': u.toUpperCase().trim() });
-                if(userExist){
-                    await programmaScadenziario.deleteOne({'cf': u.toUpperCase().trim() });
-                    continue;
-                } 
-                const newUser = new programmaScadenziario({
-                    cf: u.toUpperCase()
-                });
-                await newUser.save();
-            }
-        }
+//         for (const u of filteredUsers) {
+//             if(u && u.length == 16){
+//                 const userExist = await Scadenziario.findOne({'cf': u.toUpperCase().trim() });
+//                 if(userExist){
+//                     await programmaScadenziario.deleteOne({'cf': u.toUpperCase().trim() });
+//                     continue;
+//                 } 
+//                 const newUser = new programmaScadenziario({
+//                     cf: u.toUpperCase()
+//                 });
+//                 await newUser.save();
+//             }
+//         }
         
-        await programmaScadenziario.deleteMany({ cf: { $nin: [...receivedUsers] } });
-        res.redirect('/admin/rinnovi/scadenziario')
-    } catch (error) {
-        console.log(`An error occured while programming the retrive for license expiration date: ${error}`)
-    }
-});
+//         await programmaScadenziario.deleteMany({ cf: { $nin: [...receivedUsers] } });
+//         res.redirect('/admin/rinnovi/scadenziario')
+//     } catch (error) {
+//         console.log(`An error occured while programming the retrive for license expiration date: ${error}`)
+//     }
+// });
 
 const cron = require("node-cron");
 async function searchAndUpdate() {
@@ -618,22 +618,21 @@ async function readExcel(filePath) {
 
 // readExcel(path.resolve('rinnovi.xlsx'));
 
-router.post('/admin/rinnovi/ricerca/scadenzaPatente', authenticateJWT, async (req, res) => {
-    const { cFiscale } = req.body;
+router.post('/admin/rinnovi/scadenziario/search', authenticateJWT, async (req, res) => {
+    const { cFiscale, email } = req.body;
     try {
         const dati = await searchExpirationPortale(cFiscale);
-        const spedizione = {
-            via: `${dati.toponimo.toLowerCase().replace(/\s+/g, " ").trim()} ${dati.indirizzo.toLowerCase().replace(/\s/g, " ").trim()}`,
-            nCivico: dati.numeroCivico.toLowerCase().replace(/\s+/g, "").trim(),
-            cap: dati.cap.trim(),
-            comune: dati.comune.toLowerCase().replace(/\s+/g, " ").trim(),
-            provincia: await trovaProvincia(dati.cap.trim())
-        };
+        const residenza = `
+            ${dati.toponimo.toLowerCase().replace(/\s+/g, " ").trim()} ${dati.indirizzo.toLowerCase().replace(/\s/g, " ").trim()}
+            ${dati.numeroCivico.toLowerCase().replace(/\s+/g, "").trim()},
+            ${dati.cap.trim()},
+            ${dati.comune.toLowerCase().replace(/\s+/g, " ").trim()},
+            (${await trovaProvincia(dati.cap.trim())})`;
         const saveUser = new Scadenziario({
-            "nome": dati.nome.trim().replace(/\s+/g, " ").toLowerCase(),
-            "cognome": dati.cognome.trim().replace(/\s+/g, " ").toLowerCase(),
-            "cf": cFiscale.trim().replace(/\s+/g, "").toLowerCase(),
-            "spedizione": spedizione,
+            "nomeECognome": `${dati.nome.trim().replace(/\s+/g, " ").toLowerCase()} ${dati.cognome.trim().replace(/\s+/g, " ").toLowerCase()}`,
+            "cf": cFiscale.trim().replace(/\s+/g, "").toUpperCase(),
+            "email": email,
+            "residenza": residenza,
             "nPatente": dati.numeroPatente.trim(),
             "expPatente": dati.expPatente
         });

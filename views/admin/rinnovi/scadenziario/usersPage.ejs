@@ -154,11 +154,15 @@
                         <th colspan="2">in programma: <%= totalScheduledUsers %></th>
                         <th colspan="2">errori: <%= info.totalErrors %></th>
                     </tr>
-                    <form id="searchExpiration" action="/admin/rinnovi/ricerca/scadenzaPatente" method="POST">
+                    <form id="searchExpiration" action="/admin/rinnovi/scadenziario/search" method="POST">
                         <tr>
-                            <th class="searchExpField" colspan="2">
+                            <th class="searchExpField" colspan="1">
                                 <label for="cFiscale">Codice Fiscale:</label>
                                 <input type="text" name="cFiscale" id="cFiscale" required>
+                            </th>
+                            <th class="searchExpField" colspan="1">
+                                <label for="email">Email:</label>
+                                <input type="email" name="email" id="email" required>
                             </th>
                             <th class="searchExpField" colspan="2">
                                 <button id="searchExpirationBtn" type="submit">
@@ -261,7 +265,7 @@
                         <td>${utente.cf}</td>
                         <td>${utente.residenza}</td>
                         <td>${utente.nPatente}</td>
-                        <td>${utente.expPatente.toLocaleDateString('it-IT')}</td>
+                        <td>${new Date(utente.expPatente).toLocaleDateString('it-IT')}</td>
                     `;
                     tbody.appendChild(tr);
                 });
