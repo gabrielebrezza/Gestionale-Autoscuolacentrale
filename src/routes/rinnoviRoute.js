@@ -526,7 +526,7 @@ function isValidExecutionTime() {
     const day = now.getDay();
     return day >= 1 && day <= 6 && hour >= 8 && hour <= 20;
 }
-
+if(process.env.SERVER_URL != 'http://localhost'){
 if (isValidExecutionTime()) {
     searchAndUpdate();
 }
@@ -534,7 +534,7 @@ if (isValidExecutionTime()) {
 cron.schedule("0 8-20/2 * * 1-6", async () => {
     await searchAndUpdate();
 });
-
+}
 router.post('/admin/rinnovi/scadenziario/downloadExcel', authenticateJWT, async (req, res) =>{
     try {
         const users = await Scadenziario.find();
@@ -544,10 +544,10 @@ router.post('/admin/rinnovi/scadenziario/downloadExcel', authenticateJWT, async 
     
         const headerFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6EFCE' } };
         const headerFont = { bold: true };
-        const headers = ['Nome', 'Cognome', 'Codice Fiscale', 'Via', 'Civico',	'Cap',	'Comune', 'Provincia', 'Numero Patente', 'Scadenza'];
+        const headers = ['Nome e Cognome', 'Codice Fiscale', 'Residenza', 'Email', 'Numero Patente', 'Scadenza'];
         const columns = [];
 
-        headers.forEach(h => columns.push({ header: h, key: h, width: 20 }));
+        headers.forEach(h => columns.push({ header: h, key: h, width: 50 }));
     
         worksheet.columns = columns;
     
@@ -557,14 +557,10 @@ router.post('/admin/rinnovi/scadenziario/downloadExcel', authenticateJWT, async 
         headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
         for (const u of users) {
             const row = [
-                u.nome,
-                u.cognome,
+                u.nomeECognome,
                 u.cf,
-                u.spedizione.via,
-                u.spedizione.nCivico,
-                u.spedizione.cap,
-                u.spedizione.comune,
-                u.spedizione.provincia,
+                u.residenza,
+                u.email,
                 u.nPatente,
                 u.expPatente
             ]
