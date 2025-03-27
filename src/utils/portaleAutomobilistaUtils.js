@@ -1,5 +1,7 @@
 const puppeteer = require('puppeteer');
 const Credentials = require('../DB/Credentials');
+const programmaScadenziario = require('../DB/programmaScadenziario');
+const Scadenziario = require('../DB/Scadenziario');
 
 async function searchUserPortale(cf, cognome, nPatente) {
     let browser;
@@ -80,7 +82,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
     let browser;
     try {
         browser = await puppeteer.launch({ 
-            headless: true,
+            headless: false,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
         const credenziali = await Credentials.findOne();
@@ -107,7 +109,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
         // Vai alla pagina di raccolta dati
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiestaCertificatoMedico/ReadAcqCertificatoPrimaFase_initAcqCertificatoPrimaFase.action');
         await new Promise(resolve => setTimeout(resolve, 4000));
-
+        console.log(cf.toUpperCase().trim())
         await page.type('input[name="richiestaCertificatoMedicoView.richiestaCertificatoMedicoFrom.codFis"]', cf.toUpperCase().trim());
         
         await Promise.all([
@@ -168,4 +170,124 @@ async function searchUserPortale(cf, cognome, nPatente) {
     }
   }
   
-module.exports = {searchUserPortale, searchExpirationPortale};
+
+
+  async function searchScheduleExpirationPortale() {
+    const users = await programmaScadenziario.find().limit(500);
+    if(users.length == 0) return 0;
+    let browser, totalErrors = 0;
+    try {
+        browser = await puppeteer.launch({ 
+            headless: false,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+        const credenziali = await Credentials.findOne();
+        const page = await browser.newPage();
+        await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
+        await page.waitForSelector('.formSso2');
+
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await page.type('input[name="loginView.beanUtente.userName"]', credenziali.user);
+        await page.type('input[name="loginView.beanUtente.password"]', credenziali.password);
+        await Promise.all([
+            page.waitForNavigation({ waitUntil: 'networkidle0' }), // Aspetta che la rete sia inattiva
+            page.click('input[name="action:Login_executeLogin"]')
+        ]);
+
+        await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Inserisci il PIN
+        await page.type('input[name="loginView.pin"]', credenziali.pin);
+        await Promise.all([
+            page.waitForNavigation({ waitUntil: 'networkidle0' }),
+            page.click('input[name="action:Pin_executePinValidation"]')
+        ]);
+        // Vai alla pagina di raccolta dati
+        for(const u of users) {
+          await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiestaCertificatoMedico/ReadAcqCertificatoPrimaFase_initAcqCertificatoPrimaFase.action');
+          await new Promise(resolve => setTimeout(resolve, 4000));
+          console.log(u.cf.toUpperCase().trim())
+          await page.type('input[name="richiestaCertificatoMedicoView.richiestaCertificatoMedicoFrom.codFis"]', u.cf.toUpperCase().trim());
+          
+          await Promise.all([
+              page.waitForNavigation({ waitUntil: 'networkidle0' }),
+              page.click('input[name="action:ReadAcqCertificatoPrimaFase_pagingAcqCertMedPrimaFase"]')
+          ]);
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        
+      //   Estrai i dati dai risultati
+          let numeroPatente = await page.evaluate( async () => {
+            try {
+              return document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_thePatente_numeroPatenteCompleto').value.trim();
+            } catch (error) {
+              console.error('Errore durante l\'estrazione del numero della patente:', error);
+              const utente = await programmaScadenziario.findOne({"_id": u._id});
+              if(utente.try > 2){
+                await programmaScadenziario.deleteOne({"_id": u._id});
+              }else{
+                await programmaScadenziario.findOneAndUpdate({"_id": u._id}, {$inc: {"try" : 1}});
+              }
+              totalErrors++;
+              return null;
+            }
+
+          });
+          if(!numeroPatente) continue;
+          console.log(numeroPatente)
+          await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/permessoProvvisorioGuida/ReadAcqPermessoProvvisorio_initAcqPermessoProvvisorio.action');
+          await new Promise(resolve => setTimeout(resolve, 4000));
+          await page.type('input[name="permessoProvvisorioGuidaView.permessoProvvisorioGuidaFrom.numeroPatenteCompleto"]', numeroPatente);
+          await page.type('input[name="permessoProvvisorioGuidaView.permessoProvvisorioGuidaFrom.codiceFiscale"]', u.cf.toUpperCase());
+
+          await Promise.all([
+              page.waitForNavigation({ waitUntil: 'networkidle0' }),
+              page.click('input[name="action:ReadAcqPermessoProvvisorio_pagingAcqPermessoProvvisorio"]')
+          ]);
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        
+          // Estrai i dati dai risultati
+          const exp = await page.evaluate( async () => {
+              try {
+                return document.getElementById('noTastoInvio_permessoProvvisorioGuidaView_permessoProvvisorioGuidaFrom_thePatente_dataScadenza').value;
+              } catch (error) {
+                  console.error('Errore durante l\'estrazione della scadenza della patente:', error);
+                  const utente = await programmaScadenziario.findOne({"_id": u._id});
+                  if(utente.try > 2){
+                    await programmaScadenziario.deleteOne({"_id": u._id});
+                  }else{
+                    await programmaScadenziario.findOneAndUpdate({"_id": u._id}, {$inc: {"try" : 1}});
+                  }
+                  totalErrors++;
+                  return null;
+              }
+          });
+          if(exp && numeroPatente){
+            try {
+              const newUser = new Scadenziario({
+                nomeECognome: u.nomeECognome,
+                cf: u.cf,
+                residenza: u.residenza,
+                email: u.email,
+                nPatente: numeroPatente,
+                expPatente: exp
+              });
+              await newUser.save();
+              await programmaScadenziario.deleteOne({"_id": u._id});
+            } catch (error) {
+              console.log(`Si è verificato un'errore nell'aggiunta dell'utente allo scadenziario: ${error}`);
+              totalErrors++;
+            }
+          }
+        }
+        return totalErrors;
+    } catch (error) {
+      console.error('Errore durante l\'operazione Puppeteer:', error);
+      throw error;
+    } finally {
+      if (browser) {
+        await browser.close();
+      }
+    }
+  }
+
+module.exports = {searchUserPortale, searchExpirationPortale, searchScheduleExpirationPortale};

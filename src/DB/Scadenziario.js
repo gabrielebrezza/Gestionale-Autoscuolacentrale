@@ -2,14 +2,18 @@ const mongoose = require('mongoose');
 
 
 const ScadenziarioSchema = new mongoose.Schema({
-    nome: {
+    // nome: {
+    //     type: String,
+    //     required: false
+    // },
+    // cognome: {
+    //     type: String,
+    //     required: false
+    // },
+    nomeECognome: {
         type: String,
-        required: true
+        required: false
     },
-    cognome: {
-        type: String,
-        required: true
-    }, 
     cf: {
         type: String,
         required: true,
@@ -17,28 +21,36 @@ const ScadenziarioSchema = new mongoose.Schema({
         dropDups: true,
         unique: true
     },
-    spedizione: {
-        via: {
-            type: String,
-            required: false
-        },
-        nCivico: {
-            type: String,
-            required: false
-        },
-        cap: {
-            type: String,
-            required: false
-        },
-        comune: {
-            type: String,
-            required: false
-        },
-        provincia: {
-            type: String,
-            required: false
-        }
+    residenza: {
+        type: String,
+        required: false
     },
+    email: {
+        type: String,
+        required: false
+    },
+    // spedizione: {
+    //     via: {
+    //         type: String,
+    //         required: false
+    //     },
+    //     nCivico: {
+    //         type: String,
+    //         required: false
+    //     },
+    //     cap: {
+    //         type: String,
+    //         required: false
+    //     },
+    //     comune: {
+    //         type: String,
+    //         required: false
+    //     },
+    //     provincia: {
+    //         type: String,
+    //         required: false
+    //     }
+    // },
     nPatente: {
         type: String,
         required: true

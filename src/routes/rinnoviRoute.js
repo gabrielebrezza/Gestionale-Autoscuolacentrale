@@ -22,7 +22,7 @@ const infoScadenziario = require('../DB/infoScadenziario');
 //functions
 const sendEmail = require('../utils/emailsUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
-const {searchUserPortale, searchExpirationPortale} = require('../utils/portaleAutomobilistaUtils.js');
+const {searchUserPortale, searchExpirationPortale, searchScheduleExpirationPortale} = require('../utils/portaleAutomobilistaUtils.js');
 const { trovaProvincia } = require('../utils/genericUtils.js');
 
 router.get('/admin/rinnovi', authenticateJWT, async (req, res) =>{
@@ -414,21 +414,19 @@ router.get('/admin/rinnovi/scadenziario', authenticateJWT, async (req, res) => {
 
     const totalUsers = await Scadenziario.countDocuments();
     const scadenziario = await Scadenziario.find().skip(skip).limit(limit);
-    
     const info = await infoScadenziario.findOne();
-    let ricercheProgrammate = await programmaScadenziario.find();
-    ricercheProgrammate = ricercheProgrammate.map(user => user.cf);
+
+    const totalScheduledUsers = await programmaScadenziario.countDocuments();
     res.render('admin/rinnovi/scadenziario/usersPage', {
         scadenziario,
         totalUsers,
         totalPages: Math.ceil(totalUsers / limit),
         currentPage: page,
-        ricercheProgrammate,
+        totalScheduledUsers,
         info,
         role
     });
 });
-
 router.get('/admin/rinnovi/scadenziario/data', authenticateJWT, async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 20;
@@ -477,7 +475,7 @@ router.post('/admin/rinnovi/scadenziario/deleteUsers', authenticateJWT, async (r
         const [keep, ...remove] = doc.ids;
         await Scadenziario.deleteMany({ _id: { $in: remove } });
     }
-})();
+});
 
 router.post('/admin/programmaScadenziario', authenticateJWT, async (req, res) => {
     try {
@@ -498,8 +496,7 @@ router.post('/admin/programmaScadenziario', authenticateJWT, async (req, res) =>
                     continue;
                 } 
                 const newUser = new programmaScadenziario({
-                    cf: u.toUpperCase(),
-                    retrieved: false
+                    cf: u.toUpperCase()
                 });
                 await newUser.save();
             }
@@ -513,43 +510,29 @@ router.post('/admin/programmaScadenziario', authenticateJWT, async (req, res) =>
 });
 
 const cron = require("node-cron");
-cron.schedule("07 14 * * 1-6", async () => {
+async function searchAndUpdate() {
     console.log("🔄 Avvio ricerca scadenze patente degli utenti programmati");
     try {
-        const schedule = await programmaScadenziario.find();
-        let userProcessedCorrectly = [];
-        for (const u of schedule) {
-            try {
-            const dati = await searchExpirationPortale(u.cf);
-                const spedizione = {
-                    via: `${dati.toponimo.toLowerCase().replace(/\s+/g, " ").trim()} ${dati.indirizzo.toLowerCase().replace(/\s/g, " ").trim()}`,
-                    nCivico: dati.numeroCivico.toLowerCase().replace(/\s+/g, "").trim(),
-                    cap: dati.cap.trim(),
-                    comune: dati.comune.toLowerCase().replace(/\s+/g, " ").trim(),
-                    provincia: await trovaProvincia(dati.cap.trim())
-                };
-                const saveUser = new Scadenziario({
-                    "nome": dati.nome.trim().replace(/\s+/g, " ").toLowerCase(),
-                    "cognome": dati.cognome.trim().replace(/\s+/g, " ").toLowerCase(),
-                    "cf": u.cf.trim().replace(/\s+/g, "").toLowerCase(),
-                    "spedizione": spedizione,
-                    "nPatente": dati.numeroPatente.trim(),
-                    "expPatente": dati.expPatente
-                });
-                
-                await saveUser.save();
-                userProcessedCorrectly.push(u.cf);
-                await programmaScadenziario.deleteOne({"_id": u._id})
-            } catch (error) {
-                console.log(`error occured while processing ${u.id} for license expiration: ${error}`);
-            }
-        }
-        const errors = schedule.length - userProcessedCorrectly.length;
-        await infoScadenziario.updateOne({}, { $inc: { totalErrors: errors } });
-        // await programmaScadenziario.deleteMany({ cf: { $in: [...userProcessedCorrectly] } });
+        const { totalErrors } = await searchScheduleExpirationPortale();
+        await infoScadenziario.updateOne({}, { $inc: { "totalErrors": totalErrors } });
     } catch (error) {
-        console.log(`error occured while processing scheduled users for license expiration: ${error}`);
+        console.log(`Errore durante l'elaborazione delle scadenze patente: ${error}`);
     }
+}
+
+function isValidExecutionTime() {
+    const now = new Date();
+    const hour = now.getHours();
+    const day = now.getDay();
+    return day >= 1 && day <= 6 && hour >= 8 && hour <= 20;
+}
+
+if (isValidExecutionTime()) {
+    searchAndUpdate();
+}
+
+cron.schedule("0 8-20/2 * * 1-6", async () => {
+    await searchAndUpdate();
 });
 
 router.post('/admin/rinnovi/scadenziario/downloadExcel', authenticateJWT, async (req, res) =>{
@@ -603,6 +586,41 @@ router.post('/admin/rinnovi/scadenziario/downloadExcel', authenticateJWT, async 
         console.log(`an error occured while downloading the excel file, ${error}`)
     }
 });
+
+async function readExcel(filePath) {
+    const workbook = new exceljs.Workbook();
+    await workbook.xlsx.readFile(filePath);
+
+    const worksheet = workbook.worksheets[0];
+    const usersArr = worksheet.getSheetValues()
+    .filter(row => Array.isArray(row) && row[2] && row[2].toString().includes('RINNOVO') && row[15] && row[16] && row[17] && row[22] )
+    .map(u => ({
+        nomeECognome: u[15],
+        email: u[16],
+        cf: u[17],
+        residenza: u[22],
+        try: 0
+    }));
+    const seenCF = new Set();
+    const filteredUsers = usersArr.filter(user => {
+        if (seenCF.has(user.cf.toUpperCase())) return false;
+        seenCF.add(user.cf.toUpperCase());
+        return true;
+    });
+    if (filteredUsers.length > 0) {
+        const batchSize = 500;
+        for (let i = 0; i < filteredUsers.length; i += batchSize) {
+
+            const batch = filteredUsers.slice(i, i + batchSize);
+            await programmaScadenziario.insertMany(batch, { ordered: false });
+            console.log(`${batch.length} documenti inseriti in MongoDB.`);
+        }
+    } else {
+        console.log("Nessun documento da inserire.");
+    }
+}
+
+// readExcel(path.resolve('rinnovi.xlsx'));
 
 router.post('/admin/rinnovi/ricerca/scadenzaPatente', authenticateJWT, async (req, res) => {
     const { cFiscale } = req.body;
