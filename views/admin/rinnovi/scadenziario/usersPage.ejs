@@ -275,7 +275,7 @@
         }
         
         window.addEventListener("scroll", async () => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 20) {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) {
                 await loadMoreUsers();
                 actionBtns = document.querySelectorAll('.action');
             }

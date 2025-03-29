@@ -409,7 +409,7 @@ router.get('/admin/rinnovi/scadenziario', authenticateJWT, async (req, res) => {
     const { role } = await admins.findOne({"email": req.user.email});
 
     const page = 1;
-    const limit = 20;
+    const limit = 50;
     const skip = (page - 1) * limit; 
 
     const totalUsers = await Scadenziario.countDocuments();
@@ -429,7 +429,7 @@ router.get('/admin/rinnovi/scadenziario', authenticateJWT, async (req, res) => {
 });
 router.get('/admin/rinnovi/scadenziario/data', authenticateJWT, async (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const limit = 20;
+    const limit = 50;
     const skip = (page - 1) * limit;
 
     const scadenziario = await Scadenziario.find().skip(skip).limit(limit);
