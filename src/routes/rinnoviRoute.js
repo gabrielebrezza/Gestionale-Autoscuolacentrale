@@ -520,16 +520,16 @@ async function searchAndUpdate() {
     }
 }
 
-function isValidExecutionTime() {
-    const now = new Date();
-    const hour = now.getHours();
-    const day = now.getDay();
-    return day >= 1 && day <= 6 && hour >= 8 && hour <= 20;
-}
+// function isValidExecutionTime() {
+//     const now = new Date();
+//     const hour = now.getHours();
+//     const day = now.getDay();
+//     return day >= 1 && day <= 6 && hour >= 8 && hour <= 20;
+// }
 if(process.env.SERVER_URL != 'http://localhost'){
-if (isValidExecutionTime()) {
-    searchAndUpdate();
-}
+// if (isValidExecutionTime()) {
+//     searchAndUpdate();
+// }
 
 cron.schedule("0 8-20/2 * * 1-6", async () => {
     await searchAndUpdate();

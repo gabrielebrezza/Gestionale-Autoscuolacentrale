@@ -97,7 +97,7 @@
                                             </span>
                                                         </a>
                                                         <% }else{ %>
-                                                            <a class="pagamenti" href="<%= `/admin/pagamenti?cf=${encodeURIComponent(user.cFiscale)}` %>">
+                                                            <a class="pagamenti" href="<%= `/admin/pagamenti/${encodeURIComponent(user._id)}` %>">
                                                                 <span class="material-symbols-outlined">
                                                payments
                                             </span>
