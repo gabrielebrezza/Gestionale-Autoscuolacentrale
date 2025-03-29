@@ -91,7 +91,7 @@ router.post('/uploadUserFirma', async (req, res) => {
 
 router.get('/admin/pagamenti', async (req, res) => {
     const pagamenti = await utenti.findOne({"cFiscale": req.query.cf}, {"fatture": 1}); 
-    if(pagamenti.fatture == '') return res.render('errorPage', {error: "Questo utente non ha effetuato ancora un pagamento"});
+    if(pagamenti?.fatture == '') return res.render('errorPage', {error: "Questo utente non ha effetuato ancora un pagamento"});
     res.render('admin/payments/storicoPagamenti',{pagamenti: pagamenti.fatture})
 });
 
