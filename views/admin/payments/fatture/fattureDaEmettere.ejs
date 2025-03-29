@@ -10,7 +10,7 @@
     <%- include('../../components/header.ejs') %>
     <main>
         <% let i = 1; %>
-        <% for (const fattura of dati.fatture) { %>
+        <% for (const fattura of fatture) { %>
             <% if (!fattura.emessa) { %>
                 <div class="card">
                     <div class="card-body">

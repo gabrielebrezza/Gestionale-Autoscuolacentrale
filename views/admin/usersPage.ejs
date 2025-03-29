@@ -91,7 +91,7 @@
                             %>
                                                 <td class="buttonCell">
                                                     <% if (daEmettere) { %>
-                                                        <a class="fatturaDaEmettere" href="<%= `/admin/fattureDaEmettere?cf=${encodeURIComponent(user.cFiscale)}` %>">
+                                                        <a class="fatturaDaEmettere" href="<%= `/admin/fattureDaEmettere/${encodeURIComponent(user._id)}` %>">
                                                             <span class="material-symbols-outlined">
                                                 receipt_long
                                             </span>

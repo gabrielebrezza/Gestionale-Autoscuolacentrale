@@ -358,14 +358,13 @@ router.post('/stampa', authenticateJWT, async (req, res)=> {
   }
 });
 
-router.get('/admin/fattureDaEmettere', authenticateJWT, async (req, res)=> {
+router.get('/admin/fattureDaEmettere/:id', authenticateJWT, async (req, res)=> {
   try{
-    const cf = req.query.cf; 
-    const dati = await utenti.findOne(
-      {"cFiscale": cf},
-      {"fatture": 1}
+    const {cFiscale, fatture} = await utenti.findOne(
+      {"_id": req.params.id},
+      {"cFiscale": 1, "fatture": 1}
     );
-    res.render('admin/payments/fatture/fattureDaEmettere', {dati, cf});
+    res.render('admin/payments/fatture/fattureDaEmettere', {fatture, cf: cFiscale});
   }catch(error){
     res.render('errorPage', {error: 'Utente non trovato'})
   }
