@@ -20,7 +20,7 @@ const Duplicati = require('../DB/Duplicati');
 const programmaScadenziario = require('../DB/programmaScadenziario');
 const infoScadenziario = require('../DB/infoScadenziario');
 //functions
-const sendEmail = require('../utils/emailsUtils.js');
+const {sendEmail, sendRinnoviEmail} = require('../utils/emailsUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
 const {searchUserPortale, searchExpirationPortale, searchScheduleExpirationPortale} = require('../utils/portaleAutomobilistaUtils.js');
 const { trovaProvincia } = require('../utils/genericUtils.js');
@@ -792,5 +792,5 @@ router.post('/admin/duplicati/saveUser', authenticateJWT, async (req, res)=>{
         res.render('errorPage', {error: 'errore nel salvataggio utente'});
     }
 });
-
+sendRinnoviEmail('brezzagabriele0@gmail.com', 'La tua Patente sta per Scadere!', '')
 module.exports = router;

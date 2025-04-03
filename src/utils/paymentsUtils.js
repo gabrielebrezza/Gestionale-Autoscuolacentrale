@@ -6,7 +6,7 @@ const path = require('path');
 const utenti = require('../DB/User');
 
 //functions
-const sendEmail = require('../utils/emailsUtils.js');
+const {sendEmail} = require('../utils/emailsUtils.js');
 const {compilaTt2112, compilaCertResidenza} = require('../utils/compileUtils');
 
 async function setPayment(userId, paymentUrl, patente, price, email) {

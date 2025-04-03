@@ -7,7 +7,7 @@ const router = express.Router();
 const admins = require('../DB/Admin');
 
 const { generateToken, authenticateJWT } = require('../utils/authUtils.js');
-const sendEmail = require('../utils/emailsUtils.js');
+const {sendEmail} = require('../utils/emailsUtils.js');
 
 router.get('/admin/signup', (req, res) => {
     res.render('admin/auth/signUp');

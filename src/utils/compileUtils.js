@@ -28,25 +28,25 @@ async function compilaTt2112(id) {
 
       form.getTextField('Codice Autoscuola / Agenzia').setText('0013');
       form.getTextField('UMC').setText('TORINO')
-      form.getTextField('Cognome').setText(data.cognome);
-      form.getTextField('Nome').setText(data.nome);
-      form.getTextField('Luogo di nascita').setText(data.nascita.comune);
-      form.getTextField('Provincia_nascita').setText(data.nascita.provincia == 'EE' ? '': data.nascita.provincia);
-      form.getTextField('Stato').setText(data.nascita.stato);
-      form.getTextField('Data Nascita').setText(data.nascita.data);
-      form.getTextField('Codice fiscale').setText(duplicato ? data.cf : data.cFiscale);
-      form.getTextField('Luogo di residenza').setText(data.residenza.comune);
-      form.getTextField('Indirizzo').setText(data.residenza.via); 
-      form.getTextField('Numero Civico').setText(data.residenza.nCivico);
-      form.getTextField('Provincia_residenza').setText(data.residenza.provincia);
+      form.getTextField('Cognome').setText(data.cognome.toUpperCase());
+      form.getTextField('Nome').setText(data.nome.toUpperCase());
+      form.getTextField('Luogo di nascita').setText(data.nascita.comune.toUpperCase());
+      form.getTextField('Provincia_nascita').setText(data.nascita.provincia == 'EE' ? '': data.nascita.provincia.toUpperCase());
+      form.getTextField('Stato').setText(data.nascita.stato.toUpperCase());
+      form.getTextField('Data Nascita').setText(data.nascita.data.toUpperCase());
+      form.getTextField('Codice fiscale').setText(duplicato ? data.cf : data.cFiscale.toUpperCase());
+      form.getTextField('Luogo di residenza').setText(data.residenza.comune.toUpperCase());
+      form.getTextField('Indirizzo').setText(data.residenza.via.toUpperCase()); 
+      form.getTextField('Numero Civico').setText(data.residenza.nCivico.toUpperCase());
+      form.getTextField('Provincia_residenza').setText(data.residenza.provincia.toUpperCase());
       form.getTextField('CAP').setText(data.residenza.cap);
       form.getTextField('Sesso').setText(data.sesso);
       if(duplicato){
         form.getCheckBox('Duplicato').check();
-        form.getTextField('Cat. richiesta_1').setText(patenteRichiesta);
+        form.getTextField('Cat. richiesta_1').setText(patenteRichiesta.toUpperCase());
       }else{
         form.getCheckBox('Foglio Rosa').check();
-        form.getTextField('Cat. richiesta').setText(patenteRichiesta);
+        form.getTextField('Cat. richiesta').setText(patenteRichiesta.toUpperCase());
       }
       
       const pdfBytes = await pdfDoc.save();
@@ -82,43 +82,43 @@ async function compilaCertResidenza(id) {
         const comuneResidenzaPosition = { x: 240, y: 375 };
         const provinciaResidenzaPosition = { x: 470, y: 375 };
         const indirizzoPosition = { x: 140, y: 355 };
-        firstPage.drawText(`${data.cognome} ${data.nome}`, {
+        firstPage.drawText(`${data.cognome.toUpperCase()} ${data.nome.toUpperCase()}`, {
           x: nomeCognomePosition.x,
           y: nomeCognomePosition.y,
           size: 12,
           color: rgb(0, 0, 0),
         });
-        firstPage.drawText(data.nascita.comune, {
+        firstPage.drawText(data.nascita.comune.toUpperCase(), {
           x: luogoNascitaPosition.x,
           y: luogoNascitaPosition.y,
           size: 12,
           color: rgb(0, 0, 0),
         });
-        firstPage.drawText(data.nascita.provincia, {
+        firstPage.drawText(data.nascita.provincia.toUpperCase(), {
           x: provinciaNascitaPosition.x,
           y: provinciaNascitaPosition.y,
           size: 12,
           color: rgb(0, 0, 0),
         });
-        firstPage.drawText(data.nascita.data, {
+        firstPage.drawText(data.nascita.data.toUpperCase(), {
           x: dataNascitaPosition.x,
           y: dataNascitaPosition.y,
           size: 12,
           color: rgb(0, 0, 0),
         });
-        firstPage.drawText(data.residenza.comune, {
+        firstPage.drawText(data.residenza.comune.toUpperCase(), {
           x: comuneResidenzaPosition.x,
           y: comuneResidenzaPosition.y,
           size: 12,
           color: rgb(0, 0, 0),
         });
-        firstPage.drawText(data.residenza.provincia, {
+        firstPage.drawText(data.residenza.provincia.toUpperCase(), {
           x: provinciaResidenzaPosition.x,
           y: provinciaResidenzaPosition.y,
           size: 12,
           color: rgb(0, 0, 0),
         });
-        firstPage.drawText(`${data.residenza.via} ${data.residenza.nCivico}`, {
+        firstPage.drawText(`${data.residenza.via.toUpperCase()} ${data.residenza.nCivico.toUpperCase()}`, {
           x: indirizzoPosition.x,
           y: indirizzoPosition.y,
           size: 12,
@@ -166,7 +166,7 @@ async function compilaCertResidenza(id) {
             data.protocollo.split('').forEach(letter => nProtocollo+= `${letter} `);
           }
           
-          const intestazione = `CF: ${data.cf} \nIndirizzo Di Spedizione: \n${data.spedizione.via} ${data.spedizione.nCivico} \n${data.spedizione.cap} ${data.spedizione.comune} (${data.spedizione.provincia})`
+          const intestazione = `CF: ${data.cf} \nIndirizzo Di Spedizione: \n${data.spedizione.via.toUpperCase()} ${data.spedizione.nCivico.toUpperCase()} \n${data.spedizione.cap} ${data.spedizione.comune.toUpperCase()} (${data.spedizione.provincia.toUpperCase()})`
 
           intestazione.split('\n').forEach((linea) => {
             firstPage.drawText(linea, {
@@ -192,7 +192,7 @@ async function compilaCertResidenza(id) {
             color: rgb(0, 0, 0),
           });
 
-          firstPage.drawText(`${data.cognome} ${data.nome}`, {
+          firstPage.drawText(`${data.cognome.toUpperCase()} ${data.nome.toUpperCase()}`, {
             x: nomeCognomePosition.x,
             y: nomeCognomePosition.y,
             size: 12,

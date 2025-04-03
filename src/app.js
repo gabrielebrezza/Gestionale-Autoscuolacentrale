@@ -13,7 +13,7 @@ const codes = require('./DB/Codes');
 const app = express();
 
 //utils
-const sendEmail = require('./utils/emailsUtils');
+const {sendEmail} = require('./utils/emailsUtils');
 const {setPayment, createSatispayPayment} = require('./utils/paymentsUtils.js');
 //routes
 const paymentsRoute = require('./routes/paymentsRoute');

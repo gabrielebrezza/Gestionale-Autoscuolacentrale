@@ -20,7 +20,7 @@ const storicoFattureAgenda = require('../DB/storicoFattureAgenda');
 const rinnovi = require('../DB/Rinnovi');
 const Duplicati = require('../DB/Duplicati');
 //functions
-const sendEmail = require('../utils/emailsUtils.js');
+const {sendEmail} = require('../utils/emailsUtils.js');
 const {creaFatturaElettronica, creaFatturaCortesia, scaricaFatturaAPI} = require('../utils/fattureUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
 const {compilaTt2112, compilaCertResidenza, compilaVmRinnovo} = require('../utils/compileUtils');
