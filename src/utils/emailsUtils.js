@@ -113,7 +113,7 @@ const sendRinnoviEmail = async (email, subject, text, attachment = null) => {
 </head>
 <body>
     <div class="email-container">
-        <img src="https://rinnovopatenti.it/assets/logo_rinnovopatenti.svg" alt="Logo Rinnovopatenti" class="logo">
+        <img src="https://iscrizione-autoscuolacentrale.com/img/logo_rinnovopatenti.png" alt="Logo Rinnovopatenti" class="logo">
         <h1>La tua patente sta per scadere! Rinnovala con rinnovopatenti.it</h1>
         <p>Gentile ${nomeECognome},</p>
         <p>oltre a ringraziarti nuovamente per aver già usato il nostro servizio per rinnovare la tua patente, ti ricordiamo che la tua patente N. <strong>${numero_patente}</strong> scadrà il <strong>${data_scadenza}</strong>.</p>
