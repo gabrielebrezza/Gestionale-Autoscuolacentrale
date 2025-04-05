@@ -510,6 +510,8 @@ router.post('/admin/rinnovi/scadenziario/deleteUsers', authenticateJWT, async (r
 // });
 
 const cron = require("node-cron");
+let isSearching = false;
+
 async function searchAndUpdate() {
     console.log("🔄 Avvio ricerca scadenze patente degli utenti programmati");
     try {
@@ -518,23 +520,39 @@ async function searchAndUpdate() {
     } catch (error) {
         console.log(`Errore durante l'elaborazione delle scadenze patente: ${error}`);
     }
+    isSearching = false;
 }
 
-// function isValidExecutionTime() {
-//     const now = new Date();
-//     const hour = now.getHours();
-//     const day = now.getDay();
-//     return day >= 1 && day <= 6 && hour >= 8 && hour <= 20;
-// }
-if(process.env.SERVER_URL != 'http://localhost'){
-// if (isValidExecutionTime()) {
-//     searchAndUpdate();
-// }
+async function trySearchAndUpdate() {
+    if (isSearching) {
+        console.log("🔄 La ricerca è già in corso. Riproverò tra 5 minuti...");
+        setTimeout(async () => {
+            await trySearchAndUpdate(); // Riprova dopo 5 minuti
+        }, 5 * 60 * 1000); // 5 minuti in millisecondi
+        return;
+    }
 
-cron.schedule("0 8-20/2 * * 1-6", async () => {
+    isSearching = true;
     await searchAndUpdate();
-});
 }
+
+function isValidExecutionTime() {
+    const now = new Date();
+    const hour = now.getHours();
+    const day = now.getDay();
+    return day >= 1 && day <= 6 && hour >= 8 && hour <= 20;
+}
+
+if (process.env.SERVER_URL != 'http://localhost') {
+    if (isValidExecutionTime()) {
+        trySearchAndUpdate(); // Esegui subito se l'orario è valido
+    }
+
+    cron.schedule("0 8-20/2 * * 1-6", async () => {
+        await trySearchAndUpdate(); // Controlla se può eseguire la ricerca ogni 2 ore
+    });
+}
+
 router.post('/admin/rinnovi/scadenziario/downloadExcel', authenticateJWT, async (req, res) =>{
     try {
         const users = await Scadenziario.find();
@@ -584,18 +602,25 @@ router.post('/admin/rinnovi/scadenziario/downloadExcel', authenticateJWT, async 
 });
 
 async function readExcel(filePath) {
+    const cfRegex = /^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$/i;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const workbook = new exceljs.Workbook();
     await workbook.xlsx.readFile(filePath);
 
     const worksheet = workbook.worksheets[0];
     const usersArr = worksheet.getSheetValues()
-    .filter(row => Array.isArray(row) && row[2] && row[2].toString().includes('RINNOVO') && row[15] && row[16] && row[17] && row[22] )
+    .filter(row => 
+      Array.isArray(row) &&
+      row[1] && row[2] &&
+      (typeof row[3] === 'string' && cfRegex.test(row[3])) &&
+      (typeof row[8] === 'string' && emailRegex.test(row[8]))
+    )
     .map(u => ({
-        nomeECognome: u[15],
-        email: u[16],
-        cf: u[17],
-        residenza: u[22],
-        try: 0
+      nomeECognome: `${u[2]} ${u[1]}`,
+      email: u[8],
+      cf: u[3],
+      residenza: null,
+      try: 0
     }));
     const seenCF = new Set();
     const filteredUsers = usersArr.filter(user => {
@@ -792,5 +817,5 @@ router.post('/admin/duplicati/saveUser', authenticateJWT, async (req, res)=>{
         res.render('errorPage', {error: 'errore nel salvataggio utente'});
     }
 });
-sendRinnoviEmail('brezzagabriele0@gmail.com', 'La tua Patente sta per Scadere!', '')
+// sendRinnoviEmail('tuttopatenti@gmail.com', 'La tua Patente sta per Scadere!', '')
 module.exports = router;

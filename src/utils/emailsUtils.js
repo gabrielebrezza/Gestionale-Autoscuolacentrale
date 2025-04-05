@@ -128,7 +128,7 @@ const sendRinnoviEmail = async (email, subject, text, attachment = null) => {
         <p><strong>E dopo la visita?</strong></p>
         <p>La tua nuova patente ti verrà recapitata direttamente all'indirizzo che preferisci, indipendentemente dalla residenza, senza ulteriori pensieri.</p>
         <p><strong>Non perdere tempo prezioso!</strong></p>
-        <p>Clicca qui per prenotare subito il rinnovo della tua patente: <a href="https://www.rinnovopatenti.it" class="btn">Rinnova la tua patente ora!</a></p>
+        <p>Clicca qui per prenotare subito il rinnovo della tua patente: <a href="https://www.rinnovopatenti.it" class="btn" style="color: #fff">Rinnova la tua patente ora!</a></p>
         <p>La tua sicurezza e la tua tranquillità sono la nostra priorità.</p>
         <p>Ti aspettiamo!</p>
         <p>Team Rinnovopatenti.it</p>
