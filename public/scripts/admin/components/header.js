@@ -10,4 +10,29 @@ document.addEventListener('DOMContentLoaded', () => {
             navBarItems.style.opacity = navBarItems.style.opacity == 1 ? 0 : 1;
         }, 350); 
     });
+    document.addEventListener('click', e => {
+        if(!navBar.contains(e.target) && toggleMenuBtn != e.target){
+            toggleMenuBtn.style.rotate = '0deg';
+            navBar.style.width = 0;
+            navBarItems.style.display ='none';
+            setTimeout(() =>{     
+                navBarItems.style.opacity = 0;
+            }, 350);
+        }
+        document.querySelectorAll('details').forEach(details => {
+            if (details.open && !details.contains(e.target)) {
+                details.removeAttribute('open')
+            }
+        });
+        const filterRinnovi = document.getElementById('filterRinnovi');
+        const filterRinnoviBtn = document.getElementById('filterRinnoviBtn');
+        if(filterRinnovi && filterRinnoviBtn){
+            if (!filterRinnovi.contains(e.target) && !filterRinnoviBtn.contains(e.target)) {
+                filterRinnovi.style.height = '0px';
+                setTimeout(() => {
+                    filterRinnovi.style.opacity = 0;
+                },200);
+            }
+        }
+    })
 });
