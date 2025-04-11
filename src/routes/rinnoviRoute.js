@@ -409,7 +409,7 @@ router.get('/admin/rinnovi/scadenziario', authenticateJWT, async (req, res) => {
     const { role } = await admins.findOne({"email": req.user.email});
 
     const page = 1;
-    const limit = 50;
+    const limit = 100;
     const skip = (page - 1) * limit; 
 
     const totalUsers = await Scadenziario.countDocuments();
@@ -424,12 +424,13 @@ router.get('/admin/rinnovi/scadenziario', authenticateJWT, async (req, res) => {
         currentPage: page,
         totalScheduledUsers,
         info,
+        isSearching,
         role
     });
 });
 router.get('/admin/rinnovi/scadenziario/data', authenticateJWT, async (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const limit = 50;
+    const limit = 100;
     const skip = (page - 1) * limit;
 
     const scadenziario = await Scadenziario.find().skip(skip).limit(limit);
@@ -543,6 +544,42 @@ function isValidExecutionTime() {
     return day >= 1 && day <= 6 && hour >= 8 && hour <= 20;
 }
 
+async function notifyExpirations() {
+    let deadLine = new Date();
+    deadLine = new Date(deadLine.setMonth(deadLine.getMonth() + 4)).setHours(0, 0, 0, 0);
+    const users = await Scadenziario.find({$and: [
+      { expPatente: { $lte: deadLine } },
+      { expPatente: { $gte: new Date() } }
+    ]});
+    const notificationMessages = {
+        124: "4 mesi",
+        93: "3 mesi",
+        62: "2 mesi",
+        31: "1 mese",
+        14: "14 giorni",
+        7: "7 giorni",
+        4: "4 giorni",
+        3: "3 giorni",
+        2: "2 giorni",
+        1: "1 giorno"
+    };
+    for (const u of users) {
+        const daysLeft = Math.ceil((u.expPatente - new Date())/ (1000 * 60 * 60 * 24));
+        const emailNumber = [124, 93, 62, 31, 14, 7, 4, 3, 2, 1].indexOf(daysLeft) + 1;
+        if (daysLeft, notificationMessages[daysLeft] && u.totalEmailSentCount < emailNumber) {
+            const nomeECognome = u?.nomeECognome?.replace(/\s+/g, ' ').trim().toLowerCase().split(' ').map(p => `${p[0]?.toUpperCase()}${p?.slice(1)}`).join(' ');
+            const data = {nomeECognome: nomeECognome, numero_patente: u.nPatente, data_scadenza: u.expPatente.toLocaleDateString('IT-it'), daysLeft: notificationMessages[daysLeft]}
+            try {
+                const response = sendRinnoviEmail(u.email, 'La tua Patente sta per Scadere!', data)
+                await Scadenziario.findOneAndUpdate({"_id": u._id}, {"totalEmailSentCount": emailNumber});
+                console.log(response);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
+}
+
 if (process.env.SERVER_URL != 'http://localhost') {
     if (isValidExecutionTime()) {
         trySearchAndUpdate(); // Esegui subito se l'orario è valido
@@ -551,7 +588,13 @@ if (process.env.SERVER_URL != 'http://localhost') {
     cron.schedule("0 8-20/2 * * 1-6", async () => {
         await trySearchAndUpdate(); // Controlla se può eseguire la ricerca ogni 2 ore
     });
+
+    cron.schedule("0 15 * * *", async () => {
+        console.log('🔄 Eseguo L\'invio delle email per i rinnovi')
+        await notifyExpirations();
+    });
 }
+
 
 router.post('/admin/rinnovi/scadenziario/downloadExcel', authenticateJWT, async (req, res) =>{
     try {
@@ -817,5 +860,5 @@ router.post('/admin/duplicati/saveUser', authenticateJWT, async (req, res)=>{
         res.render('errorPage', {error: 'errore nel salvataggio utente'});
     }
 });
-// sendRinnoviEmail('tuttopatenti@gmail.com', 'La tua Patente sta per Scadere!', '')
+
 module.exports = router;

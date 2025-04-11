@@ -29,6 +29,11 @@ const ScadenziarioSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    totalEmailSentCount: {
+        type: Number,
+        required: false,
+        default: 0
+    },
     // spedizione: {
     //     via: {
     //         type: String,

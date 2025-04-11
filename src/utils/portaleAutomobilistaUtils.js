@@ -228,10 +228,10 @@ async function searchUserPortale(cf, cognome, nPatente) {
             const utente = await programmaScadenziario.findOne({"_id": u._id});
             if(utente.try > 2){
               await programmaScadenziario.deleteOne({"_id": u._id});
+              totalErrors++;
             }else{
               await programmaScadenziario.findOneAndUpdate({"_id": u._id}, {$inc: {"try" : 1}});
             }
-            totalErrors++;
             continue;
           }
           console.log(numeroPatente)
@@ -259,10 +259,10 @@ async function searchUserPortale(cf, cognome, nPatente) {
             const utente = await programmaScadenziario.findOne({"_id": u._id});
             if(utente.try > 2){
               await programmaScadenziario.deleteOne({"_id": u._id});
+              totalErrors++;
             }else{
               await programmaScadenziario.findOneAndUpdate({"_id": u._id}, {$inc: {"try" : 1}});
             }
-            totalErrors++;
             continue;
           }
           if(exp && numeroPatente){
