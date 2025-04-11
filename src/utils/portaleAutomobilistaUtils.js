@@ -265,6 +265,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
             }
             continue;
           }
+          console.log(exp)
           if(exp && numeroPatente){
             try {
               const newUser = new Scadenziario({
