@@ -280,8 +280,13 @@ async function searchUserPortale(cf, cognome, nPatente) {
               await programmaScadenziario.deleteOne({"_id": u._id});
             } catch (error) {
               console.log(`Si è verificato un'errore nell'aggiunta dell'utente allo scadenziario: ${error}`);
-              await programmaScadenziario.findOneAndUpdate({"_id": u._id}, {$inc: {"try" : 1}});
-              totalErrors++;
+              const utente = await programmaScadenziario.findOne({"_id": u._id});
+              if(utente.try > 2){
+                await programmaScadenziario.deleteOne({"_id": u._id});
+                totalErrors++;
+              }else{
+                await programmaScadenziario.findOneAndUpdate({"_id": u._id}, {$inc: {"try" : 1}});
+              }
             }
           }
         }
