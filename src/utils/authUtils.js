@@ -9,7 +9,8 @@ async function generateToken(email) {
 async function authenticateJWT(req, res, next) {
     const token = req.cookies.token;
     if (!token) {
-        return res.redirect('/admin/login');
+        return res.status(403).set('Location', '/admin/login').send('Redirecting to login...');
+
     }
 
     jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {

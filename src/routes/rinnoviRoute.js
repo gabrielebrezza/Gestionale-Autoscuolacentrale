@@ -595,7 +595,14 @@ if (process.env.SERVER_URL != 'http://localhost') {
     });
 }
 
-
+(async() => {
+    try {
+        const response = await fetch('https://iscrizione-autoscuolacentrale.com/images?dir=immaginiRinnovi%2F67d1ba2cc0eee01dc0b8a579.jpeg', {"headers": {"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJyZXp6YWdhYnJpZWxlMEBnbWFpbC5jb20iLCJpYXQiOjE3NDQzNzY1NzIsImV4cCI6MTc0NDYzNTc3Mn0.5rHY1rHtlvQqV2-Gh6diysZ5LaLNqve-dlAvS4qDlyA"}});
+        console.log(response)
+    } catch (e) {
+        console.log(`errore: ${e}`)
+    }
+});
 router.post('/admin/rinnovi/scadenziario/downloadExcel', authenticateJWT, async (req, res) =>{
     try {
         const users = await Scadenziario.find();

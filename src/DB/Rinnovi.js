@@ -90,6 +90,16 @@ const RinnoviSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    hasPhoto: {
+        type: Boolean,
+        required: false,
+        default: false
+    },
+    hasSign: {
+        type: Boolean,
+        required: false,
+        default: false
+    },
     archiviato: {
         type: Boolean,
         required: false
