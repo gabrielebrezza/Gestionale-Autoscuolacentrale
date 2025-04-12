@@ -184,6 +184,8 @@
                     <th>Telefono</th>
                     <th>Visita Medica</th>
                     <th>Registrazione</th>
+                    <th>foto</th>
+                    <th>firma</th>
                     <th>Fatture</th>
                 </tr>
             </thead>
@@ -222,6 +224,12 @@
                             <% const oraVisita = user.visita.ora ? user.visita.ora : '' %>
                             <td><%= dataVisita || oraVisita ? `${dataVisita} ${oraVisita}`  : 'Mancante' %></td>
                             <td><%= user.creationDate ? user.creationDate.toLocaleDateString() : 'N/A' %></td>
+                            <td>
+                                <input type="checkbox" disabled <%= user.hasPhoto ? 'checked' : '' %>>
+                            </td>
+                            <td>
+                                <input type="checkbox" disabled <%= user.hasSign ? 'checked' : '' %>>
+                            </td>
                             <td class="buttonCell">
                                 <% if (!user.fatture.importo) { %>
                                     <a class="pagamenti" href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>">

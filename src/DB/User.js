@@ -159,6 +159,16 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    hasPhoto: {
+        type: Boolean,
+        required: false,
+        default: false
+    },
+    hasSign: {
+        type: Boolean,
+        required: false,
+        default: false
+    },
     fatture: [
         {
             data: {

@@ -19,6 +19,7 @@ const Scadenziario = require('../DB/Scadenziario');
 const Duplicati = require('../DB/Duplicati');
 const programmaScadenziario = require('../DB/programmaScadenziario');
 const infoScadenziario = require('../DB/infoScadenziario');
+const utentiIscrizioni = require('../DB/User');
 //functions
 const {sendEmail, sendRinnoviEmail} = require('../utils/emailsUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
@@ -127,11 +128,15 @@ router.post('/uploadUserImage', async (req, res) => {
     try{
         const base64Data = data.replace(/^data:image\/jpeg;base64,/, "").replace(/\s/g, '');
         const filePath = path.join('privateImages', location , `${id}.jpeg`);
-        fs.writeFile(filePath, base64Data, 'base64', (err) => {
+        fs.writeFile(filePath, base64Data, 'base64', async (err) => {
             if (err) {
                 console.error(`Errore nel salvataggio dell'immagine ${location} ${err}`);
                 return res.status(500).json({ message: `Errore nel salvataggio dell'immagine ${location}` });
             }
+            if(location == 'immaginiRinnovi') await Rinnovi.findOneAndUpdate({"_id": id}, {"hasPhoto": true});
+            if(location == 'firmeRinnovi') await Rinnovi.findOneAndUpdate({"_id": id}, {"hasSign": true});
+            if(location == 'immaginiIscrizioni') await utentiIscrizioni.findOneAndUpdate({"_id": id}, {"hasPhoto": true});
+            if(location == 'firmeIscrizioni') await utentiIscrizioni.findOneAndUpdate({"_id": id}, {"hasSign": true});
             res.status(200).json({ message: 'immagine salvata con successo' });
         });
     }catch(err){
@@ -146,6 +151,10 @@ router.delete('/deleteUserImage', authenticateJWT, async (req, res) => {
         if (fs.existsSync(filePath)) {
             await fs.promises.unlink(filePath);
         }
+        if(location == 'immaginiRinnovi') await Rinnovi.findOneAndUpdate({"_id": id}, {"hasPhoto": false});
+        if(location == 'firmeRinnovi') await Rinnovi.findOneAndUpdate({"_id": id}, {"hasSign": false});
+        if(location == 'immaginiIscrizioni') await utentiIscrizioni.findOneAndUpdate({"_id": id}, {"hasPhoto": false});
+        if(location == 'firmeIscrizioni') await utentiIscrizioni.findOneAndUpdate({"_id": id}, {"hasSign": false});
         res.status(200).json({ message: 'Immagine eliminata con successo' });
     } catch (err) {
         console.error(`Errore durante l'eliminazione dell'immagine:`, err);
@@ -511,6 +520,8 @@ router.post('/admin/rinnovi/scadenziario/deleteUsers', authenticateJWT, async (r
 // });
 
 const cron = require("node-cron");
+const Rinnovi = require('../DB/Rinnovi');
+const utenti = require('../DB/User');
 let isSearching = false;
 
 async function searchAndUpdate() {
@@ -595,14 +606,27 @@ if (process.env.SERVER_URL != 'http://localhost') {
     });
 }
 
-(async() => {
-    try {
-        const response = await fetch('https://iscrizione-autoscuolacentrale.com/images?dir=immaginiRinnovi%2F67d1ba2cc0eee01dc0b8a579.jpeg', {"headers": {"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJyZXp6YWdhYnJpZWxlMEBnbWFpbC5jb20iLCJpYXQiOjE3NDQzNzY1NzIsImV4cCI6MTc0NDYzNTc3Mn0.5rHY1rHtlvQqV2-Gh6diysZ5LaLNqve-dlAvS4qDlyA"}});
-        console.log(response)
-    } catch (e) {
-        console.log(`errore: ${e}`)
-    }
-});
+// (async() => {
+//     try {
+//         const utentiIsc = await utentiIscrizioni.find();
+//         let usersWithImages = 0;
+//         for (const u of utentiIsc) {
+//             try {
+//                 const response = await fetch(`https://iscrizione-autoscuolacentrale.com/images?dir=immaginiIscrizioni%2F${u._id}.jpeg`, {"headers": {"cookie": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImJyZXp6YWdhYnJpZWxlMEBnbWFpbC5jb20iLCJpYXQiOjE3NDQzNzY1NzIsImV4cCI6MTc0NDYzNTc3Mn0.5rHY1rHtlvQqV2-Gh6diysZ5LaLNqve-dlAvS4qDlyA"}});
+            
+//                 if(response.status == 200){
+//                     await utentiIscrizioni.findOneAndUpdate({"_id": u._id}, {"hasPhoto": true});
+//                     usersWithImages++;
+//                     console.log(usersWithImages)
+//                 }
+//             } catch (error) {
+//                 console.error(error)
+//             }
+//         }
+//     } catch (e) {
+//         console.log(`errore: ${e}`)
+//     }
+// })();
 router.post('/admin/rinnovi/scadenziario/downloadExcel', authenticateJWT, async (req, res) =>{
     try {
         const users = await Scadenziario.find();

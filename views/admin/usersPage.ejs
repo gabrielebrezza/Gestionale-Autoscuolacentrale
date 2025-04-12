@@ -33,6 +33,8 @@
                             <th>Patente</th>
                             <th>Registrazione</th>
                             <th>Esami</th>
+                            <th>Foto</th>
+                            <th>Firma</th>
                             <th>Fatture</th>
                         </tr>
                     </thead>
@@ -81,6 +83,12 @@
                                                 <% user.teoria.forEach(function(esame) { %>
                                                     <%= esame.data %> <br>
                                                         <% }); %>
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" disabled <%= user.hasPhoto ? 'checked' : '' %>>
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" disabled <%= user.hasSign ? 'checked' : '' %>>
                                             </td>
                                             <%  
                             const fatturaEmessa = user.fatture.find(function(fattura) {
