@@ -541,7 +541,7 @@ function isValidExecutionTime() {
     const now = new Date();
     const hour = now.getHours();
     const day = now.getDay();
-    return day >= 1 && day <= 6 && hour >= 8 && hour <= 20;
+    return day >= 1 && day <= 6 && hour >= 6 && hour <= 20;
 }
 
 async function notifyExpirations() {
@@ -585,7 +585,7 @@ if (process.env.SERVER_URL != 'http://localhost') {
         trySearchAndUpdate(); // Esegui subito se l'orario è valido
     }
 
-    cron.schedule("0 8-20/2 * * 1-6", async () => {
+    cron.schedule("0 6-20/2 * * 1-6", async () => {
         await trySearchAndUpdate(); // Controlla se può eseguire la ricerca ogni 2 ore
     });
 
