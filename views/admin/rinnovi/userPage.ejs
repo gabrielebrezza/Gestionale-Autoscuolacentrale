@@ -362,7 +362,7 @@
                 </tr>
                 <tr>
                     <td>Visita Medica</td>
-                    <td><input type="datetime-local" id="visita" name="visita" value="<%= `${user.visita.data}T${user.visita.ora}` %>"></td>
+                    <td><input type="datetime-local" id="visita" name="visita" value="<%= `${user.visita.data.toISOString().slice(0, 10)}T${user.visita.ora}` %>"></td>
                 </tr>
                 <tr> 
                     <td>Numero Protocollo</td>

@@ -25,10 +25,42 @@ const {sendEmail, sendRinnoviEmail} = require('../utils/emailsUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
 const {searchUserPortale, searchExpirationPortale, searchScheduleExpirationPortale} = require('../utils/portaleAutomobilistaUtils.js');
 const { trovaProvincia } = require('../utils/genericUtils.js');
-
+const { creaGiornale, creaGiornaleExcel } = require('../utils/compileUtils.js');
 router.get('/admin/rinnovi', authenticateJWT, async (req, res) =>{
     const users = await rinnovi.find({});
     res.render('admin/rinnovi/usersPage', {users})
+});
+
+router.post('/admin/rinnovi/download/:type', authenticateJWT, async (req, res) => {
+    try {
+        const fromDate = req.body.fromDate || new Date(0);
+        const toDate = req.body.toDate || new Date();
+        const users = await rinnovi.find({
+            "visita.data": { $gte: new Date(fromDate), $lte: new Date(toDate)},
+            "archiviato": true
+        });
+        const sortedUsers = users.sort((u1, u2) => u1.visita.data - u2.visita.data)
+        if(req.params.type == 'pdf'){
+            const giornale = await creaGiornale(sortedUsers);
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', 'attachment; filename="giornale.pdf"');
+
+            return res.end(giornale);
+        }
+        if(req.params.type == 'xlsx'){
+            const excelFile = await creaGiornaleExcel(sortedUsers)
+            res.setHeader('Content-Disposition', 'attachment; filename="giornale.xlsx"');
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            await excelFile.write(res);
+            return res.end();
+        }
+
+        console.log('Tipo non valido');
+        res.status(400).send('Tipo di file non valido');
+    } catch (error) {
+        console.error('Errore durante la generazione del file:', error);
+        res.status(500).send('Si è verificato un errore durante la generazione del file');
+    }
 });
 
 router.get('/admin/rinnovi/addUser', authenticateJWT, async (req, res) =>{
@@ -48,7 +80,7 @@ router.post('/rinnovi/addUser', authenticateJWT, async (req, res) => {
         }
         const [data, ora] = req.body.visita.split('T');
         visita = {
-            data: data,
+            data: new Date(`${data}T00:00:00Z`),
             ora: ora
         }
         contatti = {
@@ -189,7 +221,7 @@ router.post('/rinnovi/updateUser', authenticateJWT, async (req, res)=> {
             provincia: dati.provinciaResidenza,
         },
         visita: {
-            data: dataVisita,
+            data: new Date(`${dataVisita}T00:00:00Z`),
             ora: oraVisita
         },
         protocollo: dati.nProtocollo,
@@ -370,7 +402,7 @@ const fetchBookings = async () => {
                 realDate.setHours(realDate.getHours() + 1);
                 const [data, ora] = realDate.toISOString().slice(0, -8).split('T');
                 const visita = {
-                  data: data,
+                  data: new Date(`${data}T00:00:00Z`),
                   ora: ora
                 }
                 const contatti = {

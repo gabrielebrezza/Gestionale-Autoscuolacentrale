@@ -95,7 +95,6 @@
             
         </script>
 
-
     <div id="blurredBg"></div>
     <section id="searchDataContainer">
             <form id="searchDataForm" action="/admin/rinnovi/ricerca/portaleAutomobilista" method="POST">
@@ -159,9 +158,67 @@
             }, 500);
         }
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const downloadGiornaleExcelBtn = document.getElementById('downloadGiornaleExcel');
+            const downloadGiornalePdfBtn = document.getElementById('downloadGiornalePdf');
+            downloadGiornaleExcelBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                downloadGiornale('xlsx')
+            });
+            downloadGiornalePdfBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                downloadGiornale('pdf')
+            });
+            async function downloadGiornale(type) {
+                const response = await fetch(`/admin/rinnovi/download/${type}`,
+                 {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        fromDate: document.getElementById('filterVisitaFromDate').value,
+                        toDate: document.getElementById('filterVisitaToDate').value
+                    })
+                 });
+                if(!response.ok) {
+                    console.log('si è verificato un\'errore durante il download')
+                    return;
+                }
+                const blob = await response.blob();
+                
+                const url = window.URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `giornale.${type}`);
+                document.body.appendChild(link);
+                
+                link.click();
+                
+                document.body.removeChild(link);
+                
+                window.URL.revokeObjectURL(url); 
+            }
+        });
+    </script>
     <table>
         <form action="/rinnovi/deleteUsers" id="actionUsersForm" method="POST">
             <thead>
+                <tr>
+                    <th colspan="5">
+                        <button id="downloadGiornaleExcel">
+                            Scarica Giornale Excel
+                        </button>
+                    </th>
+                    <th colspan="5">
+                        <button id="downloadGiornalePdf">
+                            Scarica Giornale PDF
+                        </button>
+                    </th>
+                </tr>
                 <tr>
                     <th>
                         <span id="selectUsers" class="material-symbols-outlined">
@@ -220,7 +277,7 @@
                             <td style="text-transform: uppercase;"><%= user.nome %></td>
                             <td><%= user.contatti.email %></td>
                             <td><%= user.contatti.tel %></td>
-                            <% const dataVisita = user.visita.data ? user.visita.data.split('-').reverse().join('/') : '' %>
+                            <% const dataVisita = user.visita.data ? user.visita.data.toISOString().slice(0, 10).split('-').reverse().join('/') : '' %>
                             <% const oraVisita = user.visita.ora ? user.visita.ora : '' %>
                             <td><%= dataVisita || oraVisita ? `${dataVisita} ${oraVisita}`  : 'Mancante' %></td>
                             <td><%= user.creationDate ? user.creationDate.toLocaleDateString() : 'N/A' %></td>

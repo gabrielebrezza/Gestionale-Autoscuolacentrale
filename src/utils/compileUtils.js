@@ -1,31 +1,32 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { PDFDocument, rgb, StandardFonts} = require('pdf-lib');
+const exceljs = require('exceljs');
 
 const utenti = require('../DB/User');
 const Duplicati = require('../DB/Duplicati');
 const rinnovi = require('../DB/Rinnovi');
 
 
-async function creaGiornale() {
+async function creaGiornale(users) {
   const pdfDoc = await PDFDocument.create();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
   const titleFont = await pdfDoc.embedFont(StandardFonts.CourierBoldOblique);
   const pageCount = 50;
-  const lineHeight = 20;
-  const startY = 480;
+  const lineHeight = 14;
+  const startY = 730;
   const marginLeft = 30;
 
   const columns = [
-    { name: "N. operaz.", width: 75 },
-    { name: "Data Incarico", width: 100 },
-    { name: "Committente (Identificazione)", width: 250 },
-    { name: "Natura dell'incarico", width: 225 },
-    { name: "Data ricevuta documento", width: 130 },
+    { name: "N. operaz.", width: 50 },
+    { name: "Data Incarico", width: 75 },
+    { name: "Committente (Identificazione)", width: 150 },
+    { name: "Natura dell'incarico", width: 130 },
+    { name: "Data ricevuta documento", width: 130 }
   ];
 
   for (let i = 0; i < pageCount; i++) {
-    const page = pdfDoc.addPage([842, 595]); // Landscape A4
+    const page = pdfDoc.addPage([595, 842]); // Portrait A4
     const { width, height } = page.getSize();
 
     // Numero pagina in alto a sinistra
@@ -37,8 +38,6 @@ async function creaGiornale() {
       color: rgb(0, 0, 0),
     });
 
-    // Titolo nella prima pagina
-    if (i === 0) {
       page.drawText("Registro Giornale", {
         x: width / 2 - font.widthOfTextAtSize("Registro Giornale", 18) / 2,
         y: height - 60,
@@ -51,7 +50,6 @@ async function creaGiornale() {
         size: 12,
         font,
       });
-    }
 
     // Colonne
     let currentX = marginLeft;
@@ -96,9 +94,31 @@ async function creaGiornale() {
     });
 
     // Righe orizzontali corpo
-    for (let j = 0; j < 25; j++) {
+    for (let j = 0; j < 49; j++) {
       const y = startY - j * lineHeight;
       if (y < 50) break;
+      const userIndex = j + 49 * i;
+      if(userIndex < users.length){
+        const rowData = [
+          `${1 + userIndex}`,
+          users[userIndex].visita.data.toLocaleDateString('it-IT'),
+          `${users[userIndex].nome.toUpperCase()} ${users[userIndex].cognome.toUpperCase()}`,
+          'Rinnovo Patente',
+          users[userIndex].visita.data.toLocaleDateString('it-IT')
+        ]
+        columns.forEach((c, colIndex) => {
+          const xShift =  columns
+          .slice(0, colIndex)
+          .reduce((acc, col) => acc + col.width, 0);
+          page.drawText(`${rowData[colIndex]}`, {
+            x: marginLeft + xShift + 2,
+            y: y-10,
+            size: 8,
+            font,
+            color: rgb(0, 0, 0),
+          });
+        });
+      }
       page.drawLine({
         start: { x: marginLeft, y },
         end: { x: currentX, y },
@@ -108,9 +128,46 @@ async function creaGiornale() {
     }
   }
 
-  const pdfBytes = await pdfDoc.save();
-  await fs.writeFile("registro_giornale.pdf", pdfBytes);
   console.log("PDF creato con successo.");
+  const pdfBytes = await pdfDoc.save();
+  return pdfBytes;
+}
+
+async function creaGiornaleExcel(users) {
+  const workbook = new exceljs.Workbook();
+  const worksheet = workbook.addWorksheet('Giornale');
+
+  const headerFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6EFCE' } };
+  const headerFont = { bold: true };
+  const headers = ["N. operaz.", "Data Incarico", "Committente (Identificazione)", "Natura dell'incarico", "Data ricevuta documento"];
+  const columns = [];
+
+  headers.forEach(h => columns.push({ header: h, key: h, width: 50 }));
+
+  worksheet.columns = columns;
+
+  const headerRow = worksheet.getRow(1);
+  headerRow.fill = headerFill;
+  headerRow.font = headerFont;
+  headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+  users.forEach((u, index) => {
+      const row = [
+          index+1,
+          u.visita.data.toLocaleDateString('it-IT'),
+          `${u.nome.toUpperCase()} ${u.cognome.toUpperCase()}`,
+          'Rinnovo Patente',
+          u.visita.data.toLocaleDateString('it-IT')
+      ]
+      const rowNumber = worksheet.addRow(row).number;
+      worksheet.getRow(rowNumber).height = 20;
+  
+      worksheet.getRow(rowNumber).eachCell((cell) => {
+          cell.alignment = { vertical: 'middle', horizontal: 'center' };
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+      });
+  })
+  console.log("Excel creato con successo.");
+  return workbook.xlsx;
 }
 
 async function compilaTt2112(id) {
@@ -345,4 +402,4 @@ async function compilaCertResidenza(id) {
     });
   }
 
-module.exports = {compilaTt2112, compilaCertResidenza, compilaVmRinnovo, creaGiornale}
+module.exports = {creaGiornale, creaGiornaleExcel, compilaTt2112, compilaCertResidenza, compilaVmRinnovo}

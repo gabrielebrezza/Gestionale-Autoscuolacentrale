@@ -48,7 +48,7 @@ const RinnoviSchema = new mongoose.Schema({
     },
     visita: {
         data: {
-            type: String,
+            type: Date,
             required: false
         },
         ora: {
