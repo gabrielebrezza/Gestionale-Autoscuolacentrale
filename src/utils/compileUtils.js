@@ -1,10 +1,117 @@
 const fs = require('fs').promises;
 const path = require('path');
-const { PDFDocument, rgb } = require('pdf-lib');
+const { PDFDocument, rgb, StandardFonts} = require('pdf-lib');
 
 const utenti = require('../DB/User');
 const Duplicati = require('../DB/Duplicati');
 const rinnovi = require('../DB/Rinnovi');
+
+
+async function creaGiornale() {
+  const pdfDoc = await PDFDocument.create();
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const titleFont = await pdfDoc.embedFont(StandardFonts.CourierBoldOblique);
+  const pageCount = 50;
+  const lineHeight = 20;
+  const startY = 480;
+  const marginLeft = 30;
+
+  const columns = [
+    { name: "N. operaz.", width: 75 },
+    { name: "Data Incarico", width: 100 },
+    { name: "Committente (Identificazione)", width: 250 },
+    { name: "Natura dell'incarico", width: 225 },
+    { name: "Data ricevuta documento", width: 130 },
+  ];
+
+  for (let i = 0; i < pageCount; i++) {
+    const page = pdfDoc.addPage([842, 595]); // Landscape A4
+    const { width, height } = page.getSize();
+
+    // Numero pagina in alto a sinistra
+    page.drawText(`${i + 1}`, {
+      x: 10,
+      y: height - 25,
+      size: 20,
+      font,
+      color: rgb(0, 0, 0),
+    });
+
+    // Titolo nella prima pagina
+    if (i === 0) {
+      page.drawText("Registro Giornale", {
+        x: width / 2 - font.widthOfTextAtSize("Registro Giornale", 18) / 2,
+        y: height - 60,
+        size: 18,
+        font: titleFont,
+      });
+      page.drawText("Impresa di consulenza per la Circolazione dei Mezzi di Trasporto", {
+        x: width / 2 - font.widthOfTextAtSize("Impresa di consulenza per la Circolazione dei Mezzi di Trasporto", 12) / 2,
+        y: height - 85,
+        size: 12,
+        font,
+      });
+    }
+
+    // Colonne
+    let currentX = marginLeft;
+    columns.forEach(col => {
+      page.drawText(col.name, {
+        x: currentX + 2,
+        y: height - 110,
+        size: 10,
+        font,
+      });
+      page.drawLine({
+        start: { x: currentX, y: height - 100 },
+        end: { x: currentX, y: 40 },
+        thickness: 0.5,
+        color: rgb(0, 0, 0),
+      });
+      currentX += col.width;
+    });
+
+    // Linea destra
+    page.drawLine({
+      start: { x: currentX, y: height - 100 },
+      end: { x: currentX, y: 40 },
+      thickness: 0.5,
+      color: rgb(0, 0, 0),
+    });
+
+    // Riga intestazione orizzontale
+    page.drawLine({
+      start: { x: marginLeft, y: height - 100 },
+      end: { x: currentX, y: height - 100 },
+      thickness: 0.5,
+      color: rgb(0, 0, 0),
+    });
+
+    // Riga fondo
+    page.drawLine({
+      start: { x: marginLeft, y: 40 },
+      end: { x: currentX, y: 40 },
+      thickness: 0.5,
+      color: rgb(0, 0, 0),
+    });
+
+    // Righe orizzontali corpo
+    for (let j = 0; j < 25; j++) {
+      const y = startY - j * lineHeight;
+      if (y < 50) break;
+      page.drawLine({
+        start: { x: marginLeft, y },
+        end: { x: currentX, y },
+        thickness: 0.2,
+        color: rgb(0, 0, 0),
+      });
+    }
+  }
+
+  const pdfBytes = await pdfDoc.save();
+  await fs.writeFile("registro_giornale.pdf", pdfBytes);
+  console.log("PDF creato con successo.");
+}
 
 async function compilaTt2112(id) {
     try {
@@ -238,4 +345,4 @@ async function compilaCertResidenza(id) {
     });
   }
 
-module.exports = {compilaTt2112, compilaCertResidenza, compilaVmRinnovo}
+module.exports = {compilaTt2112, compilaCertResidenza, compilaVmRinnovo, creaGiornale}

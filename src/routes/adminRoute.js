@@ -23,8 +23,8 @@ const Duplicati = require('../DB/Duplicati');
 const {sendEmail} = require('../utils/emailsUtils.js');
 const {creaFatturaElettronica, creaFatturaCortesia, scaricaFatturaAPI} = require('../utils/fattureUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
-const {compilaTt2112, compilaCertResidenza, compilaVmRinnovo} = require('../utils/compileUtils');
-
+const {compilaTt2112, compilaCertResidenza, compilaVmRinnovo, creaGiornale} = require('../utils/compileUtils');
+// creaGiornale()
 router.use(cookieParser());
 
 

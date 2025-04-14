@@ -73,8 +73,8 @@
                                                 <% user.patente.forEach(function(patente) { %>
                                                     <% if(patente.pagato){ %>
                                                         <%= patente.tipo %><br>
-                                                            <% } %>
-                                                                <% }); %>
+                                                    <% } %>
+                                                <% }); %>
                                             </td>
                                             <td>
                                                 <%= user.dataRegistrazione %>
@@ -82,7 +82,7 @@
                                             <td>
                                                 <% user.teoria.forEach(function(esame) { %>
                                                     <%= esame.data %> <br>
-                                                        <% }); %>
+                                                <% }); %>
                                             </td>
                                             <td>
                                                 <input type="checkbox" disabled <%= user.hasPhoto ? 'checked' : '' %>>
@@ -91,27 +91,26 @@
                                                 <input type="checkbox" disabled <%= user.hasSign ? 'checked' : '' %>>
                                             </td>
                                             <%  
-                            const fatturaEmessa = user.fatture.find(function(fattura) {
-                                return fattura.emessa === false;
-                            });
-                            const daEmettere = !!fatturaEmessa;
-
-                            %>
-                                                <td class="buttonCell">
-                                                    <% if (daEmettere) { %>
-                                                        <a class="fatturaDaEmettere" href="<%= `/admin/fattureDaEmettere/${encodeURIComponent(user._id)}` %>">
-                                                            <span class="material-symbols-outlined">
-                                                receipt_long
-                                            </span>
-                                                        </a>
-                                                        <% }else{ %>
-                                                            <a class="pagamenti" href="<%= `/admin/pagamenti/${encodeURIComponent(user._id)}` %>">
-                                                                <span class="material-symbols-outlined">
-                                               payments
-                                            </span>
-                                                            </a>
-                                                            <% } %>
-                                                </td>
+                                                const fatturaEmessa = user.fatture.find(function(fattura) {
+                                                    return fattura.emessa === false;
+                                                });
+                                                const daEmettere = !!fatturaEmessa;
+                                            %>
+                                            <td class="buttonCell">
+                                                <% if (daEmettere) { %>
+                                                    <a class="fatturaDaEmettere" href="<%= `/admin/fattureDaEmettere/${encodeURIComponent(user._id)}` %>">
+                                                        <span class="material-symbols-outlined">
+                                                            receipt_long
+                                                        </span>
+                                                    </a>
+                                                <% }else{ %>
+                                                    <a class="pagamenti" href="<%= `/admin/pagamenti/${encodeURIComponent(user._id)}` %>">
+                                                        <span class="material-symbols-outlined">
+                                                           payments
+                                                        </span>
+                                                    </a>
+                                                <% } %>
+                                            </td>
                                         </tr>
                                         <% } %>
                                             <% }); %>

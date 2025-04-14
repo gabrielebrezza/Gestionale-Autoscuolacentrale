@@ -16,6 +16,7 @@ span{
     gap: 15px;
     flex-wrap: wrap;
     background: #5681a9;
+    z-index: 3;
     transition: .75s;
 }
 #closeFilterBtn{

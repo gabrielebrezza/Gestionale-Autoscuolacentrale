@@ -22,7 +22,6 @@ body{
     align-items: center;
     justify-content: space-between;
     margin-bottom: 50px;
-    z-index: 1;
 }
 #toggleMenuBtn {
     font-size: 3.5rem;
@@ -41,7 +40,7 @@ body{
     align-items: center;
     justify-content: start;
     flex-direction: column;
-    z-index: 1 !important;
+    z-index: 2 !important;
 }
 
 #navBar ul {
