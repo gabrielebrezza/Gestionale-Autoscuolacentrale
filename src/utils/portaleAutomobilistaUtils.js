@@ -178,8 +178,17 @@ async function searchUserPortale(cf, cognome, nPatente) {
     let browser, totalErrors = 0;
     try {
         browser = await puppeteer.launch({ 
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            headless: 'new',
+            args: [
+              '--no-sandbox',
+              '--disable-setuid-sandbox',
+              '--disable-dev-shm-usage',            // usa la memoria normale anziché /dev/shm
+              '--disable-accelerated-2d-canvas',    // meno uso di GPU
+              '--no-first-run',                     // evita delay iniziali
+              '--no-zygote',                        // più leggero (soprattutto su Linux)
+              '--disable-gpu',                      // utile se non hai accesso a GPU
+              '--window-size=1280,1024'             // evita caricamenti layout lenti
+          ],
         });
         const credenziali = await Credentials.findOne();
         const page = await browser.newPage();
