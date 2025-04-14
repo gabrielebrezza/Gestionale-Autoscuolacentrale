@@ -232,7 +232,6 @@ span{
     font-size: 1.1rem;
     text-transform: uppercase;
     transition: .25s ease-in-out;
-    display: none;
 }
 #downloadGiornaleExcel:hover, #downloadGiornalePdf:hover,
 #downloadGiornaleExcel:focus, #downloadGiornalePdf:focus{
