@@ -170,7 +170,15 @@ async function searchUserPortale(cf, cognome, nPatente) {
     }
   }
   
-
+  function logMemoryUsage(step = '') {
+    const memoryUsage = process.memoryUsage();
+    console.log(`--- RAM USAGE ${step} ---`);
+    console.log(`🧠 RSS         : ${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB`);
+    console.log(`📦 Heap Total : ${(memoryUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`);
+    console.log(`📦 Heap Used  : ${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`);
+    console.log(`🔧 External   : ${(memoryUsage.external / 1024 / 1024).toFixed(2)} MB`);
+    console.log('------------------------\n');
+  }
 
   async function searchScheduleExpirationPortale() {
     const users = await programmaScadenziario.find().limit(500);
@@ -178,7 +186,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
     let browser, totalErrors = 0;
     try {
         browser = await puppeteer.launch({ 
-            headless: 'new',
+            headless: true,
             args: [
               '--no-sandbox',
               '--disable-setuid-sandbox',
@@ -191,7 +199,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
           ],
         });
         const credenziali = await Credentials.findOne();
-        const page = await browser.newPage();
+        let page = await browser.newPage();
         await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
         await page.waitForSelector('.formSso2');
 
@@ -212,7 +220,14 @@ async function searchUserPortale(cf, cognome, nPatente) {
             page.click('input[name="action:Pin_executePinValidation"]')
         ]);
         // Vai alla pagina di raccolta dati
+        let userIndex = 0;
         for(const u of users) {
+          if (userIndex % 3 === 0 && userIndex !== 0) { // ogni 30 utenti, resetti la pagina
+            await page.close();
+            page = await browser.newPage();
+          }
+          logMemoryUsage(`Prima di utente ${u._id}`);
+          userIndex++;
           await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiestaCertificatoMedico/ReadAcqCertificatoPrimaFase_initAcqCertificatoPrimaFase.action');
           await new Promise(resolve => setTimeout(resolve, 4000));
           console.log(u.cf.toUpperCase().trim())
@@ -306,6 +321,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
     } finally {
       if (browser) {
         await browser.close();
+        console.log('browser chiuso correttamente: ', browser)
       }
     }
   }

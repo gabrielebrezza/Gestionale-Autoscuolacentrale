@@ -612,7 +612,7 @@ async function notifyExpirations() {
         if (daysLeft, notificationMessages[daysLeft] && u.totalEmailSentCount < emailNumber) {
             const nomeECognome = u?.nomeECognome?.replace(/\s+/g, ' ').trim().toLowerCase().split(' ').map(p => `${p[0]?.toUpperCase()}${p?.slice(1)}`).join(' ');
             const data = {nomeECognome: nomeECognome, numero_patente: u.nPatente, data_scadenza: u.expPatente.toLocaleDateString('IT-it'), daysLeft: notificationMessages[daysLeft]}
-            console.log('email rinnovo:', nomeECognome)
+
             try {
                 const response = await sendRinnoviEmail(u.email, 'La tua Patente sta per Scadere!', data)
                 await Scadenziario.findOneAndUpdate({"_id": u._id}, {"totalEmailSentCount": emailNumber});
@@ -633,12 +633,11 @@ if (process.env.SERVER_URL != 'http://localhost') {
         await trySearchAndUpdate(); // Controlla se può eseguire la ricerca ogni 2 ore
     });
 
-    cron.schedule("7 9,13 * * *", async () => {
+    cron.schedule("0 9,13 * * *", async () => {
         console.log('🔄 Eseguo L\'invio delle email per i rinnovi')
         await notifyExpirations();
     });
 }
-
 // (async() => {
 //     try {
 //         const utentiIsc = await utentiIscrizioni.find();
