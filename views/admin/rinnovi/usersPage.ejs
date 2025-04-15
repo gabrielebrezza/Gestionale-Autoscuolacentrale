@@ -252,15 +252,16 @@
                 <% const filteredUsers = users
                     .filter(user => user.visita.data && user.visita.ora) 
                     .sort((a, b) => {
-                      const dataA = a.visita.data;
-                      const dataB = b.visita.data;
-                      const oraA = a.visita.ora;
-                      const oraB = b.visita.ora;
-                    
-                      const dateTimeA = new Date(`${dataA} ${oraA}`);
-                      const dateTimeB = new Date(`${dataB} ${oraB}`);
-                    
-                      return dateTimeB - dateTimeA;
+                        const dateA = new Date(a.visita.data); // clone
+                        const dateB = new Date(b.visita.data);
+
+                        const [hoursA, minutesA] = a.visita.ora.split(':').map(Number);
+                        const [hoursB, minutesB] = b.visita.ora.split(':').map(Number);
+
+                        dateA.setHours(hoursA, minutesA, 0, 0);
+                        dateB.setHours(hoursB, minutesB, 0, 0);
+
+                        return dateA - dateB;
                     }); 
                 %>
                 <% filteredUsers.forEach(function(user, index) { %>
