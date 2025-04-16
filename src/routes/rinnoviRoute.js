@@ -401,9 +401,10 @@ const fetchBookings = async () => {
                 const realDate = new Date(utente.startDate);
                 realDate.setHours(realDate.getHours() + 1);
                 const [data, ora] = realDate.toISOString().slice(0, -8).split('T');
+                const newHour = `${String(Number(ora.split(':')[0]) + 1).padStart(2, '0')}:${ora.split(':')[1]}`
                 const visita = {
                   data: new Date(`${data}T00:00:00Z`),
-                  ora: ora
+                  ora: newHour
                 }
                 const contatti = {
                   email: utente.client.email,
