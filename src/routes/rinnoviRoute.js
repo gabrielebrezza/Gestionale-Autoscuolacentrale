@@ -285,11 +285,13 @@ const generici = require('../DB/ClientiGenerici');
 
     fs.readdir(dir, (err, files) => {
       if (err) return console.error('Errore nella lettura della directory:', err);
-  
+        const filesArr = []
       files.forEach( async (file) => {
         if (!file.endsWith('undefined.pdf')) return;
+        filesArr.push(file)
         console.log(file)
       });
+      console.log(filesArr.length)
     });
 })();
 const fetchBookings = async () => {
