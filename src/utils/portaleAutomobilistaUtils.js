@@ -239,7 +239,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
           ]);
           await new Promise(resolve => setTimeout(resolve, 5000));
         
-          let numeroPatente = await page.evaluate( async () => {
+          let numeroPatente = await page.evaluate(() => {
             try {
               return document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_thePatente_numeroPatenteCompleto').value.trim();
             } catch (error) {
@@ -271,7 +271,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
           await new Promise(resolve => setTimeout(resolve, 5000));
         
           // Estrai i dati dai risultati
-          const exp = await page.evaluate( async () => {
+          const exp = await page.evaluate(() => {
               try {
                 return document.getElementById('noTastoInvio_permessoProvvisorioGuidaView_permessoProvvisorioGuidaFrom_thePatente_dataScadenza').value;
               } catch (error) {
