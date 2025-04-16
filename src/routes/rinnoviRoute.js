@@ -299,7 +299,7 @@ const generici = require('../DB/ClientiGenerici');
         const parts = nomeCompleto.split('_');
         const nome = parts[0]?.replace(/_/g, ' ');
         const cognome = parts[1]?.replace(/_/g, ' ');
-        const tipo = '';
+        let tipo = '';
         
 
 
