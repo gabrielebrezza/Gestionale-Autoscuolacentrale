@@ -279,21 +279,6 @@ router.post('/admin/downloadFatturaCortesia', authenticateJWT, async (req, res)=
     res.render('errorPage', {error: 'Si è verificato un errore durante il download della fattura di cortesia'});
     }
 });
-// const generici = require('../DB/ClientiGenerici');
-// (async () => {
-//     const dir = path.resolve('fatture/cortesia');
-
-//     fs.readdir(dir, (err, files) => {
-//       if (err) return console.error('Errore nella lettura della directory:', err);
-//         const filesArr = []
-//       files.forEach( async (file) => {
-//         if (!file.endsWith('undefined.pdf')) return;
-//         filesArr.push(file)
-//         console.log(file)
-//       });
-//       console.log(filesArr.length)
-//     });
-// })();
 
 const fetchBookings = async () => {
     if(process.env.SERVER_URL == 'http://localhost') return;
