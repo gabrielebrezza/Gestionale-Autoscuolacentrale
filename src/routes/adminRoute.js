@@ -735,6 +735,38 @@ router.post('/downloadFatture', authenticateJWT, async (req, res) => {
   }
 })
 
+
+
+router.get('/ciaociaociao', authenticateJWT, async (req, res) => {
+  const dir = path.resolve('fatture/cortesia');
+
+  fs.readdir(dir, async (err, files) => {
+    if (err) return console.error('Errore nella lettura della directory:', err);
+      const filesArr = []
+    files.forEach( async (file) => {
+      if (!file.endsWith('undefined.pdf')) return;
+      filesArr.push(file)
+      console.log(file)
+    });
+    console.log(filesArr.length)
+    res.set('Content-Type', 'application/zip');
+    res.set('Content-Disposition', 'attachment; filename="fatture_gestionale.zip"');
+    const zip = archiver('zip');
+    zip.pipe(res);
+    for (const nomeFile of filesArr) {
+      const filePath = path.join(__dirname, '../../fatture', 'cortesia', nomeFile);
+      if (fs.existsSync(filePath)) {
+        zip.append(fs.createReadStream(filePath), { name: nomeFile });
+      } else {
+        console.warn(`Il file ${nomeFile} non esiste nella cartella fatture.`);
+      }
+    }
+    await zip.finalize();
+  });
+})
+
+
+
 router.get('/admin/cassa', authenticateJWT, async (req, res) => {
     const datiCassa = await cassa.find();
 
