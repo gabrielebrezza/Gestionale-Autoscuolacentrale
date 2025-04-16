@@ -250,9 +250,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
           ]);
           
           // Aspetta che il campo patente sia visibile
-          await page.waitForSelector('#noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_thePatente_numeroPatenteCompleto', {
-              timeout: 10000 // Puoi aumentare se il sito è lento
-          });
+          await page.waitForSelector('#noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_thePatente_numeroPatenteCompleto');
 
           let numeroPatente = await page.evaluate(() => {
             try {
