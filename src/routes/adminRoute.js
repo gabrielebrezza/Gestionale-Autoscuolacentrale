@@ -986,12 +986,13 @@ const nuoviNomi = [
     if (f.del === true) {
       const filePath = path.resolve('fatture/cortesia', f.file);
       try {
-        await fs.promises.unlink(filePath);
+        fs.unlinkSync(filePath);
         console.log(`🗑️  File eliminato: ${f.file}`);
       } catch (err) {
         console.error(`❌ Errore durante l'eliminazione di ${f.file}:`, err.message);
       }
     }
+    
   }
 })();
 
