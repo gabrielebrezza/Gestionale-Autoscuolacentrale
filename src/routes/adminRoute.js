@@ -983,14 +983,22 @@ const nuoviNomi = [
 ];
 (async () => {
   for (const f of nuoviNomi) {
-    if (f.del === true) {
-      const filePath = path.resolve('fatture/cortesia', `${f.file}.pdf`);
-      try {
-        fs.unlinkSync(filePath);
-        console.log(`🗑️  File eliminato: ${f.file}`);
-      } catch (err) {
-        console.error(`❌ Errore durante l'eliminazione di ${f.file}:`, err.message);
-      }
+    if (f.del === false) {
+      const dir = path.resolve('fatture/cortesia');
+      const filePath = path.join(dir, `${f.file}.pdf`);
+      const newName = `fattura_iscrizione_${f.file.split('_')[2]}_${f.id}.pdf`;
+      const newPath = path.join(dir, newName);
+      console.log(newName)
+      await fs.promises.rename(filePath, newPath);
+      const user = await utenti.findOne({"_id": f.id});
+
+      const lastIndex = user.fatture.length - 1;
+      const path = `fatture.${lastIndex}.fileCortesia`;
+    
+      await utenti.updateOne(
+        { _id: f.id },
+        { $set: { [path]: newName } }
+      );
     }
     
   }
