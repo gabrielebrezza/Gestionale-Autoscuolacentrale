@@ -202,22 +202,18 @@ async function searchUserPortale(cf, cognome, nPatente) {
         let page = await browser.newPage();
         await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
         await page.waitForSelector('.formSso2');
-        
-        // Compila username e password
+
+        await new Promise(resolve => setTimeout(resolve, 2000));
         await page.type('input[name="loginView.beanUtente.userName"]', credenziali.user);
         await page.type('input[name="loginView.beanUtente.password"]', credenziali.password);
-        
-        // Esegui il login e aspetta il caricamento completo
         await Promise.all([
-            page.waitForNavigation({ waitUntil: 'networkidle0' }),
+            page.waitForNavigation({ waitUntil: 'networkidle0' }), // Aspetta che la rete sia inattiva
             page.click('input[name="action:Login_executeLogin"]')
         ]);
-        
-        // Vai alla pagina del PIN
+
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/index.jsp');
-        await page.waitForSelector('input[name="loginView.pin"]'); // aspetta il campo PIN visibile
-        
-        // Inserisci il PIN e valida
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Inserisci il PIN
         await page.type('input[name="loginView.pin"]', credenziali.pin);
         await Promise.all([
             page.waitForNavigation({ waitUntil: 'networkidle0' }),
@@ -232,26 +228,17 @@ async function searchUserPortale(cf, cognome, nPatente) {
           }
           logMemoryUsage(`Prima di utente ${u._id}`);
           userIndex++;
-          // Vai direttamente alla pagina per l’inserimento del CF
           await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiestaCertificatoMedico/ReadAcqCertificatoPrimaFase_initAcqCertificatoPrimaFase.action');
-                  
-          // Aspetta che il campo codice fiscale sia pronto
-          await page.waitForSelector('input[name="richiestaCertificatoMedicoView.richiestaCertificatoMedicoFrom.codFis"]');
-                  
-          console.log(u.cf.toUpperCase().trim());
-                  
-          // Inserisci il codice fiscale
+          await new Promise(resolve => setTimeout(resolve, 4000));
+          console.log(u.cf.toUpperCase().trim())
           await page.type('input[name="richiestaCertificatoMedicoView.richiestaCertificatoMedicoFrom.codFis"]', u.cf.toUpperCase().trim());
-                  
-          // Clicca sul bottone e aspetta il caricamento
+          
           await Promise.all([
               page.waitForNavigation({ waitUntil: 'networkidle0' }),
               page.click('input[name="action:ReadAcqCertificatoPrimaFase_pagingAcqCertMedPrimaFase"]')
           ]);
-          
-          // Aspetta che il campo patente sia visibile
-          await page.waitForSelector('#noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_thePatente_numeroPatenteCompleto');
-
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        
           let numeroPatente = await page.evaluate(() => {
             try {
               return document.getElementById('noTastoInvio_richiestaCertificatoMedicoView_richiestaCertificatoMedicoFrom_thePatente_numeroPatenteCompleto').value.trim();
