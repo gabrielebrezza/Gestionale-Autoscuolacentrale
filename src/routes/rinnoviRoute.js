@@ -339,8 +339,7 @@ const generici = require('../DB/ClientiGenerici');
               now.setHours(now.getHours() + 2);
               date = now.toISOString().replace(/[-:T.Z]/g, '').slice(0, 14);
             }
-    
-            const userId = `${nome}_${cognome}`.replace(/\s+/g, '-').toLowerCase();
+            
             const nuovoNome = `fattura_${tipo !== 'generico' ? tipo + '_' : ''}${userId}_${date}.pdf`;
     
             console.log(`Vecchio: ${file} => Nuovo: ${nuovoNome}`);
