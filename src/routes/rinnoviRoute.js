@@ -233,7 +233,6 @@ router.post('/rinnovi/updateUser', authenticateJWT, async (req, res)=> {
 });
 router.post('/admin/rinnovi/downloadFattura', authenticateJWT, async (req, res)=> {
     try {
-        console.log(req.body.numero)
         const fattura = await storicoFattureGenerali.findOne({"tipo": 'rinnovo', "numero": req.body.numero});
         if (fattura) {
             const filePath = path.join(__dirname, '../../fatture', 'elettroniche', fattura.nomeFile);
@@ -256,7 +255,30 @@ router.post('/admin/rinnovi/downloadFattura', authenticateJWT, async (req, res)=
     res.render('errorPage', {error: 'Si è verificato un errore durante il download della fattura'});
     }
 });
-
+router.post('/admin/rinnovi/downloadFatturaCortesia', authenticateJWT, async (req, res)=> {
+    try {
+        const nomeFile = `fattura_${req.body.user}.pdf`
+        if (nomeFile) {
+            const filePath = path.join(__dirname, '../../fatture', 'cortesia', nomeFile);
+            if (fs.existsSync(filePath)) {
+                res.set('Content-Type', 'application/pdf');
+                res.set('Content-Disposition', `attachment; filename="${nomeFile}"`);
+        
+                const fileStream = fs.createReadStream(filePath);
+                fileStream.pipe(res);
+            } else {
+                console.warn(`Il file ${nomeFile} non esiste nella cartella fatture.`);
+                res.status(404).send('File not found');
+            }
+        } else {
+            console.warn(`Nessuna fattura trovata per l'utente ${req.body.user}.`);
+            res.status(404).send('Fattura non trovata');
+        }
+    } catch (error) {
+        console.error('Si è verificato un errore durante il download della fattura rinnovi:', error);
+    res.render('errorPage', {error: 'Si è verificato un errore durante il download della fattura'});
+    }
+});
 const fetchBookings = async () => {
     if(process.env.SERVER_URL == 'http://localhost') return;
     const GRAPHQL_URL = process.env.GRAPHQL_URL_RINNOVO;
@@ -634,7 +656,7 @@ if (process.env.SERVER_URL != 'http://localhost') {
         await trySearchAndUpdate(); // Controlla se può eseguire la ricerca ogni 2 ore
     });
 
-    cron.schedule("8 9,13 * * *", async () => {
+    cron.schedule("0 9,13 * * *", async () => {
         console.log('🔄 Eseguo L\'invio delle email per i rinnovi')
         await notifyExpirations();
     });

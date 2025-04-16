@@ -296,11 +296,16 @@
                                         </span>
                                     </a>
                                 <% }else{ %>
-                                    <button class="downloadFattura" data-number="<%= user.fatture.numero %>" type="button" style="background: none; border: none; outline: none; cursor: pointer;">
+                                    <button class="downloadFattura" title="fattura elettronica" data-number="<%= user.fatture.numero %>" type="button" style="background: none; border: none; outline: none; cursor: pointer;">
                                         <span class="material-symbols-outlined pagamenti">
                                             receipt_long
                                         </span>
-                                    </button>                                   
+                                    </button>
+                                    <button class="downloadFatturaCortesia" title="fattura di cortesia" data-user="<%= `${user.nome}_${user.cognome}` %>" type="button" style="background: none; border: none; outline: none; cursor: pointer;">
+                                        <span class="material-symbols-outlined pagamenti">
+                                            receipt
+                                        </span>
+                                    </button>
                                 <% } %>
                                 
                             </td>
@@ -334,6 +339,45 @@
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({ numero: btn.dataset.number })
+                    });
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const contentDisposition = response.headers.get('Content-Disposition');
+                        let fileName;
+
+                        if (contentDisposition && contentDisposition.indexOf('filename=') !== -1) {
+                            const matches = /filename="([^"]+)"/.exec(contentDisposition);
+                            if (matches && matches[1]) {
+                                fileName = matches[1];
+                            }
+                        }
+                    
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        a.remove();
+                    } else {
+                        throw new Error('Errore durante il download della fattura');
+                    }
+                } catch (error) {
+                    alert('Errore durante il download della fattura');
+                }
+            });
+        });
+        document.querySelectorAll('.downloadFatturaCortesia').forEach(btn => {
+            btn.addEventListener('click', async (event) => {
+                try {
+                    const response = await fetch('/admin/rinnovi/downloadFatturaCortesia', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ numero: btn.dataset.user })
                     });
                     if (response.ok) {
                         const blob = await response.blob();
