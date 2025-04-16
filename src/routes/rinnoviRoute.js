@@ -610,7 +610,7 @@ async function notifyExpirations() {
     for (const u of users) {
         const daysLeft = Math.ceil((u.expPatente - new Date())/ (1000 * 60 * 60 * 24));
         const emailNumber = [124, 93, 62, 31, 14, 7, 4, 3, 2, 1].indexOf(daysLeft) + 1;
-        if (daysLeft, notificationMessages[daysLeft] && u.totalEmailSentCount < emailNumber) {
+        if (daysLeft && notificationMessages[daysLeft] && u.totalEmailSentCount < emailNumber && !u.isEmailUnsubscribed) {
             const nomeECognome = u?.nomeECognome?.replace(/\s+/g, ' ').trim().toLowerCase().split(' ').map(p => `${p[0]?.toUpperCase()}${p?.slice(1)}`).join(' ');
             const data = {nomeECognome: nomeECognome, numero_patente: u.nPatente, data_scadenza: u.expPatente.toLocaleDateString('IT-it'), daysLeft: notificationMessages[daysLeft]}
 
@@ -639,6 +639,15 @@ if (process.env.SERVER_URL != 'http://localhost') {
         await notifyExpirations();
     });
 }
+router.get('/deleteEmailSubscription/:email', async (req, res) =>{
+    try {
+        console.log('elimino iscrizione', req.params.email);
+        const i = await Scadenziario.findOneAndUpdate({"email": req.params.email}, {"isEmailUnsubscribed": true});
+        res.send(`<script>window.close();</script>`)
+    } catch (error) {
+        console.log('si è verificato un errore', error)
+    }
+})
 // (async() => {
 //     try {
 //         const utentiIsc = await utentiIscrizioni.find();

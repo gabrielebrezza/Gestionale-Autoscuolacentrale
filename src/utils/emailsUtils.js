@@ -131,6 +131,7 @@ Scegli tra le <strong>oltre 100 sedi in tutta Italia</strong>: troverai moltissi
         <p>Riceverai la nuova patente con la scadenza aggiornata direttamente a casa, tramite posta assicurata, all’indirizzo che preferisci, anche se diverso da quello di residenza.</p>
         <a class="btn" style="color: #fff" href="https://www.rinnovopatenti.it">👉 Controlla subito studi, disponibilità e costi</a>
         <p><strong>Team Rinnovopatenti.it</strong></p>
+        <a style="text-align: center" href="${process.env.SERVER_URL}/deleteEmailSubscription/${encodeURIComponent(email)}">Ho già rinnovato la patente (desidero non ricevere più email)</a>
     </div>
 </body>
 </html>

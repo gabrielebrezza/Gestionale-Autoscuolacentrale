@@ -2,14 +2,6 @@ const mongoose = require('mongoose');
 
 
 const ScadenziarioSchema = new mongoose.Schema({
-    // nome: {
-    //     type: String,
-    //     required: false
-    // },
-    // cognome: {
-    //     type: String,
-    //     required: false
-    // },
     nomeECognome: {
         type: String,
         required: false
@@ -34,28 +26,6 @@ const ScadenziarioSchema = new mongoose.Schema({
         required: false,
         default: 0
     },
-    // spedizione: {
-    //     via: {
-    //         type: String,
-    //         required: false
-    //     },
-    //     nCivico: {
-    //         type: String,
-    //         required: false
-    //     },
-    //     cap: {
-    //         type: String,
-    //         required: false
-    //     },
-    //     comune: {
-    //         type: String,
-    //         required: false
-    //     },
-    //     provincia: {
-    //         type: String,
-    //         required: false
-    //     }
-    // },
     nPatente: {
         type: String,
         required: true
@@ -67,6 +37,11 @@ const ScadenziarioSchema = new mongoose.Schema({
     note: {
         type: String,
         required: false
+    },
+    isEmailUnsubscribed: {
+        type: Boolean,
+        required: false,
+        default: false
     }
 });
 const Scadenziario = new mongoose.model('Scadenziario', ScadenziarioSchema);
