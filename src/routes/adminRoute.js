@@ -980,7 +980,7 @@ const nuoviNomi = [
     del: false,
     id: "67a32a5f4c88917af9d00857"
   }
-]
+];
 (async () => {
   for (const f of nuoviNomi) {
     if (f.del === true) {
@@ -994,6 +994,7 @@ const nuoviNomi = [
     }
   }
 })();
+
 router.get('/ciaociaociao', authenticateJWT, async (req, res) => {
   const dir = path.resolve('fatture/cortesia');
 
