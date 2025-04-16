@@ -339,10 +339,34 @@ const generici = require('../DB/ClientiGenerici');
               now.setHours(now.getHours() + 2);
               date = now.toISOString().replace(/[-:T.Z]/g, '').slice(0, 14);
             }
-            
-            const nuovoNome = `fattura_${tipo !== 'generico' ? tipo + '_' : ''}${userId}_${date}.pdf`;
-    
+
+            const nuovoNome = `fattura_${tipo !== 'generico' ? tipo + '_' : ''}${date}_${userId}.pdf`;
+            if( tipo == 'rinnovo'){
+                await rinnovi.findOneAndUpdate({"_id": userId}, {"fatture.fileCortesia": nuovoNome});
+            }
+            if(tipo == 'iscrizione'){
+                const user = await utentiIscrizioni.findOne({"_id": userId});
+                const lastIndex = user.fatture.length - 1;
+                const path = `fatture.${lastIndex}.fileCortesia`;
+              
+                await utentiIscrizioni.findOneAndUpdate(
+                  { _id: userId },
+                  { $set: { [path]: nuovoNome } }
+                );
+            }
+            if(tipo == 'duplicato'){
+                await Duplicati.findOneAndUpdate({"_id": userId}, {"fatture.fileCortesia": nuovoNome});
+            }
             console.log(`Vecchio: ${file} => Nuovo: ${nuovoNome}`);
+            const vecchioPercorso = path.join(dir, file);
+            const nuovoPercorso = path.join(dir, nuovoNome);
+            fs.rename(vecchioPercorso, nuovoPercorso, (err) => {
+                if (err) {
+                  console.error(`❌ Errore nel rinominare ${file}:`, err);
+                } else {
+                  console.log(`✅ File rinominato correttamente: ${file} -> ${nuovoNome}`);
+                }
+            });
         });
       });
     });

@@ -121,6 +121,10 @@ const DuplicatiSchema = new mongoose.Schema({
             type: Number,
             required: false
         },
+        fileCortesia: {
+            type: String,
+            required: false
+        },
         emessa:{
             type: Boolean,
             required: false
