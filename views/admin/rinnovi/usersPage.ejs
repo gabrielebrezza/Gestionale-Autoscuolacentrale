@@ -301,11 +301,13 @@
                                             receipt_long
                                         </span>
                                     </button>
-                                    <button class="downloadFatturaCortesia" title="fattura di cortesia" data-user="<%= `${user.nome}_${user.cognome}` %>" type="button" style="background: none; border: none; outline: none; cursor: pointer;">
-                                        <span class="material-symbols-outlined pagamenti">
-                                            receipt
-                                        </span>
-                                    </button>
+                                    <% if (user.fatture.fileCortesia) { %>
+                                        <button class="downloadFatturaCortesia" title="fattura di cortesia" data-file="<%= user.fatture.fileCortesia %>" type="button" style="background: none; border: none; outline: none; cursor: pointer;">
+                                            <span class="material-symbols-outlined pagamenti">
+                                                receipt
+                                            </span>
+                                        </button>
+                                    <% } %>
                                 <% } %>
                                 
                             </td>
@@ -372,12 +374,12 @@
         document.querySelectorAll('.downloadFatturaCortesia').forEach(btn => {
             btn.addEventListener('click', async (event) => {
                 try {
-                    const response = await fetch('/admin/rinnovi/downloadFatturaCortesia', {
+                    const response = await fetch('/admin/downloadFatturaCortesia', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ user: btn.dataset.user })
+                        body: JSON.stringify({ file: btn.dataset.file })
                     });
                     if (response.ok) {
                         const blob = await response.blob();

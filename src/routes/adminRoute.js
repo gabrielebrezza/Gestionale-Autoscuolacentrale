@@ -430,7 +430,7 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
       prezzoUnitario1: ((importo-27.80)/1.22).toFixed(2),
       prezzoTotale1: ((importo-27.80)/1.22).toFixed(2),
       aliquotaIVA1: '0.00',
-      descrizione2: 'anticipazioni conto cliente iva esclusa art.15 dpr 633/72',
+      descrizione2: 'anticipazioni conto cliente iva esclusa art.15 dpr 633/72',
       prezzoUnitario2: '27.80',
       prezzoTotale2: '27.80',
       aliquotaIVA2: '22.00',
@@ -476,9 +476,11 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
     console.error('Errore nell\'emissione della fattura elettronica: ', error);
     return res.render('errorPage', { error: 'errore nell\'emissione della fattura elettronica' });
   }
+  let fileFatturaCortesia;
   try {
-    const result = await creaFatturaCortesia(dati, iscrizione);
-    console.log(result);
+    const result = await creaFatturaCortesia(dati, iscrizione, rinnovo, duplicato);
+    fileFatturaCortesia = result.fileName;
+    console.log(result.message);
   } catch (error) {
     console.error(error);
     return res.render('errorPage', { error: 'errore nell\'emissione della fattura di cortesia' });
@@ -498,13 +500,14 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
       },
       {
         $set: {
-          "fatture.$.emessa": true
+          "fatture.$.emessa": true,
+          "fatture.$.fileCortesia": fileFatturaCortesia
         }
     });
   }else if(rinnovo){
-    await rinnovi.findOneAndUpdate({"_id": id}, {"fatture": {"data": dati.data, "importo": dati.importoPagamento, "emessa": true, "numero": Number(dati.progressivoInvio.replace('r00', ''))}});
+    await rinnovi.findOneAndUpdate({"_id": id}, {"fatture": {"data": dati.data, "importo": dati.importoPagamento, "emessa": true, "numero": Number(dati.progressivoInvio.replace('r00', '')), "fileCortesia": fileFatturaCortesia}});
   }else if(duplicato){
-    await Duplicati.findOneAndUpdate({"_id": id}, {"fatture": {"data": dati.data, "importo": dati.importoPagamento, "emessa": true}});
+    await Duplicati.findOneAndUpdate({"_id": id}, {"fatture": {"data": dati.data, "importo": dati.importoPagamento, "emessa": true, "fileCortesia": fileFatturaCortesia}});
   }
   if(iscrizione){
     await numeroFattura.updateOne({$inc: {"numeroIscrizioni": 1}});
@@ -527,9 +530,10 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
       importo: dati.importoPagamento,
       user: `${dati.nomeCliente} ${dati.cognomeCliente}`,
       data: dataFatturazione,
+      fileCortesia: fileFatturaCortesia,
       nomeFile: `IT06498290011_${dati.progressivoInvio}.xml`,
     });
-    await  nuovaFattura.save()                
+    await nuovaFattura.save()                
   }catch(error){
     console.error('Si è verificato un errore durante l\'aggiunta della fattura allo storico:', error);
     return res.render('errorPage', {error: 'errore nell\'aggiunta della fattura allo storico'});
@@ -544,7 +548,7 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
   }
   const subject = 'Fattura di cortesia';
   const text = `Gentile ${dati.cognomeCliente} ${dati.nomeCliente} ti inviamo la fattura di cortesia per il pagamento che hai effettuato.`;
-  const filename = `./fatture/cortesia/fattura_${dati.nomeCliente}_${dati.cognomeCliente}.pdf`;
+  const filename = `./fatture/cortesia/${fileFatturaCortesia}`;
   try{
     const result = await sendEmail(email, subject, text, filename);
     console.log(result);

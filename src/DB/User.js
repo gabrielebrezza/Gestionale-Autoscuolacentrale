@@ -183,10 +183,14 @@ const UserSchema = new mongoose.Schema({
                 type: String,
                 required: false
             },
+            fileCortesia: {
+                type: String,
+                required: false
+            },
             emessa: {
                 type: Boolean,
                 required: false
-            },
+            }
         }
     ],
     paymentId: {

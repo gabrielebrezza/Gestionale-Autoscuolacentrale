@@ -255,30 +255,99 @@ router.post('/admin/rinnovi/downloadFattura', authenticateJWT, async (req, res)=
     res.render('errorPage', {error: 'Si è verificato un errore durante il download della fattura'});
     }
 });
-router.post('/admin/rinnovi/downloadFatturaCortesia', authenticateJWT, async (req, res)=> {
+router.post('/admin/downloadFatturaCortesia', authenticateJWT, async (req, res)=> {
     try {
-        const nomeFile = `fattura_${req.body.user}.pdf`
-        if (nomeFile) {
-            const filePath = path.join(__dirname, '../../fatture', 'cortesia', nomeFile);
+        const fileName = req.body.file;
+        if (fileName) {
+            const filePath = path.join(__dirname, '../../fatture', 'cortesia', fileName);
             if (fs.existsSync(filePath)) {
                 res.set('Content-Type', 'application/pdf');
-                res.set('Content-Disposition', `attachment; filename="${nomeFile}"`);
+                res.set('Content-Disposition', `attachment; filename="${fileName}"`);
         
                 const fileStream = fs.createReadStream(filePath);
                 fileStream.pipe(res);
             } else {
-                console.warn(`Il file ${nomeFile} non esiste nella cartella fatture.`);
+                console.warn(`Il file ${fileName} non esiste nella cartella fatture.`);
                 res.status(404).send('File not found');
             }
         } else {
-            console.warn(`Nessuna fattura trovata per l'utente ${req.body.user}.`);
-            res.status(404).send('Fattura non trovata');
+            console.warn(`Nessuna fattura specificata.`);
+            res.status(404).send('Fattura non specificata');
         }
     } catch (error) {
-        console.error('Si è verificato un errore durante il download della fattura rinnovi:', error);
-    res.render('errorPage', {error: 'Si è verificato un errore durante il download della fattura'});
+        console.error('Si è verificato un errore durante il download della fattura di cortesia:', error);
+    res.render('errorPage', {error: 'Si è verificato un errore durante il download della fattura di cortesia'});
     }
 });
+const generici = require('../DB/ClientiGenerici');
+(async () => {
+    const dir = path.join(__dirname, 'fatture', 'cortesia');
+
+    fs.readdir(dir, (err, files) => {
+      if (err) return console.error('Errore nella lettura della directory:', err);
+  
+      files.forEach( async (file) => {
+        const filePath = path.join(dir, file);
+  
+        // Assicuriamoci che sia un PDF nel formato giusto
+        if (!file.endsWith('.pdf') || !file.startsWith('fattura_')) return;
+  
+        // Rimuove "fattura_" e ".pdf"
+        const nomeCompleto = file.replace(/^fattura_/, '').replace(/\.pdf$/, '');
+  
+        // Divide tra nome e cognome
+        const parts = nomeCompleto.split('_');
+        const nome = parts[0]?.replace(/_/g, ' ');
+        const cognome = parts[1]?.replace(/_/g, ' ');
+        const tipo = '';
+        
+
+
+        if(await rinnovi.findOne({"nome": nome,"cognome": cognome})) tipo = 'rinnovo';
+        if(await utentiIscrizioni.findOne({"nome": nome,"cognome": cognome})) tipo = 'iscrizione';
+        if(await Duplicati.findOne({"nome": nome,"cognome": cognome})) tipo = 'duplicato';
+        if(await generici.findOne({"nome": nome,"cognome": cognome})) tipo = 'generico';
+        let userId;
+
+        if(tipo == 'duplicato'){
+            const user = await duplicati.findOne({"nome": nome,"cognome": cognome});
+            userId = user._id;
+        }
+        if( tipo == 'rinnovo'){
+            const user = await rinnovi.findOne({"nome": nome,"cognome": cognome});
+            userId = user._id;
+        }
+        if(tipo == 'iscrizione'){
+            const utente = await iscrizioni.findOne({"nome": nome,"cognome": cognome});
+            userId = utente._id;
+        }
+        if(tipo == 'generico'){
+            const user = await generici.findOne({"nome": nome,"cognome": cognome});
+            userId = user._id;
+        }
+        console.log(nome, cognome, tipo)
+        fs.stat(filePath, async (err, stats) => {
+            if (err) return console.error(`Errore su file ${file}:`, err);
+    
+            let date;
+            if (stats.birthtime) {
+              const d = new Date(stats.birthtime);
+              d.setHours(d.getHours() + 2);
+              date = d.toISOString().replace(/[-:T.Z]/g, '').slice(0, 14);
+            } else {
+              const now = new Date();
+              now.setHours(now.getHours() + 2);
+              date = now.toISOString().replace(/[-:T.Z]/g, '').slice(0, 14);
+            }
+    
+            const userId = `${nome}_${cognome}`.replace(/\s+/g, '-').toLowerCase();
+            const nuovoNome = `fattura_${tipo !== 'generico' ? tipo + '_' : ''}${userId}_${date}.pdf`;
+    
+            console.log(`Vecchio: ${file} => Nuovo: ${nuovoNome}`);
+        });
+      });
+    });
+})();
 const fetchBookings = async () => {
     if(process.env.SERVER_URL == 'http://localhost') return;
     const GRAPHQL_URL = process.env.GRAPHQL_URL_RINNOVO;

@@ -77,6 +77,10 @@ const RinnoviSchema = new mongoose.Schema({
             type: Boolean,
             required: false
         },
+        fileCortesia: {
+            type: String,
+            required: false
+        },
         numero: {
             type: Number,
             required: false

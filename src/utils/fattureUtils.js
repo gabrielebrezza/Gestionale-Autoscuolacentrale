@@ -348,18 +348,34 @@ async function creaFatturaElettronica(dati, iscrizione, rinnovo, duplicato) {
 
 
 
-const utenti = require('../DB/User');
-async function creaFatturaCortesia(dati, iscrizione) {
+const iscrizioni = require('../DB/User');
+const rinnovi = require('../DB/Rinnovi');
+const duplicati = require('../DB/Duplicati');
+const generici = require('../DB/ClientiGenerici');
+async function creaFatturaCortesia(dati, iscrizione, rinnovo, duplicato) {
     return new Promise(async (resolve, reject) => {
         try {
+            let userId = '';
+            if(duplicato){
+                const user = await duplicati.findOne({ "cf": dati.codiceFiscaleCliente })
+                userId = user._id;
+            }
+            if(rinnovo){
+                const user = await rinnovi.findOne({ "cf": dati.codiceFiscaleCliente })
+                userId = user._id;
+            }
             if(iscrizione){
-                const utente = await utenti.findOne({ "cFiscale": dati.codiceFiscaleCliente });
+                const utente = await iscrizioni.findOne({ "cFiscale": dati.codiceFiscaleCliente });
                 const patente = utente.patente.find(item => item.pagato === true && item.bocciato === null);
                 dati.descrizionePdf =`iscrizione patente ${patente.tipo}` ;
+                userId = utente._id;
             }else{
                 dati.descrizionePdf = dati.descrizione1;
             }
-
+            if(!iscrizione && !rinnovo && !duplicato){
+                const user = await generici.findOne({ "cFiscale": dati.codiceFiscaleCliente })
+                userId = user._id;
+            }
             const doc = new PDFDocument();
             doc.fontSize(16).text('Autoscuola Centrale', { align: 'left' });
             doc.text('Corso Marconi 33 - 10125 Torino (TO)', { align: 'left' });
@@ -378,7 +394,7 @@ async function creaFatturaCortesia(dati, iscrizione) {
             doc.text(`Numero: ${dati.progressivoInvio}`, 60, doc.y + 20);
             doc.text(`Indirizzo: ${dati.indirizzoSedeCliente} ${dati.capSedeCliente} ${dati.comuneSedeCliente} (${dati.provinciaSedeCliente})`,  60, doc.y + 20);
             doc.text(`Data: ${dati.data}`, 60, doc.y + 20);
-            doc.text(`C.Fiscale: ${dati.codiceFiscaleCliente}`, 60, doc.y + 20);
+            doc.text(`C.Fiscale: ${dati.codiceFiscaleCliente.toUpperCase()}`, 60, doc.y + 20);
             doc.moveDown();
 
             // Box per dettagli della fattura
@@ -413,9 +429,15 @@ async function creaFatturaCortesia(dati, iscrizione) {
             doc.end();
             
             pdfBuffer = await pdfBufferPromise;
-
-            await fs.writeFile(`./fatture/cortesia/fattura_${dati.nomeCliente}_${dati.cognomeCliente}.pdf`, pdfBuffer);
-            resolve('Fattura di cortesia salvata con successo');
+            let date = new Date();
+            date.setHours(date.getHours() + 2);
+            date = date.toISOString().replace(/[-:T.Z]/g, '').slice(0, 14);
+            const fileName = `fattura_${iscrizione ? 'iscrizione_' : rinnovo ? 'rinnovo_' : duplicato ? 'duplicato_' : ''}${userId}_${date}.pdf`
+            await fs.writeFile(`./fatture/cortesia/${fileName}`, pdfBuffer);
+            resolve({
+                message: 'Fattura di cortesia salvata con successo',
+                fileName: fileName
+              });
         } catch (err) {
             console.error('Errore durante il salvataggio della fattura di cortesia:', err);
             reject(new Error('Errore durante il salvataggio della fattura di cortesia'));
