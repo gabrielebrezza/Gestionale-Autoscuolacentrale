@@ -288,6 +288,7 @@ const generici = require('../DB/ClientiGenerici');
   
       files.forEach( async (file) => {
         if (!file.endsWith('undefined.pdf')) return;
+        console.log(file)
       });
     });
 })();
