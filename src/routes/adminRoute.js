@@ -981,6 +981,7 @@ const nuoviNomi = [
     id: "67a32a5f4c88917af9d00857"
   }
 ];
+const path = require('path');
 (async () => {
   for (const f of nuoviNomi) {
     if (f.del === false) {
