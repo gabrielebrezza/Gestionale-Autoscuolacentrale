@@ -984,7 +984,7 @@ const nuoviNomi = [
 (async () => {
   for (const f of nuoviNomi) {
     if (f.del === true) {
-      const filePath = path.resolve('/fatture/cortesia', `${f.file}.pdf`);
+      const filePath = path.resolve('fatture/cortesia', `${f.file}.pdf`);
       try {
         fs.unlinkSync(filePath);
         console.log(`🗑️  File eliminato: ${f.file}`);
