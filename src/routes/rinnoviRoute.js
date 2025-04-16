@@ -281,7 +281,7 @@ router.post('/admin/downloadFatturaCortesia', authenticateJWT, async (req, res)=
 });
 const generici = require('../DB/ClientiGenerici');
 (async () => {
-    const dir = path.join(__dirname, 'fatture', 'cortesia');
+    const dir = path.resolve('fatture/cortesia');
 
     fs.readdir(dir, (err, files) => {
       if (err) return console.error('Errore nella lettura della directory:', err);
