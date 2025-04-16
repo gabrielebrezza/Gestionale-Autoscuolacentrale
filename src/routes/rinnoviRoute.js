@@ -634,7 +634,7 @@ if (process.env.SERVER_URL != 'http://localhost') {
         await trySearchAndUpdate(); // Controlla se può eseguire la ricerca ogni 2 ore
     });
 
-    cron.schedule("15 9,13 * * *", async () => {
+    cron.schedule("8 9,13 * * *", async () => {
         console.log('🔄 Eseguo L\'invio delle email per i rinnovi')
         await notifyExpirations();
     });
