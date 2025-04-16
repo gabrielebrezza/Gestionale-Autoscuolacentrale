@@ -981,7 +981,6 @@ const nuoviNomi = [
     id: "67a32a5f4c88917af9d00857"
   }
 ];
-const path = require('path');
 (async () => {
   for (const f of nuoviNomi) {
     if (f.del === false) {
@@ -994,11 +993,11 @@ const path = require('path');
       const user = await utenti.findOne({"_id": f.id});
 
       const lastIndex = user.fatture.length - 1;
-      const path = `fatture.${lastIndex}.fileCortesia`;
+      const pii = `fatture.${lastIndex}.fileCortesia`;
     
       await utenti.updateOne(
         { _id: f.id },
-        { $set: { [path]: newName } }
+        { $set: { [pii]: newName } }
       );
     }
     
