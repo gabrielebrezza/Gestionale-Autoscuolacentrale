@@ -309,17 +309,17 @@ const generici = require('../DB/ClientiGenerici');
         if(await generici.findOne({"nome": nome,"cognome": cognome})) tipo = 'generico';
         let userId;
 
-        if(tipo == 'duplicato'){
-            const user = await duplicati.findOne({"nome": nome,"cognome": cognome});
-            userId = user._id;
-        }
         if( tipo == 'rinnovo'){
             const user = await rinnovi.findOne({"nome": nome,"cognome": cognome});
             userId = user._id;
         }
         if(tipo == 'iscrizione'){
-            const utente = await iscrizioni.findOne({"nome": nome,"cognome": cognome});
+            const utente = await utentiIscrizioni.findOne({"nome": nome,"cognome": cognome});
             userId = utente._id;
+        }
+        if(tipo == 'duplicato'){
+            const user = await Duplicati.findOne({"nome": nome,"cognome": cognome});
+            userId = user._id;
         }
         if(tipo == 'generico'){
             const user = await generici.findOne({"nome": nome,"cognome": cognome});
