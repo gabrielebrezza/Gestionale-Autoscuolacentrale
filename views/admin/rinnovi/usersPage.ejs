@@ -377,7 +377,7 @@
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ numero: btn.dataset.user })
+                        body: JSON.stringify({ user: btn.dataset.user })
                     });
                     if (response.ok) {
                         const blob = await response.blob();
@@ -401,10 +401,10 @@
                         window.URL.revokeObjectURL(url);
                         a.remove();
                     } else {
-                        throw new Error('Errore durante il download della fattura');
+                        throw new Error('Errore durante il download della fattura di cortesia');
                     }
                 } catch (error) {
-                    alert('Errore durante il download della fattura');
+                    alert('Errore durante il download della fattura di cortesia');
                 }
             });
         });
