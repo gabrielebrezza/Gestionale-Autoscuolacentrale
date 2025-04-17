@@ -666,7 +666,12 @@ router.get('/deleteEmailSubscription/:email', async (req, res) =>{
     try {
         console.log('elimino iscrizione', req.params.email);
         const i = await Scadenziario.findOneAndUpdate({"email": req.params.email}, {"isEmailUnsubscribed": true});
-        res.send(`<script>window.close();</script>`)
+        res.send(`
+            <body style="text-align: center;">
+                <script>window.close();</script>
+                <h3>Sei stato disiscritto correttamente, ora puoi chiudere questa pagina</h3>
+            </body>
+            `)
     } catch (error) {
         console.log('si è verificato un errore', error)
     }
