@@ -622,23 +622,17 @@ async function notifyExpirations() {
         124: "4 mesi",
         93: "3 mesi",
         62: "2 mesi",
-        31: "1 mese",
-        14: "14 giorni",
-        7: "7 giorni",
-        4: "4 giorni",
-        3: "3 giorni",
-        2: "2 giorni",
-        1: "1 giorno"
+        31: "1 mese"
     };
     for (const u of users) {
         const daysLeft = Math.ceil((u.expPatente - new Date())/ (1000 * 60 * 60 * 24));
-        const emailNumber = [124, 93, 62, 31, 14, 7, 4, 3, 2, 1].indexOf(daysLeft) + 1;
+        const emailNumber = [124, 93, 62, 31].indexOf(daysLeft) + 1;
         if (daysLeft && notificationMessages[daysLeft] && u.totalEmailSentCount < emailNumber && !u.isEmailUnsubscribed) {
             const nomeECognome = u?.nomeECognome?.replace(/\s+/g, ' ').trim().toLowerCase().split(' ').map(p => `${p[0]?.toUpperCase()}${p?.slice(1)}`).join(' ');
             const data = {nomeECognome: nomeECognome, numero_patente: u.nPatente, data_scadenza: u.expPatente.toLocaleDateString('IT-it'), daysLeft: notificationMessages[daysLeft]}
 
             try {
-                const response = await sendRinnoviEmail(u.email, 'La tua Patente sta per Scadere!', data)
+                const response = await sendRinnoviEmail(u.email, 'La tua Patente sta per Scadere!', data);
                 await Scadenziario.findOneAndUpdate({"_id": u._id}, {"totalEmailSentCount": emailNumber});
                 console.log(response);
             } catch (error) {
@@ -664,14 +658,21 @@ if (process.env.SERVER_URL != 'http://localhost') {
 }
 router.get('/deleteEmailSubscription/:email', async (req, res) =>{
     try {
-        console.log('elimino iscrizione', req.params.email);
-        const i = await Scadenziario.findOneAndUpdate({"email": req.params.email}, {"isEmailUnsubscribed": true});
+        const { email } = req.params;
+        console.log('elimino iscrizione', email);
+        await Scadenziario.findOneAndUpdate({"email": email}, {"isEmailUnsubscribed": true});
+        try {
+            const response = await sendRinnoviEmail(email, `Conferma dell'annullamento dell'iscrizione`);
+            console.log(response);
+        } catch (error) {
+            console.log(error);
+        }
         res.send(`
             <body style="text-align: center;">
                 <script>window.close();</script>
                 <h3>Sei stato disiscritto correttamente, ora puoi chiudere questa pagina</h3>
             </body>
-            `)
+        `)
     } catch (error) {
         console.log('si è verificato un errore', error)
     }
