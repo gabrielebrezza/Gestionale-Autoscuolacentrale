@@ -45,7 +45,7 @@ const sendEmail = async (email, subject, text, attachment = null) => {
     });
 }
 
-function fillTemplate(data){
+function fillTemplate(data, email){
     const { numero_patente, data_scadenza, nomeECognome, daysLeft} = data;
 
     return  `
@@ -195,7 +195,7 @@ const sendRinnoviEmail = async (email, subject, data = null) => {
             from: process.env.RINNOVI_EMAIL,
             to: email,
             subject: subject,
-            html: data ? fillTemplate(data) : deleteSubscriptionTemplate
+            html: data ? fillTemplate(data, email) : deleteSubscriptionTemplate
         };
         
         transporter.sendMail(mailOptions, async function(error, info) {
