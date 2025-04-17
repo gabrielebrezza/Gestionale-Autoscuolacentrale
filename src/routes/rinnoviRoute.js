@@ -642,9 +642,6 @@ async function notifyExpirations() {
     }
 }
 
-const data = {nomeECognome: 'gb', numero_patente: 'asad', data_scadenza: '12/20/2023', daysLeft: '2 mesi'}
-sendRinnoviEmail('brezzagabriele0@gmail.com', 'La tua Patente sta per Scadere!', data);
-
 if (process.env.SERVER_URL != 'http://localhost') {
     if (isValidExecutionTime()) {
         trySearchAndUpdate(); // Esegui subito se l'orario è valido
