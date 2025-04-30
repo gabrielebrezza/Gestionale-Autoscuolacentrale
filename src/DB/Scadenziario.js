@@ -42,6 +42,11 @@ const ScadenziarioSchema = new mongoose.Schema({
         type: Boolean,
         required: false,
         default: false
+    },
+    promotionalCode: {
+        type: String,
+        required: false,
+        unique: true
     }
 });
 const Scadenziario = new mongoose.model('Scadenziario', ScadenziarioSchema);

@@ -20,6 +20,7 @@ const Duplicati = require('../DB/Duplicati');
 const programmaScadenziario = require('../DB/programmaScadenziario');
 const infoScadenziario = require('../DB/infoScadenziario');
 const utentiIscrizioni = require('../DB/User');
+const promotionalCodes = require('../DB/promotionalCodeRinnovi')
 //functions
 const {sendEmail, sendRinnoviEmail} = require('../utils/emailsUtils.js');
 const { authenticateJWT } = require('../utils/authUtils.js');
@@ -255,6 +256,36 @@ router.post('/admin/rinnovi/downloadFattura', authenticateJWT, async (req, res)=
     res.render('errorPage', {error: 'Si è verificato un errore durante il download della fattura'});
     }
 });
+router.post('/downFa', async (req, res) => {
+    const archiver = require('archiver');
+    const files = req.body.fattArr; // array di nomi file es. ['file1.xml', 'file2.xml']
+    const baseDir = path.join(__dirname, '../../fatture/elettroniche');
+  
+    try {
+      // Crea archivio zip
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader('Content-Disposition', 'attachment; filename="fatture.zip"');
+  
+      const archive = archiver('zip', { zlib: { level: 9 } });
+      archive.pipe(res);
+  
+      for (const fileName of files) {
+        const filePath = path.join(baseDir, fileName);
+        try {
+          await fs.promises.access(filePath); // Verifica esistenza file
+          archive.file(filePath, { name: fileName }); // Aggiungi al .zip
+        } catch {
+          console.warn(`Il file ${fileName} non esiste nella cartella fatture.`);
+          // puoi anche aggiungere un file di log al zip se vuoi segnalare i mancanti
+        }
+      }
+  
+      await archive.finalize();
+    } catch (err) {
+      console.error('Errore durante la creazione dello zip:', err);
+      res.status(500).send('Errore durante il download dei file.');
+    }
+  });
 router.post('/admin/downloadFatturaCortesia', authenticateJWT, async (req, res)=> {
     try {
         const fileName = req.body.file;
@@ -641,7 +672,6 @@ async function notifyExpirations() {
         }
     }
 }
-
 if (process.env.SERVER_URL != 'http://localhost') {
     if (isValidExecutionTime()) {
         trySearchAndUpdate(); // Esegui subito se l'orario è valido

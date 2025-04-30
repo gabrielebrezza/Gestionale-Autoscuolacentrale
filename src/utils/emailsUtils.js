@@ -195,7 +195,10 @@ const sendRinnoviEmail = async (email, subject, data = null) => {
             from: process.env.RINNOVI_EMAIL,
             to: email,
             subject: subject,
-            html: data ? fillTemplate(data, email) : deleteSubscriptionTemplate
+            html: data ? fillTemplate(data, email) : deleteSubscriptionTemplate,
+            headers: {
+                'List-Unsubscribe': `<${process.env.SERVER_URL}/deleteEmailSubscription/${encodeURIComponent(email)}>`
+            }
         };
         
         transporter.sendMail(mailOptions, async function(error, info) {
