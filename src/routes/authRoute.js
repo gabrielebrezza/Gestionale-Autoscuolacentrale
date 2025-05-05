@@ -80,21 +80,32 @@ router.post('/admin/signup', async (req, res) => {
 });
 
 router.post('/admin/verificaOTP', async (req, res) =>{
-    const email = req.body.email;
-    const insertedOTP = Object.values(req.body).slice(-6);
-    let otpString = '';
-    for (const key in insertedOTP) {
-        otpString += insertedOTP[key];
-    }
-    const check = await admins.findOne({ "email": email });
-    const isOTPMatched = await bcrypt.compare(otpString, check.otp);
-    if(!isOTPMatched){
-        return res.render('errorPage', { error:'Il codice OTP inserito è errato'});
-    }else{
-        await admins.findOneAndUpdate({ "email": email }, {$unset: {"otp": ""}});
-        const token = await generateToken(email);
-        res.cookie('token', token, { httpOnly: true, maxAge: 604800000 });
-        res.redirect(`/admin`);
+    try {
+        const email = req.body.email;
+        const insertedOTP = Object.values(req.body).slice(-6);
+        let otpString = '';
+        for (const key in insertedOTP) {
+            otpString += insertedOTP[key];
+        }
+        if(typeof otpString != 'string' || !otpString && otpString.length != 6){
+            return res.render('errorPage', { error:'Devi inserire un codice OTP valido'});
+        }
+        const check = await admins.findOne({ "email": email });
+        if (!check) {
+            return res.render('errorPage', { error:'Utente non trovato' });
+        }        
+        const isOTPMatched = await bcrypt.compare(otpString, check.otp);
+        if(!isOTPMatched){
+            return res.render('errorPage', { error:'Il codice OTP inserito è errato'});
+        }else{
+            await admins.findOneAndUpdate({ "email": email }, {$unset: {"otp": ""}});
+            const token = await generateToken(email);
+            res.cookie('token', token, { httpOnly: true, maxAge: 604800000 });
+            res.redirect(`/admin`);
+        }
+    } catch (e) {
+        console.error('an error occured while checking otp code: ', e);
+        return res.render('errorPage', { error:'Si è verificato un errore'});
     }
 });
 
