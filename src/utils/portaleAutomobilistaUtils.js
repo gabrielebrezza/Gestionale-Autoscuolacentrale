@@ -230,7 +230,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
             await page.close();
             page = await browser.newPage();
           }
-          logMemoryUsage(`Prima di utente ${u._id}`);
+          // logMemoryUsage(`Prima di utente ${u._id}`);
           userIndex++;
           await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiestaCertificatoMedico/ReadAcqCertificatoPrimaFase_initAcqCertificatoPrimaFase.action');
           await new Promise(resolve => setTimeout(resolve, 4000));
