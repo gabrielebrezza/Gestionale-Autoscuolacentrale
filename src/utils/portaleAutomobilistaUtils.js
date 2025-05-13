@@ -181,7 +181,24 @@ async function searchUserPortale(cf, cognome, nPatente) {
   }
 
   async function searchScheduleExpirationPortale() {
-    const users = await programmaScadenziario.find().limit(500);
+    let users = await programmaScadenziario.aggregate([
+      {
+        $match: {
+          $or: [
+            { try: { $exists: false } },
+            { try: 0 }
+          ]
+        }
+      },
+      { $sample: { size: 500 } }
+    ]);
+    
+    if (users.length === 0) {
+      users = await programmaScadenziario.aggregate([
+        { $sample: { size: 500 } }
+      ]);
+    }
+    
     if(users.length == 0) return 0;
     let browser, totalErrors = 0;
     try {
