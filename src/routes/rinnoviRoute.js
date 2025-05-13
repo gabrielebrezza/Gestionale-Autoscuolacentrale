@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
@@ -157,6 +158,10 @@ router.get('/admin/rinnovi/pagamenti', async (req, res) => {
 router.post('/uploadUserImage', async (req, res) => {
     const data = req.body.image;
     const id = req.body.id;
+    console.log(req)
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: 'ID non valido' });
+    }
     const location = req.body.location;
     try{
         const base64Data = data.replace(/^data:image\/jpeg;base64,/, "").replace(/\s/g, '');
@@ -174,6 +179,7 @@ router.post('/uploadUserImage', async (req, res) => {
         });
     }catch(err){
         console.error(`si è verificato un errore ${err}`);
+        res.status(500).json({error: 'si è verificato un errore'});
     }
 });
 
