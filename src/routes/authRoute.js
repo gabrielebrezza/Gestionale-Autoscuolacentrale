@@ -108,9 +108,32 @@ router.post('/admin/verificaOTP', async (req, res) =>{
         return res.render('errorPage', { error:'Si è verificato un errore'});
     }
 });
+const rateLimitMap = new Map();
+
+const MAX_ATTEMPTS = 5;
+const WINDOW_TIME = 5 * 60 * 1000;
 
 router.post('/admin/login', async (req, res) => {
-    const email = (req.body.email).replace(/\s/g, "").toLowerCase();
+    const ip = req.ip;
+    const now = Date.now();
+
+    const data = rateLimitMap.get(ip) || { attempts: 0, firstAttemptTime: now };
+
+    if (now - data.firstAttemptTime > WINDOW_TIME) {
+        data.attempts = 0;
+        data.firstAttemptTime = now;
+    }
+
+    if (data.attempts >= MAX_ATTEMPTS) {
+        return res.status(429).json({ error: "Troppi tentativi. Riprova tra 5 minuti." });
+    }
+
+    data.attempts++;
+    rateLimitMap.set(ip, data);
+
+    if (!req.body || !req.body.email || !req.body.password) return res.status(400).json({ error: "Dati mancanti" });
+
+    const email = req.body.email.replace(/\s/g, "").toLowerCase();
     const password = req.body.password;
     const admin = await admins.findOne({ "email": email });
 
