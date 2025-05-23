@@ -195,7 +195,7 @@ async function searchUserPortale(cf, cognome, nPatente) {
     
     if (users.length === 0) {
       users = await programmaScadenziario.aggregate([
-        { $sample: { size: 500 } }
+        { $sample: { size: 900 } }
       ]);
     }
     
