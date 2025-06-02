@@ -461,7 +461,7 @@
             const emailTd = row.getElementsByTagName('td')[3].textContent.toLocaleLowerCase();
             const telTd = row.getElementsByTagName('td')[4].textContent.toLocaleLowerCase();
             const dataOraTd = row.getElementsByTagName('td')[5].textContent.toLocaleLowerCase();
-            const hasfattura = Boolean(row.getElementsByTagName('td')[9].dataset.hasfattura);
+            const hasfattura = row.getElementsByTagName('td')[9].dataset.hasfattura == 'true';
             let dataTd, oraTd, dataCompresa, oraCompresa;
             if(dataOraTd != 'mancante'){
                 [dataTd, oraTd] = dataOraTd.split(' ');
