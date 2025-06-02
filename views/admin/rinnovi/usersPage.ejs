@@ -56,18 +56,18 @@
                 <label for="filterArchived">Archiviato</label>
                 <input type="checkbox" name="filterArchived" id="filterArchived">
             </div>
-            <div class="filterField" style="margin-top: 40px;">
-                <p>Fatture</p>
+            <div class="filterField" style="padding-top: 100px;">
+                <p style="color: #f1f1f1;">Fatture</p>
                 <div class="checkboxField">
-                    <label for="tutti">Tutti</label>
+                    <label for="tutti" style="color: #f1f1f1;">Tutti</label>
                     <input type="radio" name="filterFatture" id="tutti" value="all" checked>
                 </div>
                 <div class="checkboxField">
-                    <label for="emesse">Emesse</label>
+                    <label for="emesse" style="color: #f1f1f1;">Emesse</label>
                     <input type="radio" name="filterFatture" id="emesse" value="emesse">
                 </div>
                 <div class="checkboxField">
-                    <label for="archiviato">Non emesse</label>
+                    <label for="archiviato" style="color: #f1f1f1;">Non emesse</label>
                     <input type="radio" name="filterFatture" id="non-emesse" value="non-emesse">
                 </div>
             </div>
@@ -303,7 +303,7 @@
                             <td>
                                 <input type="checkbox" disabled <%= user.hasSign ? 'checked' : '' %>>
                             </td>
-                            <td class="buttonCell" data-hasfattura="<%= !user.fatture.importo %>">
+                            <td class="buttonCell" data-hasfattura="<%= !!user.fatture.importo %>">
                                 <% if (!user.fatture.importo) { %>
                                     <a class="pagamenti" href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>">
                                         <span class="material-symbols-outlined">
