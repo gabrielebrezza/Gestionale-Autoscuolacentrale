@@ -56,7 +56,7 @@
                 <label for="filterArchived">Archiviato</label>
                 <input type="checkbox" name="filterArchived" id="filterArchived">
             </div>
-            <div class="filterField">
+            <div class="filterField" style="margin-top: 40px;">
                 <p>Fatture</p>
                 <div class="checkboxField">
                     <label for="tutti">Tutti</label>
@@ -64,7 +64,7 @@
                 </div>
                 <div class="checkboxField">
                     <label for="emesse">Emesse</label>
-                    <input type="radio" name="filterFatture" id="emesse" value="active">
+                    <input type="radio" name="filterFatture" id="emesse" value="emesse">
                 </div>
                 <div class="checkboxField">
                     <label for="archiviato">Non emesse</label>
@@ -473,7 +473,7 @@
                 dataCompresa = true;
                 oraCompresa = true;
             }
-
+            console.log(fatture, hasfattura)
             if(
                 (nome === '' || nomeTd.includes(nome)) &&
                 (cognome === '' || cognomeTd.includes(cognome)) &&
@@ -482,7 +482,7 @@
                 ((oraCompresa) || !filterVisitaFromHour.value || !filterVisitaToHour.value) &&
                 ((dataCompresa) || !filterVisitaFromDate.value || !filterVisitaToDate.value) &&
                 ((archived && isArchived) || (!archived && !isArchived)) &&
-                ((fatture == 'active' && hasfattura) || (fatture == 'all') || (fatture == 'non-emesse' && !hasfattura))
+                ((fatture == 'emesse' && hasfattura) || (fatture == 'all') || (fatture == 'non-emesse' && !hasfattura))
             ){
                 row.style.display = 'table-row'
             }else{
