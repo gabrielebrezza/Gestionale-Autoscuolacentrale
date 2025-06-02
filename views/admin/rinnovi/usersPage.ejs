@@ -509,7 +509,7 @@
     filterVisitaFromHour.addEventListener('input', filterRinnovi);
     filterVisitaToHour.addEventListener('input', filterRinnovi);
     filterArchived.addEventListener('input', filterRinnovi);
-    filterFatture.forEach(fCheckbox => {fCheckbox => fCheckbox.addEventListener('input', filterRinnovi)});
+    filterFatture.forEach(el => el.addEventListener('change', filterRinnovi))
 });
 
 </script>
