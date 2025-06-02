@@ -18,6 +18,7 @@ span{
     background: #5681a9;
     z-index: 3;
     transition: .75s;
+    overflow-y: auto;
 }
 #closeFilterBtn{
     position: absolute;

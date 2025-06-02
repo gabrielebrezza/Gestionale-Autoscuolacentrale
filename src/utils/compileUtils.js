@@ -94,8 +94,9 @@ async function creaGiornale(users) {
     });
 
     // Righe orizzontali corpo
+    let y;
     for (let j = 0; j < 49; j++) {
-      const y = startY - j * lineHeight;
+      y = startY - j * lineHeight;
       if (y < 50) break;
       const userIndex = j + 49 * i;
       if(userIndex < users.length){
@@ -126,6 +127,12 @@ async function creaGiornale(users) {
         color: rgb(0, 0, 0),
       });
     }
+    page.drawText("Autoscuola Centrale di D'Amelio Antonio C.so Marconi 33 10125 Torino(TO) P.IVA: 06498290011", {
+      x: width / 2 - font.widthOfTextAtSize("Autoscuola Centrale di D'Amelio Antonio C.so Marconi 33 10125 Torino(TO) P.IVA: 06498290011", 10) / 2,
+      y: 8,
+      size: 10,
+      font,
+    });
   }
 
   console.log("PDF creato con successo.");
