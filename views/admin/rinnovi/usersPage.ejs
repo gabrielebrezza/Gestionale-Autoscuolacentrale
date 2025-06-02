@@ -56,6 +56,21 @@
                 <label for="filterArchived">Archiviato</label>
                 <input type="checkbox" name="filterArchived" id="filterArchived">
             </div>
+            <div class="filterField">
+                <p>Fatture</p>
+                <div class="checkboxField">
+                    <label for="tutti">Tutti</label>
+                    <input type="radio" name="filterFatture" id="tutti" value="all" checked>
+                </div>
+                <div class="checkboxField">
+                    <label for="emesse">Emesse</label>
+                    <input type="radio" name="filterFatture" id="emesse" value="active">
+                </div>
+                <div class="checkboxField">
+                    <label for="archiviato">Non emesse</label>
+                    <input type="radio" name="filterFatture" id="non-emesse" value="non-emesse">
+                </div>
+            </div>
             <div class="field">
                 <h3>Visita Medica</h3><br>
                 <div>
@@ -288,7 +303,7 @@
                             <td>
                                 <input type="checkbox" disabled <%= user.hasSign ? 'checked' : '' %>>
                             </td>
-                            <td class="buttonCell">
+                            <td class="buttonCell" data-hasfattura="<%= !user.fatture.importo %>">
                                 <% if (!user.fatture.importo) { %>
                                     <a class="pagamenti" href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>">
                                         <span class="material-symbols-outlined">
@@ -423,6 +438,7 @@
         const filterVisitaFromHour = document.getElementById('filterVisitaFromHour');
         const filterVisitaToHour = document.getElementById('filterVisitaToHour');
         const filterArchived = document.getElementById('filterArchived');
+        const filterFatture = document.querySelectorAll('input[name="filterFatture"]');
         const archiveBtn = document.querySelector('.archivia')
         const archiveBtnSpan = document.querySelector('.archivia span')
         const rows = document.querySelectorAll('.row');
@@ -437,6 +453,7 @@
         const fromHour = filterVisitaFromHour.value.split(':')[0]*60 + +filterVisitaFromHour.value.split(':')[1];
         const toHour = filterVisitaToHour.value.split(':')[0]*60 + +filterVisitaToHour.value.split(':')[1];
         const archived = filterArchived.checked;
+        const fatture = document.querySelector('input[name="filterFatture"]:checked').value;
         for(const row of rows){
             const isArchived = row.dataset.archiviato == 'true';
             const cognomeTd = row.getElementsByTagName('td')[1].textContent.toLocaleLowerCase();
@@ -444,6 +461,7 @@
             const emailTd = row.getElementsByTagName('td')[3].textContent.toLocaleLowerCase();
             const telTd = row.getElementsByTagName('td')[4].textContent.toLocaleLowerCase();
             const dataOraTd = row.getElementsByTagName('td')[5].textContent.toLocaleLowerCase();
+            const hasfattura = Boolean(row.getElementsByTagName('td')[9].dataset.hasfattura);
             let dataTd, oraTd, dataCompresa, oraCompresa;
             if(dataOraTd != 'mancante'){
                 [dataTd, oraTd] = dataOraTd.split(' ');
@@ -463,7 +481,8 @@
                 (tel === '' || telTd.includes(tel)) &&
                 ((oraCompresa) || !filterVisitaFromHour.value || !filterVisitaToHour.value) &&
                 ((dataCompresa) || !filterVisitaFromDate.value || !filterVisitaToDate.value) &&
-                ((archived && isArchived) || (!archived && !isArchived))
+                ((archived && isArchived) || (!archived && !isArchived)) &&
+                ((fatture == 'active' && hasfattura) || (fatture == 'all') || (fatture == 'non-emesse' && !hasfattura))
             ){
                 row.style.display = 'table-row'
             }else{

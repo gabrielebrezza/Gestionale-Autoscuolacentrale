@@ -53,14 +53,11 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 isVisitaMancante = visitaTd == 'mancante' ? true : false;
             }
-            console.log(dataRegTd)
             const dataRegistrazione = new Date(dataRegTd.split('/').reverse().join('-').trim());
-            console.log(dataRegistrazione)
             const startRegistrazioneDate = new Date(dataRegistrazioneDa);
             const endRegistrazioneDate = new Date(dataRegistrazioneA);
 
             const isDateRegInRange = dataRegistrazione >= startRegistrazioneDate && dataRegistrazione <= endRegistrazioneDate;
-            console.log(dataRegistrazioneDa, dataRegistrazioneA, dataRegistrazione, 'registrazi/ESAME',dataEsameDa , dataEsameA)
             if (
                 (nome === '' || nomeTd.includes(nome)) &&
                 (cognome === '' || cognomeTd.includes(cognome)) &&
