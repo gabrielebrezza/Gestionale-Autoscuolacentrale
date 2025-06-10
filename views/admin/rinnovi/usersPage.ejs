@@ -289,7 +289,12 @@
                                     </div>
                                 </div>
                             </td>
-                            <td style="text-transform: uppercase;"><a href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>"><%= user.cognome %></a></td>
+                            <td style="text-transform: uppercase;"><span>
+                                <% if (user.provenienza == 'rinnovopatenti') { %>
+                                    <span title="proveniente da rinnovopatenti" style="padding: 5px; border-radius: 8px; background: rgb(33, 59, 212); color: #f1f1f1; font-weight: 900;">R</span>
+                                <% } %>
+                                <a href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>"><%= user.cognome %></a></td>
+                            </span>
                             <td style="text-transform: uppercase;"><%= user.nome %></td>
                             <td><%= user.contatti.email %></td>
                             <td><%= user.contatti.tel %></td>
