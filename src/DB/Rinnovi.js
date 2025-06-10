@@ -104,6 +104,11 @@ const RinnoviSchema = new mongoose.Schema({
         required: false,
         default: false
     },
+    provenienza: {
+        type: String,
+        required: false,
+        default: null
+    },
     archiviato: {
         type: Boolean,
         required: false

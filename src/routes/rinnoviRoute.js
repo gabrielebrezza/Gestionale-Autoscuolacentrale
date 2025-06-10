@@ -451,6 +451,7 @@ const fetchBookings = async () => {
                   "nPatente": utente.client.licenseNumber.trim(),
                   "protocollo": null,
                   "creationDate": new Date(),
+                  "provenienza": 'rinnovopatenti',
                   "note": null
                 });
                 await saveUser.save()
@@ -474,9 +475,17 @@ const fetchBookings = async () => {
         console.error(`Errore durante il recupero dei dati dall'API: ${error}`);
     }
 };
-setInterval(fetchBookings, 600000);
+const safeFetchBookings = async () => {
+    try {
+        await fetchBookings();
+    } catch (error) {
+        console.error(`Errore nel recupero utenti: ${error}`);
+        setTimeout(safeFetchBookings, 30000); // Riprovare dopo 30 secondi
+    }
+};
 
-setTimeout(fetchBookings, 5000);
+setInterval(safeFetchBookings, 600000);
+setTimeout(safeFetchBookings, 5000);
 
 router.get('/admin/rinnovi/scadenziario', authenticateJWT, async (req, res) => {
     const { role } = await admins.findOne({"email": req.user.email});
