@@ -36,52 +36,62 @@
                     close
                 </span>
             </div>
-            <div class="field">
-                <label for="filterName">Nome:</label>
-                <input type="text" name="filterName" id="filterName">
-            </div>
-            <div class="field">
-                <label for="filterSurname">Cognome:</label>
-                <input type="text" name="filterSurname" id="filterSurname">
-            </div>
-            <div class="field">
-                <label for="filterEmail">Email:</label>
-                <input type="email" name="filterEmail" id="filterEmail">
-            </div>
-            <div class="field">
-                <label for="filterPhone">Telefono:</label>
-                <input type="tel" name="filterPhone" id="filterPhone">
-            </div>
-            <div class="field">
-                <label for="filterArchived">Archiviato</label>
-                <input type="checkbox" name="filterArchived" id="filterArchived">
-            </div>
-            <div class="field">
-                <p style="color: #f1f1f1;">Fatture</p>
-                <div class="checkboxField">
-                    <label for="tutti" style="color: #f1f1f1;">Tutti</label>
-                    <input type="radio" name="filterFatture" id="tutti" value="all" checked>
+            <div class="fields" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: center; max-width: 90dvw; width: 100%;">
+
+                <div class="field">
+                    <label for="filterName">Nome:</label>
+                    <input type="text" name="filterName" id="filterName">
                 </div>
-                <div class="checkboxField">
-                    <label for="emesse" style="color: #f1f1f1;">Emesse</label>
-                    <input type="radio" name="filterFatture" id="emesse" value="emesse">
+                <div class="field">
+                    <label for="filterSurname">Cognome:</label>
+                    <input type="text" name="filterSurname" id="filterSurname">
                 </div>
-                <div class="checkboxField">
-                    <label for="archiviato" style="color: #f1f1f1;">Non emesse</label>
-                    <input type="radio" name="filterFatture" id="non-emesse" value="non-emesse">
+                <div class="field">
+                    <label for="filterEmail">Email:</label>
+                    <input type="email" name="filterEmail" id="filterEmail">
                 </div>
-            </div>
-            <div class="field">
-                <h3>Visita Medica</h3><br>
-                <div>
-                    <label for="filterVisitaFromDate">Da Data:</label>
-                    <input type="date" id="filterVisitaFromDate" name="filterVisitaFromDate">
-                    <label for="filterVisitaToDate">A Data:</label>
-                    <input type="date" id="filterVisitaToDate" name="filterVisitaToDate">
-                    <label for="filterVisitaFromHour">Da Ora:</label>
-                    <input type="time" id="filterVisitaFromHour" name="filterVisitaFromHour">
-                    <label for="filterVisitaToHour">A Ora:</label>
-                    <input type="time" id="filterVisitaToHour" name="filterVisitaToHour">
+                <div class="field">
+                    <label for="filterPhone">Telefono:</label>
+                    <input type="tel" name="filterPhone" id="filterPhone">
+                </div>
+                <div class="field">
+                    <label for="filterProvenienza">provenienza:</label>
+                    <select name="filterProvenienza" id="filterProvenienza">
+                        <option value="all">Tutte</option>
+                        <option value="rinnovopatenti">RinnovoPatenti</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="filterArchived">Archiviato</label>
+                    <input type="checkbox" name="filterArchived" id="filterArchived">
+                </div>
+                <div class="field">
+                    <p style="color: #f1f1f1;">Fatture</p>
+                    <div class="checkboxField">
+                        <label for="tutti" style="color: #f1f1f1;">Tutti</label>
+                        <input type="radio" name="filterFatture" id="tutti" value="all" checked>
+                    </div>
+                    <div class="checkboxField">
+                        <label for="emesse" style="color: #f1f1f1;">Emesse</label>
+                        <input type="radio" name="filterFatture" id="emesse" value="emesse">
+                    </div>
+                    <div class="checkboxField">
+                        <label for="archiviato" style="color: #f1f1f1;">Non emesse</label>
+                        <input type="radio" name="filterFatture" id="non-emesse" value="non-emesse">
+                    </div>
+                </div>
+                <div class="field">
+                    <h3>Visita Medica</h3><br>
+                    <div>
+                        <label for="filterVisitaFromDate">Da Data:</label>
+                        <input type="date" id="filterVisitaFromDate" name="filterVisitaFromDate">
+                        <label for="filterVisitaToDate">A Data:</label>
+                        <input type="date" id="filterVisitaToDate" name="filterVisitaToDate">
+                        <label for="filterVisitaFromHour">Da Ora:</label>
+                        <input type="time" id="filterVisitaFromHour" name="filterVisitaFromHour">
+                        <label for="filterVisitaToHour">A Ora:</label>
+                        <input type="time" id="filterVisitaToHour" name="filterVisitaToHour">
+                    </div>
                 </div>
             </div>
         </section>
@@ -280,7 +290,7 @@
                     }); 
                 %>
                 <% filteredUsers.forEach(function(user, index) { %>
-                        <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %> row" data-archiviato="<%= !!user.archiviato %>">
+                        <tr id="row<%= index %>" class="<%= user.archiviato ? 'archiviato' : '' %> row" data-archiviato="<%= !!user.archiviato %>" data-provenienza="<%= user.provenienza ?? '' %>">
                             <td>
                                 <div class="cellContent">
                                     <input class="action" type="checkbox" name="user<%= index %>" value="<%= user._id %>">
@@ -444,6 +454,7 @@
         const filterVisitaToHour = document.getElementById('filterVisitaToHour');
         const filterArchived = document.getElementById('filterArchived');
         const filterFatture = document.querySelectorAll('input[name="filterFatture"]');
+        const filterProvenienza = document.getElementById('filterProvenienza');
         const archiveBtn = document.querySelector('.archivia')
         const archiveBtnSpan = document.querySelector('.archivia span')
         const rows = document.querySelectorAll('.row');
@@ -459,8 +470,10 @@
         const toHour = filterVisitaToHour.value.split(':')[0]*60 + +filterVisitaToHour.value.split(':')[1];
         const archived = filterArchived.checked;
         const fatture = document.querySelector('input[name="filterFatture"]:checked').value;
+        const provenienza = filterProvenienza.value;
         for(const row of rows){
             const isArchived = row.dataset.archiviato == 'true';
+            const userProvenienza = row.dataset.provenienza;
             const cognomeTd = row.getElementsByTagName('td')[1].textContent.toLocaleLowerCase();
             const nomeTd = row.getElementsByTagName('td')[2].textContent.toLocaleLowerCase();
             const emailTd = row.getElementsByTagName('td')[3].textContent.toLocaleLowerCase();
@@ -478,7 +491,6 @@
                 dataCompresa = true;
                 oraCompresa = true;
             }
-            console.log(fatture, hasfattura)
             if(
                 (nome === '' || nomeTd.includes(nome)) &&
                 (cognome === '' || cognomeTd.includes(cognome)) &&
@@ -487,7 +499,8 @@
                 ((oraCompresa) || !filterVisitaFromHour.value || !filterVisitaToHour.value) &&
                 ((dataCompresa) || !filterVisitaFromDate.value || !filterVisitaToDate.value) &&
                 ((archived && isArchived) || (!archived && !isArchived)) &&
-                ((fatture == 'emesse' && hasfattura) || (fatture == 'all') || (fatture == 'non-emesse' && !hasfattura))
+                ((fatture == 'emesse' && hasfattura) || (fatture == 'all') || (fatture == 'non-emesse' && !hasfattura)) &&
+                (provenienza == 'all' || provenienza == userProvenienza)
             ){
                 row.style.display = 'table-row'
             }else{
@@ -515,6 +528,7 @@
     filterVisitaToHour.addEventListener('input', filterRinnovi);
     filterArchived.addEventListener('input', filterRinnovi);
     filterFatture.forEach(el => el.addEventListener('change', filterRinnovi))
+    filterProvenienza.addEventListener('change', filterRinnovi)
 });
 
 </script>
