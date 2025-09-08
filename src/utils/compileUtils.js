@@ -203,8 +203,8 @@ async function compilaTt2112(id) {
       form.getTextField('Nome').setText(data.nome.toUpperCase());
       form.getTextField('Luogo di nascita').setText(data.nascita.comune.toUpperCase());
       form.getTextField('Provincia_nascita').setText(data.nascita.provincia == 'EE' ? '': data.nascita.provincia.toUpperCase());
-      form.getTextField('Stato').setText(data.nascita.stato.toUpperCase());
-      form.getTextField('Data Nascita').setText(data.nascita.data.toUpperCase());
+      form.getTextField('Stato').setText(data.nascita.stato ? data.nascita.stato.toUpperCase() : '');
+      form.getTextField('Data Nascita').setText(data.nascita.data);
       form.getTextField('Codice fiscale').setText(duplicato ? data.cf : data.cFiscale.toUpperCase());
       form.getTextField('Luogo di residenza').setText(data.residenza.comune.toUpperCase());
       form.getTextField('Indirizzo').setText(data.residenza.via.toUpperCase()); 
