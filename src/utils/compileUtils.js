@@ -196,7 +196,7 @@ async function compilaTt2112(id) {
       const pdfDoc = await PDFDocument.load(existingPdfBytes);
   
       const form = pdfDoc.getForm();
-
+      console.log(data)
       form.getTextField('Codice Autoscuola / Agenzia').setText('0013');
       form.getTextField('UMC').setText('TORINO')
       form.getTextField('Cognome').setText(data.cognome.toUpperCase());
@@ -208,7 +208,7 @@ async function compilaTt2112(id) {
       form.getTextField('Codice fiscale').setText(duplicato ? data.cf : data.cFiscale.toUpperCase());
       form.getTextField('Luogo di residenza').setText(data.residenza.comune.toUpperCase());
       form.getTextField('Indirizzo').setText(data.residenza.via.toUpperCase()); 
-      form.getTextField('Numero Civico').setText(data.residenza.nCivico.toUpperCase());
+      form.getTextField('Numero Civico').setText(String(data.residenza.nCivico).toUpperCase());
       form.getTextField('Provincia_residenza').setText(data.residenza.provincia.toUpperCase());
       form.getTextField('CAP').setText(data.residenza.cap);
       form.getTextField('Sesso').setText(data.sesso);
