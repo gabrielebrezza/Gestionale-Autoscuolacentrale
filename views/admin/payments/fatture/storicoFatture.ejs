@@ -72,7 +72,7 @@
                         <td><%= fattura.data %></td>
                         <td><%= fattura.importo %>€</td>
                         <td><%= fattura.nomeFile %></td>
-                        <td><%= fattura.user ? fattura.user : 'N/A' %></td>
+                        <td style="text-transform: capitalize;"><%= fattura.user ? fattura.user.toLowerCase() : 'N/A' %></td>
                         <td><input type="checkbox" data-fatturaid="<%= fattura._id%>" name="paid" <%= fattura.nomeFile.includes('m00') ? (fattura.paid ? 'checked' : '') : 'disabled checked' %>></td>
                     </tr>
                 <% } %>
