@@ -627,7 +627,10 @@ router.post('/downloadFatture', authenticateJWT, async (req, res) => {
     if(fattureArr == ''){
       const fromDate = new Date(req.body.fromDate);
       const toDate = new Date(req.body.toDate);
-      const fattureGenerali = await storicoFattureGenerali.find();
+      const { user } = req.body;
+      const query = {};
+      if (user) query.user = { $regex: user, $options: "i" };
+      const fattureGenerali = await storicoFattureGenerali.find(query);
       for(const fattura of fattureGenerali){
         const dataFattura = new Date(fattura.data.split('/').reverse().join('-'));
         if(fromDate <= dataFattura && dataFattura <= toDate){
@@ -638,7 +641,7 @@ router.post('/downloadFatture', authenticateJWT, async (req, res) => {
           fattureArr.push(fattura.nomeFile);
         }
       }
-      const fattureAgenda = await storicoFattureAgenda.find();
+      const fattureAgenda = await storicoFattureAgenda.find(query);
       for(const fattura of fattureAgenda){
         const dataFattura = new Date(fattura.data.split('/').reverse().join('-'));
         if(fromDate <= dataFattura && dataFattura <= toDate){
