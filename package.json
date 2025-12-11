@@ -24,7 +24,7 @@
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
     "node-fetch": "^3.3.2",
-    "nodemailer": "^6.9.13",
+    "nodemailer": "^7.0.11",
     "paypal-rest-sdk": "^1.8.1",
     "pdf-lib": "^1.17.1",
     "pdfkit": "^0.15.0",
@@ -32,8 +32,7 @@
     "sharp": "^0.33.3",
     "stripe": "^15.4.0",
     "tls": "^0.0.1",
-    "useragent": "^2.3.0",
-    "xmlbuilder2": "^3.1.1"
+    "xmlbuilder2": "^4.0.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

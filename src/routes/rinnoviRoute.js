@@ -158,7 +158,6 @@ router.get('/admin/rinnovi/pagamenti', async (req, res) => {
 router.post('/uploadUserImage', async (req, res) => {
     const data = req.body.image;
     const id = req.body.id;
-    console.log(req)
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: 'ID non valido' });
     }
