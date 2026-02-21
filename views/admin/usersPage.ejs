@@ -96,7 +96,7 @@
                                                 });
                                                 const daEmettere = !!fatturaEmessa;
                                             %>
-                                            <td class="buttonCell">
+                                            <td class="buttonCell" data-issued="<%= !daEmettere %>">
                                                 <% if (daEmettere) { %>
                                                     <a class="fatturaDaEmettere" href="<%= `/admin/fattureDaEmettere/${encodeURIComponent(user._id)}` %>">
                                                         <span class="material-symbols-outlined">

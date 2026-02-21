@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterVisitaMancante = document.getElementById('filterVisitaMancante');
     const filterPatente = document.getElementById('filterPatente');
     const filterStatus = document.querySelectorAll('input[name="status"]');
+    const filterInvoiceStatus = document.querySelectorAll('input[name="invoiceStatus"]');
     const filterRegistrazioneFrom = document.getElementById('filterRegistrazioneFrom');
     const filterRegistrazioneTo = document.getElementById('filterRegistrazioneTo');
     const filterEsameFrom = document.getElementById('filterEsameFrom');
@@ -25,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dataEsameDa = filterEsameFrom.value;
         const dataEsameA = filterEsameTo.value;
         const status = document.querySelector('input[name="status"]:checked').value;
+        const invoiceStatus = document.querySelector('input[name="invoiceStatus"]:checked').value;
         let enumeration = 1;
         for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
@@ -36,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const dataRegTd = row.getElementsByTagName('td')[7].textContent.toLowerCase().replace(/\s+/g, ' ').trim();
             const dataEsamiTd = row.getElementsByTagName('td')[8].textContent.toLowerCase().replace(/\s+/g, ' ').trim().split(' ');
             const isArchiviato = row.dataset.archiviato == 'true';
+            const isInvoiceIssued = row.getElementsByTagName('td')[11].dataset.issued == 'true'
             let isDateEsameInRange;
             for (const esame of dataEsamiTd) {
                 const dataEsame = new Date(esame.split('/').reverse().join('-'));
@@ -66,7 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 (dataVisitaDa === '' || dataVisitaA === '' || isDateVisitaInRange) &&
                 (!visitaMancante || isVisitaMancante) &&
                 (dataEsameDa === '' || dataEsameA === '' || isDateEsameInRange) &&
-                ((status == 'archived' && isArchiviato) || (status == 'all') || (status == 'active' && !isArchiviato))
+                ((status == 'archived' && isArchiviato) || (status == 'all') || (status == 'active' && !isArchiviato)) &&
+                ((invoiceStatus == 'notIssued' && !isInvoiceIssued) || (invoiceStatus == 'all') || (invoiceStatus == 'issued' && isInvoiceIssued)) 
             ) {
                 row.getElementsByTagName('td')[0].querySelector('.numero').innerText = enumeration++;
                 row.style.display = 'table-row';
@@ -86,5 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
     filterVisitaMancante.addEventListener('input', filterTable);
     filterEsameFrom.addEventListener('input', filterTable);
     filterEsameTo.addEventListener('input', filterTable);
+    filterInvoiceStatus.forEach(el => el.addEventListener('change', filterTable))
     filterStatus.forEach(el => el.addEventListener('change', filterTable))
 });
