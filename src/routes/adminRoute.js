@@ -604,7 +604,7 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
 // });
 router.get('/admin/storicoFatture', authenticateJWT, async (req, res)=> {
   try {
-    res.render('admin/payments/fatture/storicoFatture1');
+    res.render('admin/payments/fatture/storicoFatture');
   } catch (error) {
     console.error('Si è verificato un errore durante il recupero delle fatture:', error);
     res.render('errorPage', {error: 'Si è verificato un errore durante il recupero delle fatture'});
