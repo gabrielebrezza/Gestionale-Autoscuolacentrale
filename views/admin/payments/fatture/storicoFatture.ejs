@@ -1,122 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Storico Fatture</title>
-    <link rel="stylesheet" href="\styles\admin\payments\fatture\storicoFatture.css">
-    <script src="/scripts/admin/payments/fatture/storicoFatture.js"></script>
+    <link rel="stylesheet" href="/styles/admin/payments/fatture/storicoFatture.css">
+    <script defer src="/scripts/admin/payments/fatture/storicoFatture.js"></script>
 </head>
 <body>
+
     <%- include('../../components/header.ejs') %>
+
     <main>
         <table>
-            <form id="fattureFilters" action="/downloadFatture" method="POST">
-            <thead>
-                <tr class="filters">
-                        <th colspan="1">
-                            <label for="tipo">tipo</label>
+            <form id="fattureFilters">
+                <thead>
+                    <tr class="filters">
+                        <th>
+                            <label for="tipo">Tipo</label>
                             <select name="tipo" id="tipo">
-                                <option value="all">tutti</option>
-                                <option value="g">guide</option>
-                                <option value="r">rinnovi</option>
-                                <option value="m">medici</option>
-                                <option value="d">duplicati</option>
-                                <option value="i">iscrizioni</option>
+                                <option value="all">Tutti</option>
+                                <option value="guida">Guide</option>
+                                <option value="rinnovo">Rinnovi</option>
+                                <option value="generica">Generiche</option>
+                                <option value="duplicato">Duplicati</option>
+                                <option value="iscrizione">Iscrizioni</option>
                             </select>
                         </th>
+
                         <th colspan="2">
                             <label for="fromDate">Da</label>
                             <input type="date" name="fromDate" id="fromDate">
                         </th>
+
                         <th colspan="2">
                             <label for="toDate">A</label>
                             <input type="date" name="toDate" id="toDate">
                         </th>
-                        <th colspan="1">
+
+                        <th>
                             <label for="user">Utente</label>
                             <input type="text" name="user" id="user">
                         </th>
-                        <th colspan="1">
+
+                        <th>
                             <button type="submit">
                                 <span class="material-symbols-outlined">
                                     download
                                 </span>
                             </button>
                         </th>
-                    
-                </tr>
-                <tr>
-                    <th>
-                        <label for="selectUsersBtn" style="user-select: none; cursor: pointer;">
-                            <span id="selectUsers" class="material-symbols-outlined">
-                                checklist
-                            </span>
-                        </label>
-                        <input type="checkbox" id="selectUsersBtn" style="display: none;">
-                    </th>
-                    <th>numero</th>
-                    <th>data</th>
-                    <th>importo</th>
-                    <th>File</th>
-                    <th>cliente</th>
-                    <th>pagata</th>
-                </tr>
-            </thead>
-            
-            <tbody>
-                <% for(const fattura of fatture){ %>
-                    <tr class="row">
-                        <td><input type="checkbox" class="checkboxFatture" name="<%= fattura.nomeFile %>" value="<%= fattura.nomeFile %>" style="display: none;"></td>
-                        <td><%= fattura.numero %></td>
-                        <td><%= fattura.data %></td>
-                        <td><%= fattura.importo %>€</td>
-                        <td><%= fattura.nomeFile %></td>
-                        <td style="text-transform: capitalize;"><%= fattura.user ? fattura.user.toLowerCase() : 'N/A' %></td>
-                        <td><input type="checkbox" data-fatturaid="<%= fattura._id%>" name="paid" <%= fattura.nomeFile.includes('m00') ? (fattura.paid ? 'checked' : '') : 'disabled checked' %>></td>
                     </tr>
-                <% } %>
-            </tbody>
-        </form>
+
+                    <tr>
+                        <th>
+                            <label for="selectUsersBtn" style="cursor:pointer;">
+                                <span class="material-symbols-outlined">
+                                    checklist
+                                </span>
+                            </label>
+                            <input type="checkbox" id="selectUsersBtn" hidden>
+                        </th>
+                        <th>Numero</th>
+                        <th>Data</th>
+                        <th>Importo</th>
+                        <th>File</th>
+                        <th>Cliente</th>
+                        <th>Pagata</th>
+                    </tr>
+                </thead>
+
+                <tbody id="fattureBody"></tbody>
+
+            </form>
         </table>
+
+        <div id="loader" style="text-align:center; padding:20px; display:none;">
+            Caricamento...
+        </div>
+
     </main>
     <script>
-        const selectUsersBtn = document.getElementById('selectUsersBtn');
-        const checkboxFatture = document.querySelectorAll('.checkboxFatture');
-        selectUsersBtn.addEventListener('input', () => {
-            if(selectUsersBtn.checked){
-                for(const checkbox of checkboxFatture){
-                    checkbox.style.display = 'inline-flex';
-                }
-            }else{
-                for(const checkbox of checkboxFatture){
-                    checkbox.style.display = 'none';
-                }
+        document.addEventListener('DOMContentLoaded', () => {
+        
+          const form = document.getElementById('fattureFilters');
+          const tbody = document.getElementById('fattureBody');
+          const typeInput = document.getElementById('tipo');
+          const fromDateInput = document.getElementById('fromDate');
+          const toDateInput = document.getElementById('toDate');
+          const userInput = document.getElementById('user');
+        
+          form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+        
+            const formData = new FormData();
+        
+            // raccogli tutte le checkbox selezionate
+            const selected = tbody.querySelectorAll('.checkboxFatture:checked');
+            console.log(selected)
+            const body = {}
+            if (selected.length > 0) {
+              selected.forEach(cb => body[cb.name] = cb.value);
+            } else {
+              // se non ci sono checkbox, invia i filtri correnti
+              if (typeInput.value !== 'all') body['tipo'] = typeInput.value;
+              if (fromDateInput.value) body['fromDate'] = fromDateInput.value;
+              if (toDateInput.value) body['toDate'] = toDateInput.value;
+              if (userInput.value.trim()) body['user'] = userInput.value.trim();
             }
-        })
-    </script>
-
-    <script>
-        const paidInput = document.querySelectorAll('[name="paid"]');
-
-        for (const input of paidInput) {
-            input.addEventListener('change', async () => {
-                console.log(input.checked);
-                const response = await fetch('/admin/editFatturaStatus',
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({paid: input.checked, id: input.dataset.fatturaid})
-                });
-                if(!response.ok){
-                    alert(`Si è verificato un'errore con codice: ${response.status}`);
-                }
-                console.log('cambiamento di stato avvenuto con successo');
+            console.log(body)
+            // fetch POST per scaricare i file
+            const response = await fetch('/admin/downloadFatture', {
+              method: 'POST',
+              headers: {
+                "Content-Type": 'application/json'
+              },
+              body: JSON.stringify(body)
             });
-        }
-    </script>
-
+        
+            if (!response.ok) {
+              alert('Errore durante il download');
+              return;
+            }
+        
+            const blob = await response.blob();
+            const disposition = response.headers.get('Content-Disposition');
+            let filename = 'download';
+        
+            if (disposition) {
+              const match = disposition.match(/filename="(.+)"/);
+              if (match) filename = match[1];
+            }
+        
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+          });
+        });
+        </script>
 </body>
 </html>

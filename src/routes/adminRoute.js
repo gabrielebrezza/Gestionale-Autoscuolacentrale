@@ -591,15 +591,117 @@ router.post('/createFattura', authenticateJWT, async (req, res) =>{
   res.redirect(`/admin`);
 });
 
+// router.get('/admin/storicoFatture', authenticateJWT, async (req, res)=> {
+//   try {
+//     const fattureGenerali = await storicoFattureGenerali.find();
+//     const fattureAgenda = await storicoFattureAgenda.find();
+//     let fatture = [...fattureGenerali, ...fattureAgenda];
+//     res.render('admin/payments/fatture/storicoFatture', { fatture });
+//   } catch (error) {
+//     console.error('Si è verificato un errore durante il recupero delle fatture:', error);
+//     res.render('errorPage', {error: 'Si è verificato un errore durante il recupero delle fatture'});
+//   }
+// });
 router.get('/admin/storicoFatture', authenticateJWT, async (req, res)=> {
   try {
-    const fattureGenerali = await storicoFattureGenerali.find();
-    const fattureAgenda = await storicoFattureAgenda.find();
-    let fatture = [...fattureGenerali, ...fattureAgenda];
-    res.render('admin/payments/fatture/storicoFatture', { fatture });
+    res.render('admin/payments/fatture/storicoFatture1');
   } catch (error) {
     console.error('Si è verificato un errore durante il recupero delle fatture:', error);
     res.render('errorPage', {error: 'Si è verificato un errore durante il recupero delle fatture'});
+  }
+});
+router.get('/admin/api/storico-fatture', authenticateJWT, async (req, res) => {
+  try {
+    const limit = 30;
+    const page = Number.isNaN(Number(req.query.page)) ? 0 : Number(req.query.page);
+    const skip = page * limit;
+
+    const allowedTypes = ['rinnovo', 'guida', 'iscrizione', 'generica', 'duplicato'];
+    const type = allowedTypes.includes(req.query.type) ? req.query.type : undefined;
+
+    const user = req.query.user?.trim();
+    const userRegex = user ? new RegExp(user, 'i') : undefined;
+
+    const fromDate = isNaN(new Date(req.query.fromDate))
+      ? undefined
+      : new Date(req.query.fromDate);
+
+    const toDate = isNaN(new Date(req.query.toDate))
+      ? undefined
+      : new Date(req.query.toDate);
+
+    const buildDateMatch = () => {
+      const match = {};
+      if (fromDate || toDate) {
+        match.convertedDate = {};
+        if (fromDate) match.convertedDate.$gte = fromDate;
+        if (toDate) match.convertedDate.$lte = toDate;
+      }
+      return match;
+    };
+
+    const baseStages = [
+      {
+        $addFields: {
+          convertedDate: {
+            $dateFromString: {
+              dateString: "$data",
+              format: "%d/%m/%Y"
+            }
+          }
+        }
+      }
+    ];
+
+    const genericMatch = { ...buildDateMatch() };
+    if (type && type !== 'guida') genericMatch.tipo = type;
+    if (userRegex) genericMatch.user = userRegex;
+
+    const agendaMatch = { ...buildDateMatch() };
+    if (userRegex) agendaMatch.user = userRegex;
+
+    let fatture = [];
+
+    if (type === 'guida') {
+      fatture = await storicoFattureAgenda.aggregate([
+        ...baseStages,
+        { $match: agendaMatch },
+        { $skip: skip },
+        { $limit: limit }
+      ]);
+    } else {
+      const totalGeneric = await storicoFattureGenerali.aggregate([
+        ...baseStages,
+        { $match: genericMatch },
+        { $count: "count" }
+      ]);
+
+      const totalGenericCount = totalGeneric[0]?.count || 0;
+
+      if (skip < totalGenericCount) {
+        fatture = await storicoFattureGenerali.aggregate([
+          ...baseStages,
+          { $match: genericMatch },
+          { $skip: skip },
+          { $limit: limit }
+        ]);
+      } else {
+        const agendaSkip = skip - totalGenericCount;
+
+        fatture = await storicoFattureAgenda.aggregate([
+          ...baseStages,
+          { $match: agendaMatch },
+          { $skip: agendaSkip },
+          { $limit: limit }
+        ]);
+      }
+    }
+
+    res.json({ data: fatture });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Errore interno' });
   }
 });
 
@@ -619,100 +721,243 @@ router.post('/admin/editFatturaStatus', authenticateJWT, async (req, res) => {
 
 
 
-router.post('/downloadFatture', authenticateJWT, async (req, res) => {
+// router.post('/downloadFatture', authenticateJWT, async (req, res) => {
+//   try {
+//     let fattureArr = (Object.keys(req.body)
+//     .filter(key => key.startsWith('IT06498290011')))
+//     .map(key => req.body[key]);
+//     if(fattureArr == ''){
+//       const fromDate = new Date(req.body.fromDate);
+//       const toDate = new Date(req.body.toDate);
+//       const { user } = req.body;
+//       const query = {};
+//       if (user) query.user = { $regex: user, $options: "i" };
+//       const fattureGenerali = await storicoFattureGenerali.find(query);
+//       for(const fattura of fattureGenerali){
+//         const dataFattura = new Date(fattura.data.split('/').reverse().join('-'));
+//         if(fromDate <= dataFattura && dataFattura <= toDate){
+//           fattureArr.push(fattura.nomeFile);
+//           continue;
+//         }
+//         if( !req.body.fromDate || !req.body.toDate ){
+//           fattureArr.push(fattura.nomeFile);
+//         }
+//       }
+//       const fattureAgenda = await storicoFattureAgenda.find(query);
+//       for(const fattura of fattureAgenda){
+//         const dataFattura = new Date(fattura.data.split('/').reverse().join('-'));
+//         if(fromDate <= dataFattura && dataFattura <= toDate){
+//           fattureArr.push(fattura.nomeFile);
+//           const filePath = path.join(__dirname, '../../fatture/elettroniche', fattura.nomeFile);
+//           try {
+//             fs.accessSync(filePath, fs.constants.F_OK);
+//           } catch (err) {
+//             if (err.code === 'ENOENT') {
+//               await scaricaFatturaAPI(fattura.numero);
+//             } else {
+//               console.error(`Errore durante il controllo del file ${fattura.nomeFile}: `, err);
+//             }
+//           }
+//           continue;
+//         }
+//         if( !req.body.fromDate || !req.body.toDate ){
+//           fattureArr.push(fattura.nomeFile);
+//         }
+//       }
+//       if(fattureArr == '' ){
+//         return res.render('errorPage', {error: `Nessuna fattura emessa nell'intervallo di tempo selezionato `});
+//       }
+//     }else{
+//       for(const fattura of fattureArr){
+//           const filePath = path.join(__dirname, '../../fatture/elettroniche', fattura);
+//           try {
+//             fs.accessSync(filePath, fs.constants.F_OK);
+//           } catch (err) {
+//             if (err.code === 'ENOENT') {
+//               const numeroFattura = fattura.replace('.xml', '').replace('IT06498290011_', '');
+//               if(numeroFattura.startsWith('g')){
+//                 await scaricaFatturaAPI(numeroFattura.replace('g00', ''));
+//               }
+//             } else {
+//               console.error(`Errore durante il controllo del file ${fattura}: `, err);
+//             }
+//           }
+//       }
+//     }
+//     const tipo = req.body.tipo;
+//     if(tipo != 'all'){
+//       if(tipo == 'g'){
+//         fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('g'));
+//       }
+//       if(tipo == 'r'){
+//         fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('r'));
+//       }
+//       if(tipo == 'i'){
+//         fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('i'));
+//       }
+//       if(tipo == 'm'){
+//         fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('m'));
+//       }
+//       if(tipo == 'd'){
+//         fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('d'));
+//       }
+//     }
+
+//     if (fattureArr.length === 1) {
+//       const nomeFile = fattureArr[0];
+//       const filePath = path.join(__dirname, '../../fatture', 'elettroniche', nomeFile);
+//       if (fs.existsSync(filePath)) {
+//         res.set('Content-Type', 'application/xml');
+//         res.set('Content-Disposition', `attachment; filename="${nomeFile}"`);
+//         res.sendFile(filePath);
+//       } else {
+//         console.warn(`Il file ${nomeFile} non esiste nella cartella fatture.`);
+//         res.status(404).send('File non trovato.');
+//       }
+//     } else if (fattureArr.length > 1) {
+//       res.set('Content-Type', 'application/zip');
+//       res.set('Content-Disposition', 'attachment; filename="fatture_gestionale.zip"');
+
+//       const zip = archiver('zip');
+//       zip.pipe(res);
+
+//       for (const nomeFile of fattureArr) {
+//         const filePath = path.join(__dirname, '../../fatture', 'elettroniche', nomeFile);
+//         if (fs.existsSync(filePath)) {
+//           zip.append(fs.createReadStream(filePath), { name: nomeFile });
+//         } else {
+//           console.warn(`Il file ${nomeFile} non esiste nella cartella fatture.`);
+//         }
+//       }
+
+//       await zip.finalize();
+//     } else {
+//       res.status(400).send('Nessun file da inviare.');
+//     }
+//   } catch (error) {
+//     console.error('Si è verificato un errore durante il download delle fatture:', error);
+//     res.render('errorPage', {error: 'Si è verificato un errore durante il download delle fatture'});
+//   }
+// })
+
+
+router.post('/admin/downloadFatture', authenticateJWT, async (req, res) => {
   try {
-    let fattureArr = (Object.keys(req.body)
-    .filter(key => key.startsWith('IT06498290011')))
-    .map(key => req.body[key]);
-    if(fattureArr == ''){
-      const fromDate = new Date(req.body.fromDate);
-      const toDate = new Date(req.body.toDate);
-      const { user } = req.body;
-      const query = {};
-      if (user) query.user = { $regex: user, $options: "i" };
-      const fattureGenerali = await storicoFattureGenerali.find(query);
-      for(const fattura of fattureGenerali){
-        const dataFattura = new Date(fattura.data.split('/').reverse().join('-'));
-        if(fromDate <= dataFattura && dataFattura <= toDate){
-          fattureArr.push(fattura.nomeFile);
-          continue;
+
+    // =========================
+    // 1️⃣ CHECKBOX SELEZIONATE
+    // =========================
+    let fattureArr = Object.keys(req.body)
+      .filter(key => key.startsWith('IT06498290011'))
+      .map(key => req.body[key]);
+    if (fattureArr.length === 0) {
+
+      const allowedTypes = ['rinnovo', 'guida', 'iscrizione', 'generica', 'duplicato'];
+      const type = allowedTypes.includes(req.body.tipo) ? req.body.tipo : undefined;
+
+      const user = req.body.user?.trim();
+      const userRegex = user ? new RegExp(user, 'i') : undefined;
+
+      const fromDate = isNaN(new Date(req.body.fromDate))
+        ? undefined
+        : new Date(req.body.fromDate);
+
+      const toDate = isNaN(new Date(req.body.toDate))
+        ? undefined
+        : new Date(req.body.toDate);
+
+      const buildDateMatch = () => {
+        const match = {};
+        if (fromDate || toDate) {
+          match.convertedDate = {};
+          if (fromDate) match.convertedDate.$gte = fromDate;
+          if (toDate) match.convertedDate.$lte = toDate;
         }
-        if( !req.body.fromDate || !req.body.toDate ){
-          fattureArr.push(fattura.nomeFile);
-        }
-      }
-      const fattureAgenda = await storicoFattureAgenda.find(query);
-      for(const fattura of fattureAgenda){
-        const dataFattura = new Date(fattura.data.split('/').reverse().join('-'));
-        if(fromDate <= dataFattura && dataFattura <= toDate){
-          fattureArr.push(fattura.nomeFile);
-          const filePath = path.join(__dirname, '../../fatture/elettroniche', fattura.nomeFile);
-          try {
-            fs.accessSync(filePath, fs.constants.F_OK);
-          } catch (err) {
-            if (err.code === 'ENOENT') {
-              await scaricaFatturaAPI(fattura.numero);
-            } else {
-              console.error(`Errore durante il controllo del file ${fattura.nomeFile}: `, err);
-            }
-          }
-          continue;
-        }
-        if( !req.body.fromDate || !req.body.toDate ){
-          fattureArr.push(fattura.nomeFile);
-        }
-      }
-      if(fattureArr == '' ){
-        return res.render('errorPage', {error: `Nessuna fattura emessa nell'intervallo di tempo selezionato `});
-      }
-    }else{
-      for(const fattura of fattureArr){
-          const filePath = path.join(__dirname, '../../fatture/elettroniche', fattura);
-          try {
-            fs.accessSync(filePath, fs.constants.F_OK);
-          } catch (err) {
-            if (err.code === 'ENOENT') {
-              const numeroFattura = fattura.replace('.xml', '').replace('IT06498290011_', '');
-              if(numeroFattura.startsWith('g')){
-                await scaricaFatturaAPI(numeroFattura.replace('g00', ''));
+        return match;
+      };
+
+      const baseStages = [
+        {
+          $addFields: {
+            convertedDate: {
+              $dateFromString: {
+                dateString: "$data",
+                format: "%d/%m/%Y"
               }
-            } else {
-              console.error(`Errore durante il controllo del file ${fattura}: `, err);
             }
           }
+        }
+      ];
+
+      const genericMatch = { ...buildDateMatch() };
+      if (type && type !== 'guida') genericMatch.tipo = type;
+      if (userRegex) genericMatch.user = userRegex;
+
+      const agendaMatch = { ...buildDateMatch() };
+      if (userRegex) agendaMatch.user = userRegex;
+
+      let generali = [];
+      let agenda = [];
+
+      if (type === 'guida') {
+        agenda = await storicoFattureAgenda.aggregate([
+          ...baseStages,
+          { $match: agendaMatch }
+        ]);
+      } else {
+        generali = await storicoFattureGenerali.aggregate([
+          ...baseStages,
+          { $match: genericMatch }
+        ]);
+
+        agenda = await storicoFattureAgenda.aggregate([
+          ...baseStages,
+          { $match: agendaMatch }
+        ]);
       }
+
+      fattureArr = [...generali, ...agenda].map(f => f.nomeFile);
     }
-    const tipo = req.body.tipo;
-    if(tipo != 'all'){
-      if(tipo == 'g'){
-        fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('g'));
-      }
-      if(tipo == 'r'){
-        fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('r'));
-      }
-      if(tipo == 'i'){
-        fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('i'));
-      }
-      if(tipo == 'm'){
-        fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('m'));
-      }
-      if(tipo == 'd'){
-        fattureArr = fattureArr.filter(fattura => fattura.replace('IT06498290011_', '').startsWith('d'));
+
+    if (fattureArr.length === 0) {
+      return res.status(400).send('Nessuna fattura trovata.');
+    }
+
+    // =========================
+    // 2️⃣ ASSICURA FILE ESISTENTI
+    // =========================
+    for (const nomeFile of fattureArr) {
+
+      const filePath = path.join(__dirname, '../../fatture/elettroniche', nomeFile);
+
+      if (!fs.existsSync(filePath)) {
+
+        const numeroFattura = nomeFile
+          .replace('.xml', '')
+          .replace('IT06498290011_', '');
+
+        if (numeroFattura.startsWith('g')) {
+          await scaricaFatturaAPI(numeroFattura.replace('g00', ''));
+        } else {
+          await scaricaFatturaAPI(numeroFattura);
+        }
       }
     }
 
+    // =========================
+    // 3️⃣ DOWNLOAD
+    // =========================
     if (fattureArr.length === 1) {
+
       const nomeFile = fattureArr[0];
-      const filePath = path.join(__dirname, '../../fatture', 'elettroniche', nomeFile);
-      if (fs.existsSync(filePath)) {
-        res.set('Content-Type', 'application/xml');
-        res.set('Content-Disposition', `attachment; filename="${nomeFile}"`);
-        res.sendFile(filePath);
-      } else {
-        console.warn(`Il file ${nomeFile} non esiste nella cartella fatture.`);
-        res.status(404).send('File non trovato.');
-      }
-    } else if (fattureArr.length > 1) {
+      const filePath = path.join(__dirname, '../../fatture/elettroniche', nomeFile);
+
+      res.set('Content-Type', 'application/xml');
+      res.set('Content-Disposition', `attachment; filename="${nomeFile}"`);
+      return res.sendFile(filePath);
+
+    } else {
+
       res.set('Content-Type', 'application/zip');
       res.set('Content-Disposition', 'attachment; filename="fatture_gestionale.zip"');
 
@@ -720,23 +965,20 @@ router.post('/downloadFatture', authenticateJWT, async (req, res) => {
       zip.pipe(res);
 
       for (const nomeFile of fattureArr) {
-        const filePath = path.join(__dirname, '../../fatture', 'elettroniche', nomeFile);
+        const filePath = path.join(__dirname, '../../fatture/elettroniche', nomeFile);
         if (fs.existsSync(filePath)) {
           zip.append(fs.createReadStream(filePath), { name: nomeFile });
-        } else {
-          console.warn(`Il file ${nomeFile} non esiste nella cartella fatture.`);
         }
       }
 
       await zip.finalize();
-    } else {
-      res.status(400).send('Nessun file da inviare.');
     }
+
   } catch (error) {
-    console.error('Si è verificato un errore durante il download delle fatture:', error);
-    res.render('errorPage', {error: 'Si è verificato un errore durante il download delle fatture'});
+    console.error(error);
+    res.status(500).send('Errore durante il download delle fatture');
   }
-})
+});
 
 router.get('/admin/cassa', authenticateJWT, async (req, res) => {
     const datiCassa = await cassa.find();
