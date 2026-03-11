@@ -59,6 +59,7 @@
                     <select name="filterProvenienza" id="filterProvenienza">
                         <option value="all">Tutte</option>
                         <option value="rinnovopatenti">RinnovoPatenti</option>
+                        <option value="interna">Interna</option>
                     </select>
                 </div>
                 <div class="field">
@@ -471,6 +472,7 @@
         const archived = filterArchived.checked;
         const fatture = document.querySelector('input[name="filterFatture"]:checked').value;
         const provenienza = filterProvenienza.value;
+        let userNumber = 0;
         for(const row of rows){
             const isArchived = row.dataset.archiviato == 'true';
             const userProvenienza = row.dataset.provenienza;
@@ -491,6 +493,7 @@
                 dataCompresa = true;
                 oraCompresa = true;
             }
+
             if(
                 (nome === '' || nomeTd.includes(nome)) &&
                 (cognome === '' || cognomeTd.includes(cognome)) &&
@@ -500,8 +503,9 @@
                 ((dataCompresa) || !filterVisitaFromDate.value || !filterVisitaToDate.value) &&
                 ((archived && isArchived) || (!archived && !isArchived)) &&
                 ((fatture == 'emesse' && hasfattura) || (fatture == 'all') || (fatture == 'non-emesse' && !hasfattura)) &&
-                (provenienza == 'all' || provenienza == userProvenienza)
+                (provenienza == 'all' || provenienza == userProvenienza || (provenienza === 'interna' && userProvenienza !== 'rinnovopatenti'))
             ){
+                row.getElementsByTagName('td')[0].innerText = ++userNumber;
                 row.style.display = 'table-row'
             }else{
                 row.style.display = 'none'
