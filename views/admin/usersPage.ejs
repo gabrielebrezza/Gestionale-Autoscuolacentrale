@@ -53,7 +53,7 @@
                                                 </div>
                                             </td>
                                             <td style="text-transform: uppercase;">
-                                                <a href="<%=`/userPage/${user._id}`%>">
+                                                <a target="_blank" href="<%=`/userPage/${user._id}`%>">
                                                     <%= user.cognome %>
                                                 </a>
                                             </td>
@@ -98,13 +98,13 @@
                                             %>
                                             <td class="buttonCell" data-issued="<%= !daEmettere %>">
                                                 <% if (daEmettere) { %>
-                                                    <a class="fatturaDaEmettere" href="<%= `/admin/fattureDaEmettere/${encodeURIComponent(user._id)}` %>">
+                                                    <a  target="_blank" class="fatturaDaEmettere" href="<%= `/admin/fattureDaEmettere/${encodeURIComponent(user._id)}` %>">
                                                         <span class="material-symbols-outlined">
                                                             receipt_long
                                                         </span>
                                                     </a>
                                                 <% }else{ %>
-                                                    <a class="pagamenti" href="<%= `/admin/pagamenti/${encodeURIComponent(user._id)}` %>">
+                                                    <a  target="_blank" class="pagamenti" href="<%= `/admin/pagamenti/${encodeURIComponent(user._id)}` %>">
                                                         <span class="material-symbols-outlined">
                                                            payments
                                                         </span>

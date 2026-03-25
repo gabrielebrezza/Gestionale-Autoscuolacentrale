@@ -304,7 +304,7 @@
                                 <% if (user.provenienza == 'rinnovopatenti') { %>
                                     <span title="proveniente da rinnovopatenti" style="padding: 5px; border-radius: 8px; background: rgb(33, 59, 212); color: #f1f1f1; font-weight: 900;">R</span>
                                 <% } %>
-                                <a href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>"><%= user.cognome %></a></td>
+                                <a target="_blank"  href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>"><%= user.cognome %></a></td>
                             </span>
                             <td style="text-transform: uppercase;"><%= user.nome %></td>
                             <td><%= user.contatti.email %></td>
@@ -321,7 +321,7 @@
                             </td>
                             <td class="buttonCell" data-hasfattura="<%= !!user.fatture.importo %>">
                                 <% if (!user.fatture.importo) { %>
-                                    <a class="pagamenti" href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>">
+                                    <a  target="_blank" class="pagamenti" href="<%=`rinnovi/userPage?id=${encodeURIComponent(user._id)}`%>">
                                         <span class="material-symbols-outlined">
                                             euro_symbol
                                         </span>
