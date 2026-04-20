@@ -43,7 +43,14 @@ paypal.configure({
 });
 
 app.get('/', async (req, res) =>{
-    res.render('getData');
+    try{
+      const prices = await prezzi.findOne({"tipo": 'B'});
+      const price = prices.prezzoPrimaIscrizione;
+      return res.render('getData', { price });
+    }catch(error){
+      console.error(error)
+      return res.json({ success: false});
+    }
 });
 
 app.post('/payment', async (req, res) =>{

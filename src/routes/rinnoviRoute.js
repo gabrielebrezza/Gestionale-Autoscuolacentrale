@@ -429,7 +429,7 @@ const fetchBookings = async () => {
                     provincia: await trovaProvincia(utente.client.shippingAddressCap.trim())
                 }
                 const realDate = new Date(utente.startDate);
-                realDate.setHours(realDate.getHours() + 1);
+                realDate.setHours(realDate.getHours() + 2);
                 const [data, ora] = realDate.toISOString().slice(0, -8).split('T');
                 const newHour = `${String(Number(ora.split(':')[0])).padStart(2, '0')}:${ora.split(':')[1]}`
                 const visita = {

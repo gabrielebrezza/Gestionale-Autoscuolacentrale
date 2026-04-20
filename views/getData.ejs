@@ -17,7 +17,7 @@
     </gmpx-api-loader>
     <div class="container">
         <form id="subscriptionForm" action="/payment" method="POST">
-            <h1>Inserisci i tuoi dati per poterti registrare</h1>
+            <h1 style="font-size: 25px;">Per completare l'iscrizione, inserisci i tuoi dati ed effettua il pagamento di <%= price.toFixed(2) %>€</h1>
             <div class="field">
                 <label for="nome">Nome:</label>
                 <input type="text" name="nome" id="nome" required>
@@ -148,18 +148,18 @@
                     <i class="fa fa-qrcode"></i>
                     Paga con SatisPay
                 </button>
-                <button class="submitBtn" id="codeBtn">
+                <!-- <button class="submitBtn" id="codeBtn">
                     <span class="material-symbols-outlined">
                         vpn_key
                     </span>
                     Paga con Codice
-                </button>
+                </button> -->
             </div>
-            <div class="field" id="codeContainer" style="display: none;">
+            <!-- <div class="field" id="codeContainer" style="display: none;">
                 <label for="code">Codice:</label>
                 <input type="text" name="code" id="code">
                 <button type="submit" id="codeSubmitBtn">Conferma</button>
-            </div>
+            </div> -->
         </form>
     </div>
     <script defer src="/scripts/user/subscriptionForm.js"></script>

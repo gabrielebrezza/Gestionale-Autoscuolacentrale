@@ -91,9 +91,7 @@
                                                 <input type="checkbox" disabled <%= user.hasSign ? 'checked' : '' %>>
                                             </td>
                                             <%  
-                                                const fatturaEmessa = user.fatture.find(function(fattura) {
-                                                    return fattura.emessa === false;
-                                                });
+                                                const fatturaEmessa = user.fatture.find((fattura) => fattura.emessa === false);
                                                 const daEmettere = !!fatturaEmessa;
                                             %>
                                             <td class="buttonCell" data-issued="<%= !daEmettere %>">
@@ -104,11 +102,34 @@
                                                         </span>
                                                     </a>
                                                 <% }else{ %>
+                                                    <div style="display: flex; align-items: center; gap: 4px;">
+                                                    <% for (const fattura of user.fatture) { 
+                                                        const str = JSON.stringify(fattura).toLowerCase();
+                                           
+                                                        if (str.includes("paypal")) { %>
+                                                            <p style="color:mediumpurple; font-weight:bold;">
+                                                                P
+                                                            </p>
+                                                        <% } else if (str.includes("stripe")) { %>
+                                                            <p style="color: rebeccapurple; font-weight:bold;">
+                                                                V
+                                                            </p>
+                                                        <% } else if (str.includes("satispay")) { %>
+                                                            <p style="color: orange; font-weight:bold;">
+                                                                S
+                                                            </p>
+                                                        <% } else if (str.includes("codice")) { %>
+                                                            <p style="color: green; font-weight:bold;">
+                                                                C
+                                                            </p>
+                                                        <% }
+                                                    } %>
                                                     <a  target="_blank" class="pagamenti" href="<%= `/admin/pagamenti/${encodeURIComponent(user._id)}` %>">
                                                         <span class="material-symbols-outlined">
                                                            payments
                                                         </span>
                                                     </a>
+                                                </div>
                                                 <% } %>
                                             </td>
                                         </tr>
