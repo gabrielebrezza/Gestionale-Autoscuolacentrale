@@ -364,7 +364,7 @@ app.use((req, res, next) => {
 app.get('/price', async (req, res) => {
   try {
     const { license, fiscalCode } = req.query;
-    console.log(license, fiscalCode)
+    console.log(license, fiscalCode, req.query)
 
     // 🔹 Validazione input
     if (!license || !fiscalCode) {
