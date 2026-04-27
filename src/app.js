@@ -399,7 +399,7 @@ app.get('/price', async (req, res) => {
       price = prices.prezzoIscrizioniSuccessive;
     }
 
-    return res.status(200).json({ price });
+    return res.status(200).json({ price, firstRegistration: !exist });
 
   } catch (error) {
     console.error(`Error in /price: ${error}`);
