@@ -368,7 +368,7 @@ app.get('/price', async (req, res) => {
       });
     }
     const utente = await utenti.findOne({
-      cFiscale: fiscalCode
+      cFiscale: fiscalCode.trim().toLowerCase()
     })
     console.log(utente)
     const exist = await utenti.findOne({
