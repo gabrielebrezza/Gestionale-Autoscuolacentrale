@@ -368,7 +368,7 @@ app.get('/price', async (req, res) => {
       });
     }
     const utente = await utenti.findOne({
-      cFiscale: fiscalCode.trim().toUpperCase()
+      cFiscale: fiscalCode.trim().toLowerCase()
     })
     console.log(utente)
     const exist = await utenti.findOne({
@@ -397,7 +397,7 @@ app.get('/price', async (req, res) => {
     } else {
       price = prices.prezzoIscrizioniSuccessive;
     }
-    console.log(price, exist, fiscalCode, license)
+    console.log(price, exist, fiscalCode.trim().toLowerCase(), license)
 
     return res.status(200).json({ price, firstRegistration: !exist });
 
