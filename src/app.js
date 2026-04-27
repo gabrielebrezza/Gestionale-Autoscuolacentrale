@@ -369,10 +369,10 @@ app.get('/price', async (req, res) => {
     }
 
     const exist = await utenti.findOne({
-      cFiscale: fiscalCode,
+      cFiscale: fiscalCode.trim(),
       patente: {
         $elemMatch: {
-          tipo: license,
+          tipo: license.trim(),
           pagato: true,
           bocciato: true
         }
