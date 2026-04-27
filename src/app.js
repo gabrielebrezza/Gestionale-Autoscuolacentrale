@@ -367,7 +367,10 @@ app.get('/price', async (req, res) => {
         error: 'license and fiscalCode are required'
       });
     }
-
+    const utente = await utenti.findOne({
+      cFiscale: fiscalCode
+    })
+    console.log(utente)
     const exist = await utenti.findOne({
       cFiscale: fiscalCode.trim(),
       patente: {
