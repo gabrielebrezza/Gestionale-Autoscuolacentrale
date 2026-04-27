@@ -357,14 +357,9 @@ app.post('/payment', async (req, res) =>{
 
 });
 
-app.use((req, res, next) => {
-  res.render('errorPage', {error: 'pagina non trovata'});
-});
-
 app.get('/price', async (req, res) => {
   try {
     const { license, fiscalCode } = req.query;
-    console.log(license, fiscalCode, req.query)
 
     // 🔹 Validazione input
     if (!license || !fiscalCode) {
@@ -409,6 +404,11 @@ app.get('/price', async (req, res) => {
     });
   }
 });
+
+app.use((req, res, next) => {
+  res.render('errorPage', {error: 'pagina non trovata'});
+});
+
 
 const PORT = process.env.PORT || 80;
 
