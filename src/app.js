@@ -361,6 +361,54 @@ app.use((req, res, next) => {
   res.render('errorPage', {error: 'pagina non trovata'});
 });
 
+app.get('/price', async (req, res) => {
+  try {
+    const { license, fiscalCode } = req.query;
+
+    // 🔹 Validazione input
+    if (!license || !fiscalCode) {
+      return res.status(400).json({
+        error: 'license and fiscalCode are required'
+      });
+    }
+
+    const exist = await utenti.findOne({
+      cFiscale: fiscalCode,
+      patente: {
+        $elemMatch: {
+          tipo: license,
+          pagato: true,
+          bocciato: true
+        }
+      }
+    });
+
+    const prices = await prezzi.findOne({ tipo: license });
+
+    // 🔹 Se non trovi i prezzi
+    if (!prices) {
+      return res.status(404).json({
+        error: 'Price not found for this license type'
+      });
+    }
+
+    let price;
+    if (!exist) {
+      price = prices.prezzoPrimaIscrizione;
+    } else {
+      price = prices.prezzoIscrizioniSuccessive;
+    }
+
+    return res.status(200).json({ price });
+
+  } catch (error) {
+    console.error(`Error in /price: ${error}`);
+    return res.status(500).json({
+      error: 'Internal server error'
+    });
+  }
+});
+
 const PORT = process.env.PORT || 80;
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
