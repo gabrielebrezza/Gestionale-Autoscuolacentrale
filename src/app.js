@@ -397,7 +397,7 @@ app.get('/price', async (req, res) => {
     } else {
       price = prices.prezzoIscrizioniSuccessive;
     }
-    console.log(price, exist, fiscalCode.trim().toLowerCase(), license)
+    console.log(price, !!exist, fiscalCode.trim().toLowerCase(), license)
 
     return res.status(200).json({ price, firstRegistration: !exist });
 
