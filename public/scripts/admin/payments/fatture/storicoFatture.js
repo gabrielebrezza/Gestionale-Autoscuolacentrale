@@ -18,8 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams();
       params.append('page', page);
   
-      if (typeInput.value !== 'all')
-        params.append('type', typeInput.value);
+      params.append('type', typeInput.value);
   
       if (fromDateInput.value)
         params.append('fromDate', fromDateInput.value);
@@ -74,9 +73,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await fetch(`/admin/api/storico-fatture?${buildQuery()}`);
       const result = await response.json();
   
-      if (!result.data.length) {
+      if (!result.data || !result.data.length) {
         finished = true;
         loader.style.display = 'none';
+        loading = false;
         return;
       }
   

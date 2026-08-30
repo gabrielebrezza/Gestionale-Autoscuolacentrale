@@ -616,19 +616,14 @@ router.get('/admin/api/storico-fatture', authenticateJWT, async (req, res) => {
     const page = Number.isNaN(Number(req.query.page)) ? 0 : Number(req.query.page);
     const skip = page * limit;
 
-    const allowedTypes = ['rinnovo', 'guida', 'iscrizione', 'generica', 'duplicato'];
-    const type = allowedTypes.includes(req.query.type) ? req.query.type : undefined;
-
+    // Gestione tipo 'all'
+    const allowedTypes = ['rinnovo', 'guida', 'iscrizione', 'generica', 'duplicato', 'all'];
+    let type = allowedTypes.includes(req.query.type) ? req.query.type : 'all'; // Default 'all'
     const user = req.query.user?.trim();
     const userRegex = user ? new RegExp(user, 'i') : undefined;
 
-    const fromDate = isNaN(new Date(req.query.fromDate))
-      ? undefined
-      : new Date(req.query.fromDate);
-
-    const toDate = isNaN(new Date(req.query.toDate))
-      ? undefined
-      : new Date(req.query.toDate);
+    const fromDate = isNaN(new Date(req.query.fromDate)) ? undefined : new Date(req.query.fromDate);
+    const toDate = isNaN(new Date(req.query.toDate)) ? undefined : new Date(req.query.toDate);
 
     const buildDateMatch = () => {
       const match = {};
@@ -654,7 +649,7 @@ router.get('/admin/api/storico-fatture', authenticateJWT, async (req, res) => {
     ];
 
     const genericMatch = { ...buildDateMatch() };
-    if (type && type !== 'guida') genericMatch.tipo = type;
+    if (type !== 'all' && type !== 'guida') genericMatch.tipo = type;
     if (userRegex) genericMatch.user = userRegex;
 
     const agendaMatch = { ...buildDateMatch() };
@@ -663,38 +658,51 @@ router.get('/admin/api/storico-fatture', authenticateJWT, async (req, res) => {
     let fatture = [];
 
     if (type === 'guida') {
+      // SOLO AGENDA
       fatture = await storicoFattureAgenda.aggregate([
         ...baseStages,
         { $match: agendaMatch },
+        { $sort: { convertedDate: -1 } },
         { $skip: skip },
         { $limit: limit }
       ]);
-    } else {
-      const totalGeneric = await storicoFattureGenerali.aggregate([
+      
+    } else if (type !== 'all') {
+      // SOLO SPECIFICHE GENERALI (es. rinnovo, iscrizione)
+      fatture = await storicoFattureGenerali.aggregate([
         ...baseStages,
         { $match: genericMatch },
-        { $count: "count" }
+        { $sort: { convertedDate: -1 } },
+        { $skip: skip },
+        { $limit: limit }
       ]);
 
-      const totalGenericCount = totalGeneric[0]?.count || 0;
+    } else {
+      // TUTTE: Uniamo i due DB per mantenere l'ordine cronologico nell'infinite scroll
+      const fetchLimit = skip + limit;
 
-      if (skip < totalGenericCount) {
-        fatture = await storicoFattureGenerali.aggregate([
+      const [genDocs, agendaDocs] = await Promise.all([
+        storicoFattureGenerali.aggregate([
           ...baseStages,
           { $match: genericMatch },
-          { $skip: skip },
-          { $limit: limit }
-        ]);
-      } else {
-        const agendaSkip = skip - totalGenericCount;
-
-        fatture = await storicoFattureAgenda.aggregate([
+          { $sort: { convertedDate: -1 } }, // Ordine decrescente dal DB
+          { $limit: fetchLimit }            // Prendiamo fino a skip + limit
+        ]),
+        storicoFattureAgenda.aggregate([
           ...baseStages,
           { $match: agendaMatch },
-          { $skip: agendaSkip },
-          { $limit: limit }
-        ]);
-      }
+          { $sort: { convertedDate: -1 } },
+          { $limit: fetchLimit }
+        ])
+      ]);
+
+      // Uniamo e ri-ordiniamo globalmente in base alla data
+      const merged = [...genDocs, ...agendaDocs].sort((a, b) => {
+        return b.convertedDate.getTime() - a.convertedDate.getTime();
+      });
+
+      // Estraiamo esattamente il "chunk" di 30 elementi per lo scroll attuale
+      fatture = merged.slice(skip, skip + limit);
     }
 
     res.json({ data: fatture });

@@ -28,10 +28,71 @@ const { authenticateJWT } = require('../utils/authUtils.js');
 const {searchUserPortale, searchExpirationPortale, searchScheduleExpirationPortale} = require('../utils/portaleAutomobilistaUtils.js');
 const { trovaProvincia } = require('../utils/genericUtils.js');
 const { creaGiornale, creaGiornaleExcel } = require('../utils/compileUtils.js');
-router.get('/admin/rinnovi', authenticateJWT, async (req, res) =>{
-    const users = await rinnovi.find({});
-    res.render('admin/rinnovi/usersPage', {users})
+
+router.get('/admin/rinnovi', authenticateJWT, (req, res) => {
+    res.render('admin/rinnovi/usersPage');
 });
+
+router.get('/admin/api/rinnovi', authenticateJWT, async (req, res) => {
+    try {
+      const limit = 30;
+      const page = Number.isNaN(Number(req.query.page)) ? 0 : Number(req.query.page);
+      const skip = page * limit;
+  
+      const {
+        nome, cognome, email, tel,
+        fromDate, toDate, fromHour, toHour,
+        archived, fatture, provenienza
+      } = req.query;
+  
+      const match = {};
+  
+      if (nome) match.nome = new RegExp(nome.trim(), 'i');
+      if (cognome) match.cognome = new RegExp(cognome.trim(), 'i');
+      if (email) match['contatti.email'] = new RegExp(email.trim(), 'i');
+      if (tel) match['contatti.tel'] = new RegExp(tel.trim(), 'i');
+  
+      if (archived === 'active') match.archiviato = { $ne: true };
+      if (archived === 'archived') match.archiviato = true;
+  
+      if (fatture === 'emesse') {
+        match['fatture.importo'] = { $exists: true, $ne: null, $ne: 0, $ne: "" };
+      } else if (fatture === 'non-emesse') {
+        match['fatture.importo'] = { $in: [null, 0, "", undefined] };
+      }
+  
+      if (provenienza === 'rinnovopatenti') {
+        match.provenienza = 'rinnovopatenti';
+      } else if (provenienza === 'interna') {
+        match.provenienza = { $ne: 'rinnovopatenti' };
+      }
+  
+      match['visita.data'] = { $exists: true, $ne: null };
+      match['visita.ora'] = { $exists: true, $ne: "" };
+  
+      if (fromDate || toDate) {
+        if (fromDate) match['visita.data'].$gte = new Date(fromDate);
+        if (toDate) match['visita.data'].$lte = new Date(toDate);
+      }
+  
+      if (fromHour || toHour) {
+        if (fromHour) match['visita.ora'].$gte = fromHour;
+        if (toHour) match['visita.ora'].$lte = toHour;
+      }
+  
+      const users = await rinnovi.find(match)
+        .sort({ 'visita.data': 1, 'visita.ora': 1 })
+        .skip(skip)
+        .limit(limit)
+        .allowDiskUse(true); 
+      
+      res.json({ data: users });
+  
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Errore interno' });
+    }
+  });
 
 router.post('/admin/rinnovi/download/:type', authenticateJWT, async (req, res) => {
     try {
