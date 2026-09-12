@@ -873,12 +873,16 @@ router.post('/admin/rinnovi/scadenziario/search', authenticateJWT, async (req, r
     const { cFiscale, email } = req.body;
     try {
         const dati = await searchExpirationPortale(cFiscale);
+        const provincia = await trovaProvincia(dati.cap.trim());
         const residenza = `
-            ${dati.toponimo.toLowerCase().replace(/\s+/g, " ").trim()} ${dati.indirizzo.toLowerCase().replace(/\s/g, " ").trim()}
-            ${dati.numeroCivico.toLowerCase().replace(/\s+/g, "").trim()},
-            ${dati.cap.trim()},
-            ${dati.comune.toLowerCase().replace(/\s+/g, " ").trim()},
-            (${await trovaProvincia(dati.cap.trim())})`;
+            ${dati.toponimo} 
+            ${dati.indirizzo} 
+            ${dati.numeroCivico},
+            ${dati.cap},
+            ${dati.comune},
+            (${provincia})
+        `.toLowerCase().replace(/\s+/g, " ").trim();
+
         const saveUser = new Scadenziario({
             "nomeECognome": `${dati.nome.trim().replace(/\s+/g, " ").toLowerCase()} ${dati.cognome.trim().replace(/\s+/g, " ").toLowerCase()}`,
             "cf": cFiscale.trim().replace(/\s+/g, "").toUpperCase(),
