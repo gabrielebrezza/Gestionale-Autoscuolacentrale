@@ -885,7 +885,7 @@ router.post('/admin/rinnovi/scadenziario/search', authenticateJWT, async (req, r
             "email": email,
             "residenza": residenza,
             "nPatente": dati.numeroPatente.trim(),
-            "expPatente": dati.expPatente
+            "expPatente": dati.expPatente.split('/').reverse().join('-')
         });
 
         await saveUser.save();
