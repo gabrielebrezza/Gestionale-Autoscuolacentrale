@@ -14,17 +14,16 @@ const browserArgs = [
 ];
 
 async function searchUserPortale(cf, cognome, nPatente) {
-    let browser;
+    let browser, context, page;
     try {
         browser = await chromium.launch({ headless: true, args: browserArgs });
         const credenziali = await Credentials.findOne();
         
-        const context = await browser.newContext();
-        const page = await context.newPage();
+        context = await browser.newContext();
+        page = await context.newPage();
         
         await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
         
-        // Playwright usa .fill() ed è istantaneo, aspetta da solo che l'elemento sia pronto
         await page.fill('input[name="loginView.beanUtente.userName"]', credenziali.user);
         await page.fill('input[name="loginView.beanUtente.password"]', credenziali.password);
         
@@ -40,7 +39,6 @@ async function searchUserPortale(cf, cognome, nPatente) {
         // Vai alla pagina di raccolta dati
         await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiesta/ReadAcqRinnAgenzia_initAcqRinnAgenzia.action');
         
-        // Ho mantenuto un piccolo ritardo solo dove i portali ministeriali hanno script lenti
         await page.waitForTimeout(2000); 
 
         if (nPatente && cognome) {
@@ -81,19 +79,21 @@ async function searchUserPortale(cf, cognome, nPatente) {
         console.error('Errore durante l\'operazione Playwright:', error);
         throw error;
     } finally {
-        if (browser) await browser.close();
+        if (page && !page.isClosed()) await page.close().catch(()=>{});
+        if (context) await context.close().catch(()=>{});
+        if (browser) await browser.close().catch(()=>{});
     }
 }
 
 
 async function searchExpirationPortale(cf) {
-    let browser;
+    let browser, context, page;
     try {
         browser = await chromium.launch({ headless: true, args: browserArgs });
         const credenziali = await Credentials.findOne();
         
-        const context = await browser.newContext();
-        const page = await context.newPage();
+        context = await browser.newContext();
+        page = await context.newPage();
         
         // --- LOGIN ---
         await page.goto('https://www.ilportaledellautomobilista.it/web/portale-automobilista/loginspid');
@@ -175,7 +175,9 @@ async function searchExpirationPortale(cf) {
         console.error('Errore durante l\'operazione Playwright:', error);
         throw error;
     } finally {
-        if (browser) await browser.close();
+        if (page && !page.isClosed()) await page.close().catch(()=>{});
+        if (context) await context.close().catch(()=>{});
+        if (browser) await browser.close().catch(()=>{});
     }
 }
 
@@ -212,13 +214,13 @@ async function searchScheduleExpirationPortale() {
     
     if (users.length == 0) return { totalErrors: 0 }; 
 
-    let browser, totalErrors = 0;
+    let browser, context, totalErrors = 0;
     try {
         browser = await chromium.launch({ headless: true, args: browserArgs });
         const credenziali = await Credentials.findOne();
 
-        // INIZIALIZZA IL CONTEXT DI PLAYWRIGHT (Mantiene i cookie per le schede successive)
-        const context = await browser.newContext();
+        // INIZIALIZZA IL CONTEXT
+        context = await browser.newContext();
 
         // 1. Facciamo il LOGIN una volta sola
         let loginPage = await context.newPage();
@@ -234,7 +236,6 @@ async function searchScheduleExpirationPortale() {
         await loginPage.click('input[name="action:Pin_executePinValidation"]');
         await loginPage.waitForLoadState('networkidle');
 
-        // Login completato. Chiudiamo la pagina, il CONTEXT ricorderà la sessione.
         await loginPage.close(); 
         
         // 2. Ciclo sugli utenti
@@ -245,7 +246,6 @@ async function searchScheduleExpirationPortale() {
             
             let page; 
             try {
-                // Nuova scheda vergine, ma già loggata (condivide i cookie del context)
                 page = await context.newPage(); 
                 
                 await page.goto('https://www.ilportaledellautomobilista.it/RichiestaPatenti/richiestaCertificatoMedico/ReadAcqCertificatoPrimaFase_initAcqCertificatoPrimaFase.action');
@@ -330,7 +330,7 @@ async function searchScheduleExpirationPortale() {
                 console.error(`Errore Playwright per utente ${u.cf}:`, innerError);
             } finally {
                 if (page && !page.isClosed()) {
-                    await page.close();
+                    await page.close().catch(()=>{});
                 }
             }
         } 
@@ -341,8 +341,12 @@ async function searchScheduleExpirationPortale() {
         console.error('Errore globale dell\'operazione Playwright:', error);
         throw error;
     } finally {
+        // Pulizia totale e sicura della RAM
+        if (context) {
+            await context.close().catch(()=>{});
+        }
         if (browser) {
-            await browser.close();
+            await browser.close().catch(()=>{});
             console.log('Browser chiuso correttamente.');
         }
     }
