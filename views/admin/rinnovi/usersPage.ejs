@@ -114,7 +114,6 @@
     <!-- Container Ricerca Dati Portale -->
     <div id="blurredBg"></div>
     <section id="searchDataContainer">
-        <!-- Mantengo il tuo codice form inalterato per brevità -->
         <form id="searchDataForm" action="/admin/rinnovi/ricerca/portaleAutomobilista" method="POST">
             <div class="field"><span id="closeSearchFormBtn" class="material-symbols-outlined">close</span></div>
             <div class="field"><h3>Cerca Dati</h3></div>
@@ -126,7 +125,6 @@
     </section>
     
     <script>
-        // Gestione Menu Ricerca (inalterato)
         const searchUsersBtn = document.getElementById('searchUsersBtn');
         const blurredBg = document.getElementById('blurredBg');
         const searchDataContainer = document.getElementById('searchDataContainer');
@@ -144,7 +142,7 @@
         blurredBg.addEventListener('click', closeSearchForm);
     </script>
 
-    <!-- Scarica Giornale Excel / PDF (inalterato) -->
+    <!-- Scarica Giornale Excel / PDF -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const downloadGiornaleExcelBtn = document.getElementById('downloadGiornaleExcel');
@@ -178,39 +176,37 @@
 
     <!-- Tabella e Infinite Scroll -->
     <table>
-        <form action="/rinnovi/deleteUsers" id="actionUsersForm" method="POST">
-            <thead>
-                <tr>
-                    <th colspan="5"><button id="downloadGiornaleExcel">Scarica Giornale Excel</button></th>
-                    <th colspan="5"><button id="downloadGiornalePdf">Scarica Giornale PDF</button></th>
-                </tr>
-                <tr>
-                    <th>
-                        <span id="selectUsers" class="material-symbols-outlined" style="cursor: pointer;">checklist</span>
-                        <button type="submit" class="elimina theadBtn action" name="action" title="elimina" value="elimina" style="display:none;">
-                            <span class="material-symbols-outlined">delete_forever</span>
-                        </button>
-                        <button type="submit" class="archivia theadBtn action" name="action" title="archivia" value="archive" style="display:none;">
-                            <span class="material-symbols-outlined">archive</span>
-                        </button>
-                    </th>
-                    <th>Cognome</th>
-                    <th>Nome</th>
-                    <th>Email</th>
-                    <th>Telefono</th>
-                    <th>Visita Medica</th>
-                    <th>Registrazione</th>
-                    <th>foto</th>
-                    <th>firma</th>
-                    <th>Fatture</th>
-                </tr>
-            </thead>
-            <!-- Questo corpo ora si riempie tramite JS -->
-            <tbody id="usersTableBody"></tbody>
-        </form>
+        <thead>
+            <tr>
+                <th colspan="5"><button type="button" id="downloadGiornaleExcel">Scarica Giornale Excel</button></th>
+                <th colspan="5"><button type="button" id="downloadGiornalePdf">Scarica Giornale PDF</button></th>
+            </tr>
+            <tr>
+                <th>
+                    <span id="selectUsers" class="material-symbols-outlined" style="cursor: pointer;">checklist</span>
+                    <!-- Bottoni cambiati in type="button" e aggiunto ID -->
+                    <button type="button" id="btnElimina" class="elimina theadBtn action" title="elimina" value="elimina" style="display:none;">
+                        <span class="material-symbols-outlined">delete_forever</span>
+                    </button>
+                    <button type="button" id="btnArchivia" class="archivia theadBtn action" title="archivia" value="archive" style="display:none;">
+                        <span class="material-symbols-outlined">archive</span>
+                    </button>
+                </th>
+                <th>Cognome</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Telefono</th>
+                <th>Visita Medica</th>
+                <th>Registrazione</th>
+                <th>foto</th>
+                <th>firma</th>
+                <th>Fatture</th>
+            </tr>
+        </thead>
+        <tbody id="usersTableBody"></tbody>
     </table>
     
-    <!-- Loader (opzionale per styling) -->
+    <!-- Loader -->
     <div id="loader" style="display:none; text-align:center; padding: 20px;">Caricamento...</div>
 
     <script>
@@ -229,9 +225,10 @@
             const filterVisitaToHour = document.getElementById('filterVisitaToHour');
             const filterProvenienza = document.getElementById('filterProvenienza');
             
-            // Checkboxes
-            const archiveBtn = document.querySelector('.archivia');
-            const archiveBtnSpan = document.querySelector('.archivia span');
+            // Bottoni azione (ora referenziati via ID)
+            const btnElimina = document.getElementById('btnElimina');
+            const btnArchivia = document.getElementById('btnArchivia');
+            const archiveBtnSpan = btnArchivia.querySelector('span');
             const selectUsersBtn = document.getElementById('selectUsers');
 
             // Stato Infinite Scroll
@@ -240,7 +237,7 @@
             let loading = false;
             let finished = false;
             let globalCounter = 0;
-            let isSelectionMode = false; // per mantenere lo stato dei bottoni checklist
+            let isSelectionMode = false;
 
             const buildQuery = () => {
                 const params = new URLSearchParams();
@@ -268,11 +265,9 @@
 
             const renderRows = (users) => {
                 users.forEach((user) => {
-                    try { // <--- Aggiunto try/catch: se un utente ha dati corrotti, non blocca gli altri
+                    try {
                         const tr = document.createElement('tr');
                         tr.className = `row ${user.archiviato ? 'archiviato' : ''}`;
-                        
-                        // FIX 1: Forziamo il display per sovrascrivere eventuali regole CSS che nascondono .archiviato
                         tr.style.display = 'table-row'; 
                         
                         const provBadge = user.provenienza === 'rinnovopatenti' 
@@ -280,17 +275,14 @@
                             : '';
                         
                         let dataVisitaStr = 'Mancante';
-                        
-                        // FIX 2: Controllo sicuro della validità delle date
                         if (user.visita?.data || user.visita?.ora) {
                             let d = '';
                             if (user.visita?.data) {
                                 const dateObj = new Date(user.visita.data);
-                                // Controlliamo se la data è un formato valido prima di formattarla
                                 if (!isNaN(dateObj.getTime())) {
                                     d = dateObj.toISOString().slice(0,10).split('-').reverse().join('/');
                                 } else {
-                                    d = user.visita.data; // Fallback: stampa la stringa grezza
+                                    d = user.visita.data;
                                 }
                             }
                             const o = user.visita?.ora || '';
@@ -392,25 +384,36 @@
                 // Aggiorna l'estetica del pulsante Archivia in base al filtro
                 const archived = document.querySelector('input[name="filterArchived"]:checked').value;
                 if(archived === 'archived'){
-                    archiveBtn.style.display = '';
-                    archiveBtn.title="disarchivia";
-                    archiveBtn.value = 'unarchive';
+                    btnArchivia.title = "disarchivia";
+                    btnArchivia.value = 'unarchive';
                     archiveBtnSpan.style.color = 'green';
                     archiveBtnSpan.innerText = 'unarchive';
                 } else if(archived === 'all'){
-                    archiveBtn.style.display = 'none';
+                    // Non nascondiamo forzatamente, ma disabilitiamo la logica o cambiamo stato se serve
+                    btnArchivia.value = 'archive';
+                    archiveBtnSpan.style.color = 'orange';
+                    archiveBtnSpan.innerText = 'archive';
                 } else {
-                    archiveBtn.style.display = '';
-                    archiveBtn.value = 'archive';
-                    archiveBtn.title="archivia";
+                    btnArchivia.title = "archivia";
+                    btnArchivia.value = 'archive';
                     archiveBtnSpan.style.color = 'orange';
                     archiveBtnSpan.innerText = 'archive';
                 }
 
+                // Riapplica la visibilità corretta a seconda del fatto che sia attiva o meno la selectionMode
+                document.querySelectorAll('.action').forEach(el => {
+                    // Nascondi archivia del tutto se è selezionato "Tutti", opzionale a seconda delle tue esigenze
+                    if (el.id === 'btnArchivia' && archived === 'all') {
+                        el.style.display = 'none'; 
+                    } else {
+                        el.style.display = isSelectionMode ? 'inline-flex' : 'none';
+                    }
+                });
+
                 loadData();
             };
 
-            // Event Listeners dei Filtri (con Debounce per il testo)
+            // Event Listeners dei Filtri
             const inputsText = [filterName, filterSurname, filterEmail, filterPhone];
             inputsText.forEach(input => {
                 input.addEventListener('input', () => {
@@ -430,19 +433,63 @@
             // Logica Modalità Selezione Utenti
             selectUsersBtn.addEventListener('click', () => {
                 isSelectionMode = !isSelectionMode;
+                const archived = document.querySelector('input[name="filterArchived"]:checked').value;
+                
                 document.querySelectorAll('.action').forEach(el => {
-                    el.style.display = isSelectionMode ? 'inline-flex' : 'none';
+                    if (el.id === 'btnArchivia' && archived === 'all') {
+                        el.style.display = 'none';
+                    } else {
+                        el.style.display = isSelectionMode ? 'inline-flex' : 'none';
+                    }
                 });
             });
 
-            document.getElementById('actionUsersForm').addEventListener('submit', event => {
-                if (!confirm("Sei sicuro di voler effettuare l'azione sugli utenti selezionati?")) {
-                    event.preventDefault();
-                }
-            });
+            // GESTIONE AZIONI: ELIMINA / ARCHIVIA CON FETCH API
+            const handleAction = async (actionType) => {
+                const selectedCheckboxes = document.querySelectorAll('.checkboxUser:checked');
+                const selectedUserIds = Array.from(selectedCheckboxes).map(cb => cb.value);
 
-            // EVENT DELEGATION: Sostituisce i forEach() precedenti per le fatture
-            // dato che le righe vengono caricate in modo asincrono.
+                if (selectedUserIds.length === 0) {
+                    alert("Seleziona almeno un allievo.");
+                    return;
+                }
+
+                const confirmMsg = actionType === 'elimina' 
+                    ? "Sei sicuro di voler eliminare definitivamente gli utenti selezionati?" 
+                    : "Sei sicuro di voler cambiare lo stato di archiviazione degli utenti selezionati?";
+                    
+                if (!confirm(confirmMsg)) return;
+
+                if (loader) loader.style.display = 'block';
+
+                try {
+                    const response = await fetch('/admin/rinnovi/deleteUsers', { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: actionType,
+                            userIds: selectedUserIds
+                        })
+                    });
+
+                    if (response.ok) {
+                        isSelectionMode = false;
+                        resetAndReload(); // Ricarica la tabella pulita
+                    } else {
+                        alert("Si è verificato un errore durante l'operazione.");
+                        if (loader) loader.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error("Errore di rete:", error);
+                    alert("Impossibile connettersi al server.");
+                    if (loader) loader.style.display = 'none';
+                }
+            };
+
+            btnElimina.addEventListener('click', () => handleAction('elimina'));
+            btnArchivia.addEventListener('click', () => handleAction(btnArchivia.value));
+
+            // GESTIONE DOWNLOAD FATTURE
             tbody.addEventListener('click', async (e) => {
                 const btnElettronica = e.target.closest('.downloadFattura');
                 const btnCortesia = e.target.closest('.downloadFatturaCortesia');
@@ -490,6 +537,7 @@
                 a.remove();
             }
 
+            // Inizializza
             loadData();
         });
     </script>

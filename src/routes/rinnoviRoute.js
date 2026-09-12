@@ -175,32 +175,37 @@ router.post('/rinnovi/addUser', authenticateJWT, async (req, res) => {
             return res.status(500).json({error: 'Errore durante il salvataggio dell\'utente'});
         });
 });
-router.post('/rinnovi/deleteUsers', authenticateJWT, async (req, res)=> {
-    const {action} = req.body;
-    const ids = (Object.keys(req.body)
-        .filter(key => key.startsWith('user')))
-        .map(key => req.body[key]);
+router.post('/admin/rinnovi/deleteUsers', authenticateJWT, async (req, res)=> {
+    const { action, userIds } = req.body;
+    
+    if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+        return res.status(400).json({ success: false, error: 'Nessun utente selezionato' });
+    }
+
     try {
-        if(action == 'archive'){
-            for (const id of ids) {
-                await rinnovi.findOneAndUpdate({"_id": id}, {"archiviato": true});
-                console.log(`utente rinnovi ${id} archiviato`);
-            }
-        }else if(action == 'unarchive'){
-            for (const id of ids) {
-                await rinnovi.findOneAndUpdate({"_id": id}, {"archiviato": false});
-                console.log(`utente rinnovi ${id} disarchiviato`);
-            }
-        }else{
-            for (const id of ids) {
-                await rinnovi.deleteOne({"_id": id});
-                console.log(`utente rinnovi ${id} eliminato definitivamente`);
-            }
+        if (action === 'archive') {
+            await rinnovi.updateMany(
+                { "_id": { $in: userIds } }, 
+                { "archiviato": true }
+            );
+            
+        } else if (action === 'unarchive') {
+            await rinnovi.updateMany(
+                { "_id": { $in: userIds } }, 
+                { "archiviato": false }
+            );
+            
+        } else {
+            await rinnovi.deleteMany(
+                { "_id": { $in: userIds } }
+            );
         }
-        return res.redirect('/admin/rinnovi');
+
+        return res.status(200).json({ success: true, message: 'Operazione completata' });
+
     } catch (error) {
-        console.error(`errore durante l'eliminazione degli utenti rinnovi: ${error}`);
-        return res.render('errorPage', {error: `errore durante l'eliminazione degli alievi`});
+        console.error(`Errore durante l'eliminazione degli utenti rinnovi: ${error}`);
+        return res.status(500).json({ success: false, error: 'Errore interno del server' });
     }
 });
 router.get('/admin/rinnovi/pagamenti', async (req, res) => {
