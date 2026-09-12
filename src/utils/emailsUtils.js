@@ -1,21 +1,30 @@
 const nodemailer = require('nodemailer');
-const tls = require('tls');
-const fs = require('fs');
-const path = require('path');
+
+const mainTransporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.GMAIL_SECRET
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+});
+
+const rinnoviTransporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.RINNOVI_EMAIL,
+        pass: process.env.RINNOVI_EMAIL_SECRET
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+});
+
 
 const sendEmail = async (email, subject, text, attachment = null) => {
     return new Promise((resolve, reject) => {
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.EMAIL,
-                pass: process.env.GMAIL_SECRET
-            },
-            tls: {
-                rejectUnauthorized: false
-            }
-        });
-        
         let mailOptions = {
             from: process.env.EMAIL,
             to: email,
@@ -26,16 +35,16 @@ const sendEmail = async (email, subject, text, attachment = null) => {
         if (attachment) {
             if (Array.isArray(attachment)) {
                 const attachments = [];
-
                 attachment.forEach(fileName => {
                     attachments.push({path: fileName});
                 });
                 mailOptions.attachments = attachments;
-            }else{
+            } else {
                 mailOptions.attachments = {path: attachment};
             }
         }
-        transporter.sendMail(mailOptions, async function(error, info) {
+        
+        mainTransporter.sendMail(mailOptions, async function(error, info) {
             if (error) {
                 reject(new Error('Errore nell\'invio dell\'email:'));
             } else {
@@ -44,6 +53,7 @@ const sendEmail = async (email, subject, text, attachment = null) => {
         });
     });
 }
+
 
 function fillTemplate(data, email){
     const { numero_patente, data_scadenza, nomeECognome, daysLeft} = data;
@@ -122,6 +132,7 @@ function fillTemplate(data, email){
         </body>
     </html>`;
 }
+
 const deleteSubscriptionTemplate = `
     <!DOCTYPE html>
     <html lang="it">
@@ -178,19 +189,10 @@ const deleteSubscriptionTemplate = `
             </div>
         </body>
     </html>`;
+
+
 const sendRinnoviEmail = async (email, subject, data = null) => {
     return new Promise((resolve, reject) => {
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.RINNOVI_EMAIL,
-                pass: process.env.RINNOVI_EMAIL_SECRET
-            },
-            tls: {
-                rejectUnauthorized: false
-            }
-        });
-        
         let mailOptions = {
             from: process.env.RINNOVI_EMAIL,
             to: email,
@@ -201,14 +203,13 @@ const sendRinnoviEmail = async (email, subject, data = null) => {
             }
         };
         
-        transporter.sendMail(mailOptions, async function(error, info) {
+        rinnoviTransporter.sendMail(mailOptions, async function(error, info) {
             if (error) {
                 reject(new Error('Errore nell\'invio dell\'email rinnovo patente:'));
             } else {
                 resolve(`email rinnovo patente inviata con successo a ${email}`);
             }
         });
-        
     });
 }
 
